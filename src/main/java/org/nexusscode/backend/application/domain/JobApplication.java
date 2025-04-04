@@ -1,0 +1,40 @@
+package org.nexusscode.backend.application.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.nexusscode.backend.user.domain.User;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class JobApplication {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private String companyName;
+    private String jobTitle;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    private LocalDate applicationDate;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private Career career;
+
+}
