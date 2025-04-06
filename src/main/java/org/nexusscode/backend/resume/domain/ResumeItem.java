@@ -23,7 +23,7 @@ public class ResumeItem {
     @Column(columnDefinition = "TEXT")
     private String answer;
 
-    private int order;
+    private int seq;
     private int wordLimit;
 
 }
