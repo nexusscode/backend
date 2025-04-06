@@ -25,5 +25,5 @@ public class InterviewQuestion {
     @Column(columnDefinition = "TEXT")
     private String intentText;
 
-    private int order;
+    private int seq;
 }
