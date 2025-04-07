@@ -9,11 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.transcribe.TranscribeClient;
 
 import java.time.Duration;
 
 @Configuration
-public class OpenAIConfig {
+public class AIConfig {
 
     @Value("${spring.ai.openai.api-key}")
     private String openAITTSApiKey;
@@ -62,4 +65,15 @@ public class OpenAIConfig {
                 .defaultHeader("Authorization", "Bearer " + openAIWhisperApiKey)
                 .build();
     }
+
+    @Bean
+    public TranscribeClient transcribeClient() {
+        return TranscribeClient.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+
+    }
+
+
 }

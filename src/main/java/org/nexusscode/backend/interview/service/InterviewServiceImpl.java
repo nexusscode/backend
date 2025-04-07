@@ -1,12 +1,16 @@
 package org.nexusscode.backend.interview.service;
 
 import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.interview.client.AwsSTTClient;
 import org.nexusscode.backend.interview.client.GPTClient;
+import org.nexusscode.backend.interview.client.OpenAiWhisperClient;
+import org.nexusscode.backend.interview.domain.InterviewAnswer;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.dto.InterviewQuestionDTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDTO;
 import org.nexusscode.backend.interview.dto.QuestionAndHintDTO;
+import org.nexusscode.backend.interview.repository.InterviewAnswerRepository;
 import org.nexusscode.backend.interview.repository.InterviewQuestionRepository;
 import org.nexusscode.backend.interview.repository.InterviewSessionRepository;
 import org.nexusscode.backend.resume.domain.Resume;
@@ -29,6 +33,8 @@ public class InterviewServiceImpl implements InterviewService{
     private final GPTClient gptClient;
     private final InterviewSessionRepository interviewSessionRepository;
     private final InterviewQuestionRepository interviewQuestionRepository;
+    private final AwsSTTClient awsSTTClient;
+    private final InterviewAnswerRepository interviewAnswerRepository;
 
     @Override
     public Long startInterview(String title, Long resumeId) {
@@ -83,8 +89,25 @@ public class InterviewServiceImpl implements InterviewService{
     }
 
     @Override
+    public Long submitAnswer(Long questionId, String audioUrl) { // 나중에 userId 추가?
+        InterviewQuestion question = interviewQuestionRepository.findById(questionId).orElseThrow();
+
+        String transContext = awsSTTClient.convertAudioText(audioUrl);
+
+        InterviewAnswer answer = InterviewAnswer.builder()
+                .question(question)
+                .audioUrl(audioUrl)
+                .transcript(transContext)
+                .build();
+
+        return interviewAnswerRepository.save(answer).getId();
+    }
+
+    @Override
     public List<InterviewSessionDTO> getList() {
         return List.of();
     }
+
+
 }
 
