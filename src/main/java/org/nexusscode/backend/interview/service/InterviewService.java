@@ -13,4 +13,6 @@ public interface InterviewService {
     List<InterviewSessionDTO> getList();
 
     QuestionAndHintDTO getQuestion(Long sessionId, Integer seq);
+
+    Long submitAnswer(Long questionId, String audioUrl);
 }
