@@ -1,1 +1,33 @@
-spring.application.name=backend
+spring:
+  application:
+    name: backend
+
+  ai:
+    openai:
+      api-key: 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
+      model: gpt-3.5-turbo
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+org:
+  nexusscode:
+    openAITTS:
+      tts-endpoint: https://api.openai.com/v1/audio/speech
+    openAIWhisper:
+      whisper-endpoint: https://api.openai.com/v1/audio/transcriptions
