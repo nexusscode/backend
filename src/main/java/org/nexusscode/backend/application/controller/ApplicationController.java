@@ -1,5 +1,7 @@
 package org.nexusscode.backend.application.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
@@ -18,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Application API", description = "공고 관련 API")
 @RestController
 @RequestMapping("/application")
 @RequiredArgsConstructor
 public class ApplicationController {
     private final ApplicationService applicationService;
 
+    @Operation(summary = "공고 생성")
     @PostMapping
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> createApplication(@RequestBody ApplicationRequestDto applicationRequestDto){
         ApplicationResponseDto responseDto = applicationService.createApplication(applicationRequestDto);
@@ -31,6 +35,7 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "공고 수정")
     @PutMapping("/{applicationId}")
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> updateApplication(@RequestBody ApplicationUpdateRequestDto updateRequestDto,@PathVariable(name = "applicationId")Long applicationId){
         ApplicationResponseDto responseDto = applicationService.updateApplication(updateRequestDto,applicationId);
@@ -38,6 +43,7 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "단건 공고 조회")
     @GetMapping("/{applicationId}")
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> getApplication(@PathVariable(name = "applicationId")Long applicationId){
         ApplicationResponseDto responseDto = applicationService.getApplication(applicationId);
@@ -45,6 +51,7 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "공고 삭제")
     @DeleteMapping("/{applicationId}")
     public ResponseEntity<CommonResponse> deleteApplication(@PathVariable(name = "applicationId")Long applicationId){
         applicationService.deleteApplication(applicationId);
@@ -52,6 +59,7 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "전체 공고 조회")
     @GetMapping
     public ResponseEntity<CommonResponse<List<ApplicationResponseDto>>> getAllApplication(){
         List<ApplicationResponseDto> responseDtoList = applicationService.getAllApplication();
