@@ -24,6 +24,7 @@ public class ResumeItem {
     private String answer;
 
     private int seq;
+    @Column(name = "word_limit")
     private int wordLimit;
 
 }
