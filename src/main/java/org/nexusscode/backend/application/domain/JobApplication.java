@@ -41,7 +41,7 @@ public class JobApplication extends Timestamped {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "application_date")
+    @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
     @Column(name = "experience_level")

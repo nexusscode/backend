@@ -1,0 +1,73 @@
+package org.nexusscode.backend.resume.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.global.common.CommonResponse;
+import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
+import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
+import org.nexusscode.backend.resume.dto.ResumeRequestDto;
+import org.nexusscode.backend.resume.dto.ResumeResponseDto;
+import org.nexusscode.backend.resume.service.ResumeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Tag(name = "Resume API", description = "자소서 관련 API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/application")
+public class ResumeController {
+
+    private final ResumeService resumeService;
+
+    @Operation(summary = "자소서 생성")
+    @PostMapping("/{applicationId}/resume")
+    public ResponseEntity<CommonResponse<ResumeResponseDto>> createResume(
+        @PathVariable(name = "applicationId") Long applicationId,
+        @RequestBody ResumeRequestDto resumeRequestDto) {
+        ResumeResponseDto responseDto = resumeService.createResume(applicationId,
+            resumeRequestDto);
+        CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 생성이 완료되었습니다.", 200,
+            responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "특정 공고에 대한 생성된 자소서 전체 조회")
+    @GetMapping("/{applicationId}/resume")
+    public ResponseEntity<CommonResponse<List<ResumeResponseDto>>> getAllResumes(
+        @PathVariable(name = "applicationId") Long applicationId) {
+        List<ResumeResponseDto> responseDtos = resumeService.getAllResumes(applicationId);
+        CommonResponse<List<ResumeResponseDto>> response = new CommonResponse<>(
+            "특정 공고에 대한 모든 자소서 목록 조회가 완료되었습니다.", 200, responseDtos);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "자소서 수정")
+    @PutMapping("/resume/{resumeId}")
+    public ResponseEntity<CommonResponse<ResumeResponseDto>> updateResume(
+        @PathVariable(name = "resumeId") Long resumeId,
+        @RequestBody ResumeRequestDto resumeRequestDto) {
+        ResumeResponseDto responseDto = resumeService.updateResume(resumeId, resumeRequestDto);
+        CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 수정이 완료되었습니다.", 200,
+            responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "자소서 삭제")
+    @DeleteMapping("/resume/{resumeId}")
+    public ResponseEntity<CommonResponse> deleteResume(
+        @PathVariable(name = "resumeId") Long resumeId) {
+        resumeService.deleteResume(resumeId);
+        CommonResponse response = new CommonResponse<>("자소서 삭제가 완료되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+}
