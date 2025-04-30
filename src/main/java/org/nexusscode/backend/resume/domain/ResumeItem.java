@@ -2,12 +2,11 @@ package org.nexusscode.backend.resume.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class ResumeItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +23,18 @@ public class ResumeItem {
     private String answer;
 
     private int seq;
-    @Column(name = "word_limit")
-    private int wordLimit;
 
+    @Builder
+    public ResumeItem(Resume resume, String question, String answer, int seq) {
+        this.resume = resume;
+        this.question = question;
+        this.answer = answer;
+        this.seq = seq;
+    }
+
+    public void updateResumeItem(ResumeItemRequestDto resumeItemRequestDto) {
+        this.question= resumeItemRequestDto.getQuestion();
+        this.answer= resumeItemRequestDto.getAnswer();
+        this.seq= resumeItemRequestDto.getSeq();
+    }
 }

@@ -1,6 +1,7 @@
 package org.nexusscode.backend.resume.domain;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
@@ -35,6 +36,14 @@ public class Resume extends Timestamped {
 
     public void updateResume(String title) {
         this.title=title;
+    }
+
+    public void addResumeItem(ResumeItem resumeItem) {
+        if (this.resumeItems == null) {
+            this.resumeItems = new ArrayList<>();
+        }
+
+        this.resumeItems.add(resumeItem);
     }
 }
 
