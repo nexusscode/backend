@@ -28,6 +28,9 @@ public class JobApplication extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "saramin_job_id")
+    private String saraminJobId;
+
     @Column(name = "company_name")
     private String companyName;
 
@@ -38,21 +41,8 @@ public class JobApplication extends Timestamped {
     private Status status;
 
     @Column(name = "application_date")
-    private LocalDate applicationDate;
+    private LocalDateTime expirationDate;
 
-    @Enumerated(EnumType.STRING)
-    private Career career;
+    private String experienceLevel;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "job_source")
-    private JobSource jobSource;
-
-    public void updateApplication(ApplicationUpdateRequestDto updateRequestDto,Career career,JobSource jobSource,Status status) {
-        this.companyName= updateRequestDto.getCompanyName();
-        this.jobTitle= updateRequestDto.getJobTitle();
-        this.status=status;
-        this.applicationDate=updateRequestDto.getApplicationDate();
-        this.career=career;
-        this.jobSource=jobSource;
-    }
 }

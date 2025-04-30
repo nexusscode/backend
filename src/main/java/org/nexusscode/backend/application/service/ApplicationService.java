@@ -1,7 +1,17 @@
 package org.nexusscode.backend.application.service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.net.URL;
 import org.nexusscode.backend.application.domain.Career;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.application.domain.JobSource;
@@ -12,43 +22,93 @@ import org.nexusscode.backend.application.dto.ApplicationUpdateRequestDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
+
     private final JobApplicationRepository applicationRepository;
 
+    @Value("${saramin.access-key}")
+    private String accessKey;
+
+    @Value("${saramin.endpoint}")
+    private String apiUrl;
+
     public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
-        Career career = checkCareer(applicationRequestDto.getCareer());
-        JobSource jobSource=checkSource(applicationRequestDto.getJobSource());
+        String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
+            .queryParam("access-key", accessKey)
+            .queryParam("id", applicationRequestDto.getSaraminJobId())
+            .toUriString();
 
-        JobApplication application = JobApplication.builder()
-            .companyName(applicationRequestDto.getCompanyName())
-            .jobTitle(applicationRequestDto.getJobTitle())
-            .status(Status.IN_PROGRESS)
-            .applicationDate(applicationRequestDto.getApplicationDate())
-            .career(career)
-            .jobSource(jobSource)
-            .build();
-        applicationRepository.save(application);
+        System.out.println("API URL: " + apiURL);
 
-        return new ApplicationResponseDto(application);
-    }
+        try {
+            HttpURLConnection con = (HttpURLConnection) new URL(apiURL).openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept", "application/json");
 
-    public ApplicationResponseDto updateApplication(
-        ApplicationUpdateRequestDto updateRequestDto, Long applicationId) {
-        JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
-            ()->new CustomException(ErrorCode.NOT_FOUND)
-        );
-        Career career = checkCareer(updateRequestDto.getCareer());
-        JobSource jobSource=checkSource(updateRequestDto.getJobSource());
-        Status status = checkStatus(updateRequestDto.getStatus());
-        // 추후 로그인 유저의 application 맞는지 확인 필요
-        application.updateApplication(updateRequestDto,career,jobSource,status);
-        applicationRepository.save(application);
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                con.getResponseCode() == 200 ? con.getInputStream() : con.getErrorStream()));
 
-        return new ApplicationResponseDto(application);
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+            br.close();
+
+            System.out.println("Response: " + response);
+
+            JSONObject jsonObject = new JSONObject(response.toString());
+            JSONArray jobs = jsonObject.getJSONObject("jobs").optJSONArray("job");
+
+            if (jobs == null || jobs.length() == 0) {
+                throw new RuntimeException("공고 정보를 찾을 수 없습니다.");
+            }
+
+            JSONObject job = jobs.getJSONObject(0);
+            String companyName = job
+                .optJSONObject("company")
+                .optJSONObject("detail")
+                .optString("name", "회사명 없음");
+
+            String title = job.getJSONObject("position")
+                .optString("title", "제목 없음");
+
+            String expirationTimestampStr = job.optString("expiration-timestamp", null);
+            LocalDateTime expirationDate = null;
+            if (expirationTimestampStr != null) {
+                try {
+                    long epoch = Long.parseLong(expirationTimestampStr);
+                    expirationDate = Instant.ofEpochSecond(epoch)
+                        .atZone(ZoneId.of("Asia/Seoul"))
+                        .toLocalDateTime();
+                } catch (NumberFormatException ignored) {}
+            }
+
+            String experienceLevel = job.getJSONObject("position")
+                .optJSONObject("experience-level")
+                .optString("name", "경력 정보 없음");
+
+            JobApplication application = JobApplication.builder()
+                .saraminJobId(applicationRequestDto.getSaraminJobId())
+                .companyName(companyName)
+                .jobTitle(title)
+                .status(Status.RESUME_IN_PROGRESS)
+                .expirationDate(expirationDate)
+                .experienceLevel(experienceLevel)
+                .build();
+
+            applicationRepository.save(application);
+            return new ApplicationResponseDto(application);
+
+        } catch (Exception e) {
+            throw new RuntimeException("사람인 API 호출 또는 공고 생성 실패", e);
+        }
     }
 
     public ApplicationResponseDto getApplication(Long applicationId) {
@@ -72,45 +132,5 @@ public class ApplicationService {
         // 추후 로그인 유저의 application 로만 리스트 조회
 
         return applicationList.stream().map(ApplicationResponseDto::new).toList();
-    }
-
-    public Career checkCareer(String requestCareer){
-        Career career;
-        if(requestCareer.equals("신입")){
-            career = Career.NEW;
-        } else if (requestCareer.equals("경력")) {
-            career = Career.EXPERIENCED;
-        } else {
-            throw new CustomException(ErrorCode.INVALID_VALUE);
-        }
-        return career;
-    }
-
-    public JobSource checkSource(String requestSource){
-        JobSource jobSource;
-        if(requestSource.equals("사람인")){
-            jobSource = JobSource.SARAMIN;
-        } else if (requestSource.equals("원티드")) {
-            jobSource = JobSource.WANTED;
-        } else {
-            throw new CustomException(ErrorCode.INVALID_VALUE);
-        }
-        return jobSource;
-    }
-
-    public Status checkStatus(String requestStatus){
-        Status status;
-        if(requestStatus.equals("진행")){
-            status = Status.IN_PROGRESS;
-        } else if (requestStatus.equals("제출")) {
-            status = Status.SUBMITTED;
-        }  else if (requestStatus.equals("통과")) {
-            status = Status.PASSED;
-        }  else if (requestStatus.equals("탈락")) {
-            status = Status.FAILED;
-        } else {
-            throw new CustomException(ErrorCode.INVALID_VALUE);
-        }
-        return status;
     }
 }
