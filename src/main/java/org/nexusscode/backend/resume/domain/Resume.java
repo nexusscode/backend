@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class Resume extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +26,7 @@ public class Resume extends Timestamped {
 
     private String title;
 
-    @OneToMany(mappedBy = "resume",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResumeItem> resumeItems;
 
     @Builder
@@ -35,7 +36,7 @@ public class Resume extends Timestamped {
     }
 
     public void updateResume(String title) {
-        this.title=title;
+        this.title = title;
     }
 
     public void addResumeItem(ResumeItem resumeItem) {

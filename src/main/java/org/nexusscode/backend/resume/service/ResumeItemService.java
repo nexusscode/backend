@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ResumeItemService {
+
     private final ResumeService resumeService;
     private final ResumeItemRepository resumeItemRepository;
 
-    public List<ResumeItemResponseDto> createResumeItems(Long resumeId, List<ResumeItemRequestDto> resumeItemRequestDtos) {
+    public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
+        List<ResumeItemRequestDto> resumeItemRequestDtos) {
         Resume resume = resumeService.findById(resumeId);
         List<ResumeItem> resumeItems = new ArrayList<>();
 
@@ -44,7 +46,8 @@ public class ResumeItemService {
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
 
-    public ResumeItemResponseDto updateResumeItem(Long resumeItemId,ResumeItemRequestDto resumeItemRequestDto) {
+    public ResumeItemResponseDto updateResumeItem(Long resumeItemId,
+        ResumeItemRequestDto resumeItemRequestDto) {
         ResumeItem resumeItem = findById(resumeItemId);
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItemRepository.save(resumeItem);
@@ -57,9 +60,9 @@ public class ResumeItemService {
         resumeItemRepository.delete(resumeItem);
     }
 
-    public ResumeItem findById(Long id){
+    public ResumeItem findById(Long id) {
         return resumeItemRepository.findById(id).orElseThrow(
-            ()->new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
+            () -> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
     }
 }

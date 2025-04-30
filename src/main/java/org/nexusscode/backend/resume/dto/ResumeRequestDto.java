@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class ResumeRequestDto {
+
     @NotBlank(message = "제목을 입력해주세요.")
     private String title;
 }

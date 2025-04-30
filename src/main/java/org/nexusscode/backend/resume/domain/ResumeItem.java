@@ -8,6 +8,7 @@ import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 @Getter
 @NoArgsConstructor
 public class ResumeItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +34,8 @@ public class ResumeItem {
     }
 
     public void updateResumeItem(ResumeItemRequestDto resumeItemRequestDto) {
-        this.question= resumeItemRequestDto.getQuestion();
-        this.answer= resumeItemRequestDto.getAnswer();
-        this.seq= resumeItemRequestDto.getSeq();
+        this.question = resumeItemRequestDto.getQuestion();
+        this.answer = resumeItemRequestDto.getAnswer();
+        this.seq = resumeItemRequestDto.getSeq();
     }
 }

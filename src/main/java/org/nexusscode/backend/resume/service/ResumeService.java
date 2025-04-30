@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ResumeService {
+
     private final ApplicationService applicationService;
     private final ResumeRepository resumeRepository;
 
@@ -37,7 +38,7 @@ public class ResumeService {
         return resumeList.stream().map(ResumeResponseDto::new).toList();
     }
 
-    public ResumeResponseDto updateResume(Long resumeId,ResumeRequestDto resumeRequestDto) {
+    public ResumeResponseDto updateResume(Long resumeId, ResumeRequestDto resumeRequestDto) {
         Resume resume = findById(resumeId);
         resume.updateResume(resumeRequestDto.getTitle());
         resumeRepository.save(resume);
@@ -50,9 +51,9 @@ public class ResumeService {
         resumeRepository.delete(resume);
     }
 
-    public Resume findById(Long id){
+    public Resume findById(Long id) {
         return resumeRepository.findById(id).orElseThrow(
-            ()->new CustomException(ErrorCode.NOT_FOUND_RESUME)
+            () -> new CustomException(ErrorCode.NOT_FOUND_RESUME)
         );
     }
 }

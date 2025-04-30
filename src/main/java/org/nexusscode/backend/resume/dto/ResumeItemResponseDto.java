@@ -5,6 +5,7 @@ import org.nexusscode.backend.resume.domain.ResumeItem;
 
 @Getter
 public class ResumeItemResponseDto {
+
     private Long id;
     private Long resumeId;
     private String question;
