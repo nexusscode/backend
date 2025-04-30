@@ -13,9 +13,6 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EntityListeners(AuditingEntityListener.class)
 public class Resume extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +26,15 @@ public class Resume extends Timestamped {
 
     @OneToMany(mappedBy = "resume",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResumeItem> resumeItems;
+
+    @Builder
+    public Resume(JobApplication application, String title) {
+        this.application = application;
+        this.title = title;
+    }
+
+    public void updateResume(String title) {
+        this.title=title;
+    }
 }
 

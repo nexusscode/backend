@@ -144,4 +144,9 @@ public class ApplicationService {
 
         return applicationList.stream().map(ApplicationResponseDto::new).toList();
     }
+    public JobApplication findById(Long id){
+        return applicationRepository.findById(id).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_APPLICATION)
+        );
+    }
 }

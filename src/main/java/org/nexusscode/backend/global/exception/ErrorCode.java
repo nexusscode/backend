@@ -13,7 +13,9 @@ public enum ErrorCode {
     NOT_FOUND(HttpStatus.NOT_FOUND, "NOT FOUND"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR"),
 
-    INVALID_VALUE(HttpStatus.BAD_REQUEST,"유효하지 않은 값 입니다.");
+    INVALID_VALUE(HttpStatus.BAD_REQUEST,"유효하지 않은 값 입니다."),
+    NOT_FOUND_APPLICATION(HttpStatus.NOT_FOUND, "등록된 공고를 찾을 수 없습니다."),
+    NOT_FOUND_RESUME(HttpStatus.NOT_FOUND, "등록된 자소서를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
