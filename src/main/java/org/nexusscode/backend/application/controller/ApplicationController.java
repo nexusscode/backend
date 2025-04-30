@@ -22,24 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Application API", description = "공고 관련 API")
 @RestController
-@RequestMapping("/application")
+@RequestMapping("/api/application")
 @RequiredArgsConstructor
 public class ApplicationController {
     private final ApplicationService applicationService;
 
-    @Operation(summary = "공고 생성")
     @PostMapping
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> createApplication(@RequestBody ApplicationRequestDto applicationRequestDto){
         ApplicationResponseDto responseDto = applicationService.createApplication(applicationRequestDto);
         CommonResponse response = new CommonResponse("공고 생성이 완료되었습니다.",200,responseDto);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
-    @Operation(summary = "공고 수정")
-    @PutMapping("/{applicationId}")
-    public ResponseEntity<CommonResponse<ApplicationResponseDto>> updateApplication(@RequestBody ApplicationUpdateRequestDto updateRequestDto,@PathVariable(name = "applicationId")Long applicationId){
-        ApplicationResponseDto responseDto = applicationService.updateApplication(updateRequestDto,applicationId);
-        CommonResponse response = new CommonResponse("공고 수정이 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
