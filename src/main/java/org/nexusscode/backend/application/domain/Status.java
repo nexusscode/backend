@@ -4,7 +4,7 @@ public enum Status {
     IN_PROGRESS("진행"),
     SUBMITTED("제출"),
     PASSED("통과"),
-    FAILED("탈락");
+    FAILED("실패");
 
     private final String status;
 
