@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class ResumeItemRequestDto {
+
     @NotBlank(message = "질문을 입력해주세요.")
     private String question;
     @NotNull(message = "답변을 입력해주세요.")

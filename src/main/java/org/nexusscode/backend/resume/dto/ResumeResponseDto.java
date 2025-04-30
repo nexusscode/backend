@@ -7,14 +7,15 @@ import org.nexusscode.backend.resume.domain.ResumeItem;
 
 @Getter
 public class ResumeResponseDto {
+
     private Long id;
     private Long applicationId;
     private String title;
     private List<ResumeItem> resumeItems;
 
     public ResumeResponseDto(Resume resume) {
-        this.id= resume.getId();
-        this.applicationId=resume.getApplication().getId();
-        this.title= resume.getTitle();
+        this.id = resume.getId();
+        this.applicationId = resume.getApplication().getId();
+        this.title = resume.getTitle();
     }
 }
