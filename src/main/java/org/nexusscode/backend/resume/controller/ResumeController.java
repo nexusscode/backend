@@ -29,35 +29,28 @@ public class ResumeController {
     public ResponseEntity<CommonResponse<ResumeResponseDto>> createResume(@PathVariable(name = "applicationId")Long applicationId, @RequestBody ResumeRequestDto resumeRequestDto){
         ResumeResponseDto responseDto = resumeService.createResume(applicationId,
             resumeRequestDto);
-        CommonResponse response = new CommonResponse("자소서 생성이 완료되었습니다.",200,responseDto);
+        CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 생성이 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{applicationId}")
-    public ResponseEntity<CommonResponse<ResumeResponseDto>> getAllResumes(@PathVariable(name = "applicationId")Long applicationId){
-        ResumeResponseDto responseDto = resumeService.getAllResumes(applicationId);
-        CommonResponse response = new CommonResponse("특정 공고에 대한 모든 자소서 목록 조회가 완료되었습니다.",200,responseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping("/{resumeId}")
-    public ResponseEntity<CommonResponse<List<ResumeItemResponseDto>>> getResume(@PathVariable(name = "resumeId")Long resumeId){
-        ResumeItemResponseDto responseDto = resumeService.getResume(resumeId);
-        CommonResponse response = new CommonResponse("단건 자소서 상세 조회가 완료되었습니다.",200,responseDto);
+    public ResponseEntity<CommonResponse<List<ResumeResponseDto>>> getAllResumes(@PathVariable(name = "applicationId")Long applicationId){
+        List<ResumeResponseDto> responseDtos = resumeService.getAllResumes(applicationId);
+        CommonResponse<List<ResumeResponseDto>> response = new CommonResponse<>("특정 공고에 대한 모든 자소서 목록 조회가 완료되었습니다.",200,responseDtos);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{resumeId}")
-    public ResponseEntity<CommonResponse> updateResume(@PathVariable(name = "resumeId")Long resumeId){
-        resumeService.updateResume(resumeId);
-        CommonResponse response = new CommonResponse("자소서 수정이 완료되었습니다.",200,"");
+    public ResponseEntity<CommonResponse<ResumeResponseDto>> updateResume(@PathVariable(name = "resumeId")Long resumeId,@RequestBody ResumeRequestDto resumeRequestDto){
+        ResumeResponseDto responseDto = resumeService.updateResume(resumeId,resumeRequestDto);
+        CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 수정이 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{resumeId}")
     public ResponseEntity<CommonResponse> deleteResume(@PathVariable(name = "resumeId")Long resumeId){
         resumeService.deleteResume(resumeId);
-        CommonResponse response = new CommonResponse("자소서 삭제가 완료되었습니다.",200,"");
+        CommonResponse response = new CommonResponse<>("자소서 삭제가 완료되었습니다.",200,"");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
