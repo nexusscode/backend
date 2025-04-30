@@ -14,6 +14,9 @@ public class ApplicationResponseDto {
     private String status;
     private LocalDateTime expirationDate;
     private String experienceLevel;
+    private String jobCode;
+    private String jobType;
+    private String requiredEducationLevel;
 
     public ApplicationResponseDto(JobApplication application) {
         this.id=application.getId();
@@ -23,5 +26,8 @@ public class ApplicationResponseDto {
         this.status=application.getStatus().getStatus();
         this.expirationDate=application.getExpirationDate();
         this.experienceLevel=application.getExperienceLevel();
+        this.jobCode= application.getJobCode();
+        this.jobType= application.getJobType();
+        this.requiredEducationLevel= application.getRequiredEducationLevel();
     }
 }

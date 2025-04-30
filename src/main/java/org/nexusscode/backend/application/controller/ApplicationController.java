@@ -27,10 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApplicationController {
     private final ApplicationService applicationService;
 
+    @Operation(summary = "공고 생성")
     @PostMapping
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> createApplication(@RequestBody ApplicationRequestDto applicationRequestDto){
         ApplicationResponseDto responseDto = applicationService.createApplication(applicationRequestDto);
-        CommonResponse response = new CommonResponse("공고 생성이 완료되었습니다.",200,responseDto);
+        CommonResponse<ApplicationResponseDto> response = new CommonResponse<>("공고 생성이 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -38,7 +39,7 @@ public class ApplicationController {
     @GetMapping("/{applicationId}")
     public ResponseEntity<CommonResponse<ApplicationResponseDto>> getApplication(@PathVariable(name = "applicationId")Long applicationId){
         ApplicationResponseDto responseDto = applicationService.getApplication(applicationId);
-        CommonResponse response = new CommonResponse("공고 단건 조회가 완료되었습니다.",200,responseDto);
+        CommonResponse<ApplicationResponseDto> response = new CommonResponse<>("공고 단건 조회가 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -46,7 +47,7 @@ public class ApplicationController {
     @DeleteMapping("/{applicationId}")
     public ResponseEntity<CommonResponse> deleteApplication(@PathVariable(name = "applicationId")Long applicationId){
         applicationService.deleteApplication(applicationId);
-        CommonResponse response = new CommonResponse("공고 삭제가 완료되었습니다.",200,"");
+        CommonResponse response = new CommonResponse<>("공고 삭제가 완료되었습니다.",200,"");
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -54,7 +55,7 @@ public class ApplicationController {
     @GetMapping
     public ResponseEntity<CommonResponse<List<ApplicationResponseDto>>> getAllApplication(){
         List<ApplicationResponseDto> responseDtoList = applicationService.getAllApplication();
-        CommonResponse response = new CommonResponse("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
+        CommonResponse<List<ApplicationResponseDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 

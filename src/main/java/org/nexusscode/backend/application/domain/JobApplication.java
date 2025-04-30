@@ -43,6 +43,15 @@ public class JobApplication extends Timestamped {
     @Column(name = "application_date")
     private LocalDateTime expirationDate;
 
+    @Column(name = "experience_level")
     private String experienceLevel;
 
+    @Column(name = "job_code")
+    private String jobCode;
+
+    @Column(name = "job_type")
+    private String jobType;
+
+    @Column(name = "required_education_level")
+    private String requiredEducationLevel;
 }
