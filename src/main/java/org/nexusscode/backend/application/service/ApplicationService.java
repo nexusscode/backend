@@ -3,22 +3,18 @@ package org.nexusscode.backend.application.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.net.URL;
-import org.nexusscode.backend.application.domain.Career;
 import org.nexusscode.backend.application.domain.JobApplication;
-import org.nexusscode.backend.application.domain.JobSource;
 import org.nexusscode.backend.application.domain.Status;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
-import org.nexusscode.backend.application.dto.ApplicationUpdateRequestDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
@@ -94,13 +90,28 @@ public class ApplicationService {
                 .optJSONObject("experience-level")
                 .optString("name", "경력 정보 없음");
 
+            String jobCode = job.getJSONObject("position")
+                .optJSONObject("job-code")
+                .optString("name", "공고 코드 정보 없음");
+
+            String jobType = job.getJSONObject("position")
+                .optJSONObject("job-type")
+                .optString("name", "직업 유형 정보 없음");
+
+            String educationLevel = job.getJSONObject("position")
+                .optJSONObject("required-education-level")
+                .optString("name", "학력 정보 없음");
+
             JobApplication application = JobApplication.builder()
                 .saraminJobId(applicationRequestDto.getSaraminJobId())
                 .companyName(companyName)
                 .jobTitle(title)
-                .status(Status.RESUME_IN_PROGRESS)
+                .status(Status.IN_PROGRESS)
                 .expirationDate(expirationDate)
                 .experienceLevel(experienceLevel)
+                .jobCode(jobCode)
+                .jobType(jobType)
+                .requiredEducationLevel(educationLevel)
                 .build();
 
             applicationRepository.save(application);
