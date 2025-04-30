@@ -1,6 +1,8 @@
 package org.nexusscode.backend.application.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.application.dto.SaraminResponseDto;
 import org.nexusscode.backend.application.service.SaraminService;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.springframework.http.HttpStatus;
@@ -17,9 +19,9 @@ public class SaraminController {
     private final SaraminService saraminService;
 
     @GetMapping
-    public ResponseEntity<CommonResponse> getSaraminContents(@RequestParam String keyword){
-        saraminService.getSaraminContents(keyword);
-        CommonResponse response = new CommonResponse("사암인 채용공고 조회가 완료되었습니다.",200,"");
+    public ResponseEntity<CommonResponse<List<SaraminResponseDto>>> getSaraminContents(@RequestParam String keyword){
+        List<SaraminResponseDto> responseDtos = saraminService.getSaraminContents(keyword);
+        CommonResponse<List<SaraminResponseDto>> response = new CommonResponse("특정 회사에 대한 사람인 채용공고 리스트 조회가 완료되었습니다.",200,responseDtos);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
