@@ -4,10 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.nexusscode.backend.application.dto.ApplicationResponseDto;
 import org.nexusscode.backend.application.dto.SaraminResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,14 +26,12 @@ public class SaraminService {
     @Value("${saramin.endpoint}")
     private String apiUrl;
 
-    public List<SaraminResponseDto> getSaraminContents(String keyword) {
+    public List<SaraminResponseDto> getJobsByKeyword(String keyword) {
         try {
-            System.out.println("keyword : " + keyword);
             String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .queryParam("access-key", accessKey)
                 .queryParam("keywords", keyword)
                 .toUriString();
-            System.out.println("apiUrl : " + apiURL);
 
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -90,10 +92,72 @@ public class SaraminService {
             if (companyName.toLowerCase().contains(keyword.toLowerCase())) {
                 String id = job.optString("id", null);
                 String title = job.getJSONObject("position").optString("title", "제목 없음");
-                filteredJobs.add(new SaraminResponseDto(id, companyName, title));
+                String expirationTimestampStr = job.optString("expiration-timestamp", null);
+
+                ZonedDateTime kstTime = null;
+                if (expirationTimestampStr != null) {
+                    try {
+                        long expirationEpoch = Long.parseLong(expirationTimestampStr);
+                        kstTime = Instant.ofEpochSecond(expirationEpoch).atZone(ZoneId.of("Asia/Seoul"));
+                    } catch (NumberFormatException e) {
+                        kstTime = null;
+                    }
+                }
+
+                String experienceLevel = job.getJSONObject("position")
+                    .getJSONObject("experience-level")
+                    .optString("name", "경력 정보 없음");
+
+                filteredJobs.add(
+                    new SaraminResponseDto(
+                        id,
+                        companyName,
+                        title,
+                        kstTime != null ? kstTime.toLocalDateTime() : null,
+                        experienceLevel
+                    )
+                );
             }
+
         }
 
         return filteredJobs;
     }
+
+    /*public ApplicationResponseDto getJobById(String id) {
+        try {
+            String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                .queryParam("access-key", accessKey)
+                .queryParam("id", id)
+                .toUriString();
+
+            URL url = new URL(apiURL);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept", "application/json");
+
+            int responseCode = con.getResponseCode();
+            BufferedReader br = (responseCode == 200) ?
+                new BufferedReader(new InputStreamReader(con.getInputStream())) :
+                new BufferedReader(new InputStreamReader(con.getErrorStream()));
+
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            br.close();
+
+            JSONObject jsonObject = new JSONObject(response.toString());
+            JSONObject job = jsonObject.getJSONObject("job");
+            JSONObject companyObject = job.optJSONObject("company");
+            JSONObject detailObject = companyObject.optJSONObject("detail");
+            String companyName = detailObject.optString("name", "");
+            String title = job.getJSONObject("position").optString("title", "제목 없음");
+
+
+        } catch (Exception e) {
+            throw new RuntimeException("사람인 API 호출 실패", e);
+        }
+    }*/
 }
