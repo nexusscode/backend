@@ -1,6 +1,5 @@
 package org.nexusscode.backend.application.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.nexusscode.backend.application.domain.JobApplication;
