@@ -7,9 +7,10 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
+import org.nexusscode.backend.resume.domain.ResumeFeedback;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
-import org.nexusscode.backend.resume.dto.ResumeResponseDto;
+import org.nexusscode.backend.resume.repository.ResumeFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ public class ResumeItemService {
 
     private final ResumeService resumeService;
     private final ResumeItemRepository resumeItemRepository;
+    private final ResumeFeedbackService resumeFeedbackService;
+    private final ResumeFeedbackRepository resumeFeedbackRepository;
 
     public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
         List<ResumeItemRequestDto> resumeItemRequestDtos) {
@@ -35,6 +38,12 @@ public class ResumeItemService {
             resumeItems.add(resumeItem);
             resume.addResumeItem(resumeItem);
             resumeItemRepository.save(resumeItem);
+            String feedbackText = resumeFeedbackService.getResumeFeedback(resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+            ResumeFeedback feedback = ResumeFeedback.builder()
+                .resumeItem(resumeItem)
+                .feedbackText(feedbackText)
+                .build();
+            resumeFeedbackRepository.save(feedback);
         }
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
