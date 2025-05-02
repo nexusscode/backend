@@ -3,7 +3,7 @@ package org.nexusscode.backend.survey.controller;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
-import org.nexusscode.backend.survey.dto.SureveyRequestDto;
+import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.service.SurveyResultService;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,11 @@ public class SurveyResultController {
     private final SurveyResultService surveyResultService;
 
     @PostMapping("/submit")
-    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SureveyRequestDto sureveyRequestDto){
-        surveyResultService.submitSurvey(sureveyRequestDto);
+    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SurveyRequestDto surveyRequestDto){
+        System.out.println("RequestDto is null? " + (surveyRequestDto == null));
+        System.out.println("Answers is null? " + (surveyRequestDto.getAnswers() == null));
+
+        surveyResultService.submitSurvey(surveyRequestDto);
         CommonResponse response = new CommonResponse<>("설문 제출이 완료되었습니다.",200,"");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
