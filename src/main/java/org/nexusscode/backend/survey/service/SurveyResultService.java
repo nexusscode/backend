@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.global.exception.CustomException;
+import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.dto.SureveyRequestDto;
+import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +79,17 @@ public class SurveyResultService {
                 return answer != null ? answer : 0;
             })
             .sum();
+    }
+
+    public SurveyResponseDto getSurveyResult(Long resultId) {
+        //SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        SurveyResult surveyResult = findbyId(resultId);
+        return new SurveyResponseDto(surveyResult);
+    }
+
+    public SurveyResult findbyId(Long id){
+        return surveyResultRepository.findById(id).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
     }
 }
