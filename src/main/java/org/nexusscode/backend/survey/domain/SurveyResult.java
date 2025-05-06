@@ -1,0 +1,77 @@
+package org.nexusscode.backend.survey.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.nexusscode.backend.global.Timestamped;
+import org.nexusscode.backend.user.domain.User;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@Table(name = "survey_results")
+public class SurveyResult extends Timestamped {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "dominance_score")
+    private int dominanceScore;
+
+    @Column(name = "influence_score")
+    private int influenceScore;
+
+    @Column(name = "steadiness_score")
+    private int steadinessScore;
+
+    @Column(name = "conscientiousness_score")
+    private int conscientiousnessScore;
+
+    @Column(name = "primary_type")
+    private String primaryType;
+
+    @Column(name = "secondary_type")
+    private String secondaryType;
+
+    @Column(name = "development_approach_scroe")
+    private int developmentApproachScore;
+
+    @Column(name = "team_collaboration_score")
+    private int teamCollaborationScore;
+
+    @Column(name = "problem_solving_score")
+    private int problemSolvingScore;
+
+    @Column(name = "development_values_score")
+    private int developmentValuesScore;
+
+    @Builder
+    public SurveyResult(int dominanceScore, int influenceScore, int steadinessScore,
+        int conscientiousnessScore, String primaryType, String secondaryType,
+        int developmentApproachScore, int teamCollaborationScore, int problemSolvingScore,
+        int developmentValuesScore) {
+        this.dominanceScore = dominanceScore;
+        this.influenceScore = influenceScore;
+        this.steadinessScore = steadinessScore;
+        this.conscientiousnessScore = conscientiousnessScore;
+        this.primaryType = primaryType;
+        this.secondaryType = secondaryType;
+        this.developmentApproachScore = developmentApproachScore;
+        this.teamCollaborationScore = teamCollaborationScore;
+        this.problemSolvingScore = problemSolvingScore;
+        this.developmentValuesScore = developmentValuesScore;
+    }
+}

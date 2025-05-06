@@ -1,0 +1,120 @@
+package org.nexusscode.backend.survey.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.global.exception.CustomException;
+import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.survey.domain.SurveyResult;
+import org.nexusscode.backend.survey.dto.SurveyRequestDto;
+import org.nexusscode.backend.survey.dto.SurveyResponseDto;
+import org.nexusscode.backend.survey.repository.SurveyResultRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class SurveyResultService {
+    private final SurveyResultRepository surveyResultRepository;
+
+    private static final List<Integer> D_TYPE_QUESTIONS = List.of(1, 2, 3, 4, 5);
+    private static final List<Integer> I_TYPE_QUESTIONS = List.of(6, 7, 8, 9, 10);
+    private static final List<Integer> S_TYPE_QUESTIONS = List.of(11, 12, 13, 14, 15);
+    private static final List<Integer> C_TYPE_QUESTIONS = List.of(16, 17, 18, 19, 20);
+
+    private static final List<Integer> DEV_APPROACH_QUESTIONS = List.of(21, 22, 23, 24, 25);
+    private static final List<Integer> TEAM_COLLAB_QUESTIONS = List.of(26, 27, 28, 29, 30);
+    private static final List<Integer> PROBLEM_SOLVING_QUESTIONS = List.of(31, 32, 33, 34, 35);
+    private static final List<Integer> DEV_VALUES_QUESTIONS = List.of(36, 37, 38, 39, 40);
+
+    public void submitSurvey(List<SurveyRequestDto> surveyRequestDtoList) {
+        // 각 유형별 점수 계산
+        int dScore = calculateScoreForQuestions(surveyRequestDtoList, D_TYPE_QUESTIONS);
+        int iScore = calculateScoreForQuestions(surveyRequestDtoList, I_TYPE_QUESTIONS);
+        int sScore = calculateScoreForQuestions(surveyRequestDtoList, S_TYPE_QUESTIONS);
+        int cScore = calculateScoreForQuestions(surveyRequestDtoList, C_TYPE_QUESTIONS);
+
+        // 개발자 영역별 점수 계산
+        int devApproachScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_APPROACH_QUESTIONS);
+        int teamCollabScore = calculateScoreForQuestions(surveyRequestDtoList, TEAM_COLLAB_QUESTIONS);
+        int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtoList, PROBLEM_SOLVING_QUESTIONS);
+        int devValuesScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_VALUES_QUESTIONS);
+
+        Map<String, Integer> typeScores = new HashMap<>();
+        typeScores.put("D", dScore);
+        typeScores.put("I", iScore);
+        typeScores.put("S", sScore);
+        typeScores.put("C", cScore);
+
+        // 점수를 내림차순으로 정렬
+        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .collect(Collectors.toList());
+
+        // 최대 점수와 두 번째 점수 확인
+        int maxScore = sortedTypes.get(0).getValue();
+        Optional<Integer> secondScoreOpt = sortedTypes.stream()
+            .map(Map.Entry::getValue)
+            .filter(score -> score < maxScore)
+            .findFirst();
+
+        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
+
+        // 동점 항목 찾아서 문자열로 결합
+        String primaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == maxScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
+        String secondaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == secondScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
+
+        SurveyResult surveyResult = SurveyResult.builder()
+            .dominanceScore(dScore)
+            .influenceScore(iScore)
+            .steadinessScore(sScore)
+            .conscientiousnessScore(cScore)
+            .primaryType(primaryType)
+            .secondaryType(secondaryType)
+            .developmentApproachScore(devApproachScore)
+            .teamCollaborationScore(teamCollabScore)
+            .problemSolvingScore(problemSolvingScore)
+            .developmentValuesScore(devValuesScore)
+            .build();
+
+        surveyResultRepository.save(surveyResult);
+    }
+
+    private int calculateScoreForQuestions(List<SurveyRequestDto> surveyRequestDtoList, List<Integer> questionIds) {
+        return questionIds.stream()
+            .mapToInt(id -> {
+                // 해당 ID와 일치하는 질문 찾기
+                for (SurveyRequestDto surveyRequestDto : surveyRequestDtoList) {
+                    if (surveyRequestDto.getQuestionNo() == id) {
+                        return surveyRequestDto.getScore();
+                    }
+                }
+                return 0;
+            })
+            .sum();
+    }
+
+    public SurveyResponseDto getSurveyResult(Long resultId) {
+        //SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        SurveyResult surveyResult = findbyId(resultId);
+        return new SurveyResponseDto(surveyResult);
+    }
+
+    public SurveyResult findbyId(Long id){
+        return surveyResultRepository.findById(id).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
+    }
+}
