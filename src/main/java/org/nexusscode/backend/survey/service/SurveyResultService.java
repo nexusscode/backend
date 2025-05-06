@@ -3,6 +3,7 @@ package org.nexusscode.backend.survey.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.exception.CustomException;
@@ -41,19 +42,39 @@ public class SurveyResultService {
         int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtoList, PROBLEM_SOLVING_QUESTIONS);
         int devValuesScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_VALUES_QUESTIONS);
 
-        // 주요 유형과 부수적 유형 결정
         Map<String, Integer> typeScores = new HashMap<>();
         typeScores.put("D", dScore);
         typeScores.put("I", iScore);
         typeScores.put("S", sScore);
         typeScores.put("C", cScore);
 
+        // 점수를 내림차순으로 정렬
         List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
             .collect(Collectors.toList());
 
-        String primaryType = sortedTypes.get(0).getKey();
-        String secondaryType = sortedTypes.get(1).getKey();
+        // 최대 점수와 두 번째 점수 확인
+        int maxScore = sortedTypes.get(0).getValue();
+        Optional<Integer> secondScoreOpt = sortedTypes.stream()
+            .map(Map.Entry::getValue)
+            .filter(score -> score < maxScore)
+            .findFirst();
+
+        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
+
+        // 동점 항목 찾아서 문자열로 결합
+        String primaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == maxScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
+        String secondaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == secondScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
 
         SurveyResult surveyResult = SurveyResult.builder()
             .dominanceScore(dScore)
