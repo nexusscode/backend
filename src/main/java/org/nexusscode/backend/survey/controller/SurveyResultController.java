@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
-import org.nexusscode.backend.survey.dto.SurveyRequestWrapper;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.service.SurveyResultService;
 import org.springframework.http.HttpStatus;
@@ -27,12 +26,8 @@ public class SurveyResultController {
 
     @Operation(summary = "설문 제출")
     @PostMapping("/submit")
-    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SurveyRequestWrapper wrapper){
-        if (wrapper == null || wrapper.getSurveys() == null) {
-            return new ResponseEntity<>(new CommonResponse<>("설문 응답이 비어있습니다.", 400, ""), HttpStatus.BAD_REQUEST);
-        }
-        List<SurveyRequestDto> surveyList = wrapper.getSurveys();
-        surveyResultService.submitSurvey(surveyList);
+    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody List<SurveyRequestDto> surveyRequestDtos){
+        surveyResultService.submitSurvey(surveyRequestDtos);
         CommonResponse response = new CommonResponse<>("설문 제출이 완료되었습니다.",200,"");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
