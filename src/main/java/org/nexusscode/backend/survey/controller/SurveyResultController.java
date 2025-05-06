@@ -1,5 +1,7 @@
 package org.nexusscode.backend.survey.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
@@ -16,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Survey API",description = "설문 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/survey")
 public class SurveyResultController {
     private final SurveyResultService surveyResultService;
 
+    @Operation(summary = "설문 제출")
     @PostMapping("/submit")
     public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SurveyRequestWrapper wrapper){
         if (wrapper == null || wrapper.getSurveys() == null) {
@@ -33,6 +37,7 @@ public class SurveyResultController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "설문 조회")
     @GetMapping("/result/{resultId}")
     public ResponseEntity<CommonResponse<SurveyResponseDto>> getSurveyResult(@PathVariable(name = "resultId")Long resultId){
         SurveyResponseDto responseDto = surveyResultService.getSurveyResult(resultId);
