@@ -28,18 +28,18 @@ public class SurveyResultService {
     private static final List<Integer> PROBLEM_SOLVING_QUESTIONS = List.of(31, 32, 33, 34, 35);
     private static final List<Integer> DEV_VALUES_QUESTIONS = List.of(36, 37, 38, 39, 40);
 
-    public void submitSurvey(SurveyRequestDto surveyRequestDto) {
+    public void submitSurvey(List<SurveyRequestDto> surveyRequestDtoList) {
         // 각 유형별 점수 계산
-        int dScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), D_TYPE_QUESTIONS);
-        int iScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), I_TYPE_QUESTIONS);
-        int sScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), S_TYPE_QUESTIONS);
-        int cScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), C_TYPE_QUESTIONS);
+        int dScore = calculateScoreForQuestions(surveyRequestDtoList, D_TYPE_QUESTIONS);
+        int iScore = calculateScoreForQuestions(surveyRequestDtoList, I_TYPE_QUESTIONS);
+        int sScore = calculateScoreForQuestions(surveyRequestDtoList, S_TYPE_QUESTIONS);
+        int cScore = calculateScoreForQuestions(surveyRequestDtoList, C_TYPE_QUESTIONS);
 
         // 개발자 영역별 점수 계산
-        int devApproachScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), DEV_APPROACH_QUESTIONS);
-        int teamCollabScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), TEAM_COLLAB_QUESTIONS);
-        int problemSolvingScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), PROBLEM_SOLVING_QUESTIONS);
-        int devValuesScore = calculateScoreForQuestions(surveyRequestDto.getAnswers(), DEV_VALUES_QUESTIONS);
+        int devApproachScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_APPROACH_QUESTIONS);
+        int teamCollabScore = calculateScoreForQuestions(surveyRequestDtoList, TEAM_COLLAB_QUESTIONS);
+        int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtoList, PROBLEM_SOLVING_QUESTIONS);
+        int devValuesScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_VALUES_QUESTIONS);
 
         // 주요 유형과 부수적 유형 결정
         Map<String, Integer> typeScores = new HashMap<>();
@@ -71,17 +71,17 @@ public class SurveyResultService {
         surveyResultRepository.save(surveyResult);
     }
 
-    private int calculateScoreForQuestions(Map<String, Integer> answers, List<Integer> questionIds) {
-        if (answers == null) {
-            System.out.println("answers == null");
-        }
-        ;
+    private int calculateScoreForQuestions(List<SurveyRequestDto> surveyRequestDtoList, List<Integer> questionIds) {
         return questionIds.stream()
             .mapToInt(id -> {
-                Integer answer = answers.get(String.valueOf(id));
-                System.out.println("answer : "+answer);
-                // "그렇다"(4), "대체로 그렇다"(3), "대체로 그렇지 않다"(2), "그렇지 않다"(1)로 매핑
-                return answer != null ? answer : 0;
+                // 해당 ID와 일치하는 질문 찾기
+                for (SurveyRequestDto surveyRequestDto : surveyRequestDtoList) {
+                    if (surveyRequestDto.getQuestionNo() == id) {
+                        System.out.println("surveyRequestDto.getScore() : "+surveyRequestDto.getScore());
+                        return surveyRequestDto.getScore();
+                    }
+                }
+                return 0;
             })
             .sum();
     }
