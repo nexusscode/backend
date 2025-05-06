@@ -77,7 +77,6 @@ public class SurveyResultService {
                 // 해당 ID와 일치하는 질문 찾기
                 for (SurveyRequestDto surveyRequestDto : surveyRequestDtoList) {
                     if (surveyRequestDto.getQuestionNo() == id) {
-                        System.out.println("surveyRequestDto.getScore() : "+surveyRequestDto.getScore());
                         return surveyRequestDto.getScore();
                     }
                 }
