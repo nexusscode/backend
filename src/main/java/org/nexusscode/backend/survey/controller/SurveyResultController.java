@@ -1,9 +1,12 @@
 package org.nexusscode.backend.survey.controller;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
+import org.nexusscode.backend.survey.dto.SurveyRequestWrapper;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.service.SurveyResultService;
 import org.springframework.http.HttpStatus;
@@ -21,11 +24,16 @@ public class SurveyResultController {
     private final SurveyResultService surveyResultService;
 
     @PostMapping("/submit")
-    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SurveyRequestDto surveyRequestDto){
-        System.out.println("RequestDto is null? " + (surveyRequestDto == null));
-        System.out.println("Answers is null? " + (surveyRequestDto.getAnswers() == null));
+    public ResponseEntity<CommonResponse> submitSurvey(@RequestBody SurveyRequestWrapper wrapper){
+        System.out.println("Received wrapper: " + wrapper);
+        System.out.println("Wrapper surveys field: " + wrapper.getSurveys());
 
-        surveyResultService.submitSurvey(surveyRequestDto);
+        if (wrapper == null || wrapper.getSurveys() == null) {
+            return new ResponseEntity<>(new CommonResponse<>("설문 응답이 비어있습니다.", 400, ""), HttpStatus.BAD_REQUEST);
+        }
+        List<SurveyRequestDto> surveyList = wrapper.getSurveys();
+        System.out.println("설문 응답 목록: " + surveyList);
+        surveyResultService.submitSurvey(surveyList);
         CommonResponse response = new CommonResponse<>("설문 제출이 완료되었습니다.",200,"");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
