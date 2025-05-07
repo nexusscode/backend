@@ -1,18 +1,24 @@
 package org.nexusscode.backend.interview.service;
 
-import org.nexusscode.backend.interview.dto.InterviewQuestionDTO;
-import org.nexusscode.backend.interview.dto.InterviewSessionDTO;
-import org.nexusscode.backend.interview.dto.QuestionAndHintDTO;
+import org.nexusscode.backend.interview.dto.*;
 
 import java.util.List;
 
 public interface InterviewService {
 
-    Long startInterview(String title, Long resumeId);
+    Long startInterview(InterviewStartRequest request);
 
-    List<InterviewSessionDTO> getList();
+    List<InterviewSessionDTO> getList(Long applicationId);
 
     QuestionAndHintDTO getQuestion(Long sessionId, Integer seq);
 
-    Long submitAnswer(Long questionId, String audioUrl);
+    Long submitAnswer(InterviewAnswerRequest request);
+
+    InterviewAllSessionDTO getFullSessionDetail(Long sessionId);
+
+    boolean saveSessionToArchive(Long sessionId);
+
+    boolean deleteSessionToArchive(Long sessionId);
+
+    String getPreSignUrl(String fileName);
 }
