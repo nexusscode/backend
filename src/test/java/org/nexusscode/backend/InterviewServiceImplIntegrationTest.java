@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "MYSQL_USER=interview_user",
         "MYSQL_PASSWORD=secure_password123",
         "AWS_PROFILE=s3-test",
-        "SARAMIN_ACCESS_KEY=K8z0sp90vxrx59BSBdQGdekM68IvFOCoigCbpKW0yEtNXvoQZd0sK"
+        "SARAMIN_ACCESS_KEY=3213255"
 })
 @Log4j2
 @Transactional

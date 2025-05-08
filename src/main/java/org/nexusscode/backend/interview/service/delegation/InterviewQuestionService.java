@@ -8,7 +8,6 @@ import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.domain.InterviewType;
 import org.nexusscode.backend.interview.repository.InterviewQuestionRepository;
 import org.nexusscode.backend.interview.repository.InterviewSessionRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,7 @@ public class InterviewQuestionService {
                 .session(session)
                 .questionText(questionText)
                 .intentText(intentText)
-                .ttsUrl(ttsUrl)
+                .TTSFileName(ttsUrl)
                 .interviewType(type)
                 .seq(seq)
                 .build();
@@ -39,7 +38,7 @@ public class InterviewQuestionService {
 
     @Transactional
     public void updateQuestion(InterviewQuestion question) {
-        interviewQuestionRepository.updateTTSUrlById(question.getId(), question.getTtsUrl());
+        interviewQuestionRepository.updateTTSUrlById(question.getId(), question.getTTSFileName());
     }
 
     public Optional<InterviewQuestion> findById(Long questionId) {

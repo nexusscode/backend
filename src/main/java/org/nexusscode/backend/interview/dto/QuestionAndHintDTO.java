@@ -14,4 +14,5 @@ public class QuestionAndHintDTO {
     private String intentText;
     private Integer seq;
     private InterviewType type;
+    private String ttsUrl;
 }
