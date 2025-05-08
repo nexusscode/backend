@@ -9,6 +9,8 @@ import org.nexusscode.backend.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -26,7 +28,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -155,15 +156,26 @@ public class AwsClient {
         throw new IllegalArgumentException("지원하지 않는 오디오 형식입니다: " + url);
     }
 
-    public String generatePresignedUrl(String fileName, Duration expiresIn) {
+    public String generateUserVoicePresignedUrl(String fileName, Duration expiresIn) {
+        return generatePresignedUrl(userVoiceUploadPath, fileName, expiresIn);
+    }
+
+    public String generateAIVoicePresignedUrl(String fileName, Duration expiresIn) {
+        return generatePresignedUrl(aiVoiceUploadPath, fileName, expiresIn);
+    }
+
+
+    private String generatePresignedUrl(String prefixPath, String fileName, Duration expiresIn) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(Region.AP_NORTHEAST_2)
                 .credentialsProvider(ProfileCredentialsProvider.create("s3-test"))
                 .build()) {
 
+            String key = prefixPath + "/" + fileName;
+
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(userVoiceUploadPath + "/" + fileName)
+                    .key(key)
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -174,32 +186,34 @@ public class AwsClient {
             return presigner.presignGetObject(presignRequest).url().toString();
 
         } catch (Exception e) {
-            log.error("Presigned URL 생성 실패 - fileName: {}", fileName, e);
+            log.error("Presigned URL 생성 실패 - path: {}/{}", prefixPath, fileName, e);
             throw new RuntimeException("Presigned URL 생성 실패");
         }
     }
 
 
+
     @Async
-    public String uploadTtsAudio(byte[] audioData, String fileName) {
-        String key = aiVoiceUploadPath + "/" + fileName;
+    public Mono<String> uploadTtsAudio(byte[] audioData, String fileName) {
+        return Mono.fromCallable(() -> {
+                    String key = aiVoiceUploadPath + "/" + fileName;
 
-        try {
-            PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .contentType("audio/mpeg")
-                    .build();
+                    PutObjectRequest putRequest = PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .contentType("audio/mpeg")
+                            .build();
 
-            s3Client.putObject(putRequest, RequestBody.fromBytes(audioData));
+                    s3Client.putObject(putRequest, RequestBody.fromBytes(audioData));
 
-            return String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
-
-        } catch (Exception e) {
-            log.error("S3 업로드 실패", e);
-            throw new CustomException(ErrorCode.S3_UPLOAD_FAILED);
-        }
+                    return String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
+                }).subscribeOn(Schedulers.boundedElastic())
+                .onErrorMap(e -> {
+                    log.error("S3 업로드 실패 - fileName: {}", fileName, e);
+                    return new CustomException(ErrorCode.S3_UPLOAD_FAILED);
+                });
     }
+
 
 
 }

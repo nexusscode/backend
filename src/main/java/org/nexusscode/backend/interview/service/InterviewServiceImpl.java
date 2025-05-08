@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
@@ -66,7 +67,7 @@ public class InterviewServiceImpl implements InterviewService {
 
         String fileUrl = awsService.uploadTtsAudio(voiceFile);
 
-        firstQuestion.saveTTSUrl(fileUrl);
+        firstQuestion.saveTTSFileName(fileUrl);
 
         InterviewSession session = interviewSessionService.createSession(request.getTitle(), questions, resume.getApplication(), request.getInterviewType());
 
@@ -79,21 +80,21 @@ public class InterviewServiceImpl implements InterviewService {
 
                 Flux.fromIterable(remainingQuestions)
                         .flatMap(question ->
-                                generatorService.generateQuestionVoiceAsync(question, request.getInterviewType())
-                                        .map(voiceFile -> {
-                                            String url = awsService.uploadTtsAudio(voiceFile);
+                                        generatorService.generateQuestionVoiceAsync(question, request.getInterviewType())
+                                                .flatMap(voice -> Mono.fromCallable(() -> {
+                                                    String url = awsService.uploadTtsAudio(voice);
 
-                                            question.saveTTSUrl(url);
+                                                    question.saveTTSFileName(url);
 
-                                            interviewQuestionService.updateQuestion(question);
+                                                    interviewQuestionService.updateQuestion(question);
 
-                                            return true;
-                                        })
-                                        .onErrorResume(e -> {
-                                            log.error("TTS 처리 실패: {}", question.getId(), e);
-                                            return Mono.empty();
-                                        })
-                        )
+                                                    return true;
+                                                }).subscribeOn(Schedulers.boundedElastic()))
+                                                .onErrorResume(e -> {
+                                                    log.error("TTS 처리 실패 - questionId: {}", question.getId(), e);
+                                                    return Mono.just(false);
+                                                })
+                                , 10)
                         .collectList()
                         .block();
             }
@@ -115,12 +116,14 @@ public class InterviewServiceImpl implements InterviewService {
             return result;
         });
 
+
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())
                 .questionText(question.getQuestionText())
                 .intentText(question.getIntentText())
                 .seq(question.getSeq())
                 .type(question.getInterviewType())
+                .ttsUrl(question.getTTSFileName())
                 .build();
     }
 
@@ -178,8 +181,13 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    public String getPreSignUrl(String fileName) {
-        return awsClient.generatePresignedUrl(fileName, Duration.ofSeconds(90));
+    public String getUserVoicePreSignUrl(String fileName) {
+        return awsClient.generateUserVoicePresignedUrl(fileName, Duration.ofSeconds(90));
+    }
+
+    @Override
+    public String getAIVoicePreSignUrl(String fileName) {
+        return awsClient.generateAIVoicePresignedUrl(fileName, Duration.ofSeconds(90));
     }
 }
 

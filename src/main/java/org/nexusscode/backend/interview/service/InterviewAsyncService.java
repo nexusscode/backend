@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
-import org.nexusscode.backend.interview.client.AwsClient;
 import org.nexusscode.backend.interview.domain.*;
 import org.nexusscode.backend.interview.dto.InterviewAdviceDTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDetailDto;
@@ -123,7 +122,7 @@ public class InterviewAsyncService {
                                             try {
                                                 String url = awsService.uploadTtsAudio(voiceFile);
 
-                                                question.saveTTSUrl(url);
+                                                question.saveTTSFileName(url);
 
                                                 return true;
                                             } catch (Exception e) {

@@ -10,7 +10,6 @@ import org.nexusscode.backend.interview.service.InterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -43,15 +42,22 @@ public class InterviewController {
     }
 
     @Operation(summary = "답변 저장")
-    @PostMapping("/interview_answer")
+    @PostMapping("/interview-answer")
     public ResponseEntity<CommonResponse<Long>> submitAnswer(@RequestBody InterviewAnswerRequest request) {
         return ResponseEntity.ok(new CommonResponse<>("답변 저장 완료", 200, interviewService.submitAnswer(request)));
     }
 
-    @Operation(summary = "s3 접근 권한 presign")
-    @GetMapping("/presign")
+    @Operation(summary = "사용자 목소리를 업로드 시키기 위한 s3 접근 권한 presign")
+    @GetMapping("/voice-presign")
     public ResponseEntity<CommonResponse<Map<String, String>>> getUploadPresignUrlPath(@RequestParam String fileName) {
-        Map<String, String> url = Map.of("url", interviewService.getPreSignUrl(fileName));
+        Map<String, String> url = Map.of("url", interviewService.getUserVoicePreSignUrl(fileName));
+        return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
+    }
+
+    @Operation(summary = "tts 파일 s3 접근 권한 presign")
+    @GetMapping("/tts-presign")
+    public ResponseEntity<CommonResponse<Map<String, String>>> getAccessPresignUrlPath(@RequestParam String fileName) {
+        Map<String, String> url = Map.of("url", interviewService.getAIVoicePreSignUrl(fileName));
         return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
     }
 

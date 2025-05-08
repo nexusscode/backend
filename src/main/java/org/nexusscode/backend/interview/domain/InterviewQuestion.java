@@ -1,7 +1,6 @@
 package org.nexusscode.backend.interview.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
@@ -30,7 +29,7 @@ public class InterviewQuestion extends Timestamped {
     @Column(columnDefinition = "TEXT")
     private String questionText;
 
-    private String ttsUrl;
+    private String TTSFileName;
 
     @Column(columnDefinition = "TEXT")
     private String intentText;
@@ -48,7 +47,7 @@ public class InterviewQuestion extends Timestamped {
         this.answer = answer;
     }
 
-    public void saveTTSUrl(String ttsUrl) {
-        this.ttsUrl = ttsUrl;
+    public void saveTTSFileName(String ttsUrl) {
+        this.TTSFileName = ttsUrl;
     }
 }
