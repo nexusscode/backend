@@ -7,6 +7,7 @@ import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "resume_items")
 public class ResumeItem {
 
     @Id

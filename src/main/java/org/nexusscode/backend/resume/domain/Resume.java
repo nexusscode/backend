@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "resumes")
 public class Resume extends Timestamped {
 
     @Id

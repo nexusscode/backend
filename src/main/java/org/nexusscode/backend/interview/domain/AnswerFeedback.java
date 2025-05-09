@@ -1,31 +1,41 @@
 package org.nexusscode.backend.interview.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import org.nexusscode.backend.global.Timestamped;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class AnswerFeedback {
+public class AnswerFeedback extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answer_id")
+    @JsonBackReference
     private InterviewAnswer answer;
 
     @Column(columnDefinition = "TEXT")
     private String feedbackText;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @Column(columnDefinition = "TEXT")
+    private String blindKeywords;
+
+    public static AnswerFeedback createAnswerFeedback(InterviewAnswer interviewAnswer, String feedbackText, String blindKeywords) {
+        AnswerFeedback result = AnswerFeedback.builder()
+                .answer(interviewAnswer)
+                .feedbackText(feedbackText)
+                .blindKeywords(blindKeywords)
+                .build();
+
+        return result;
+    }
+
 }
 
