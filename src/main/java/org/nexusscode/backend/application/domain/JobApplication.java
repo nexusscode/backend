@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import org.nexusscode.backend.user.domain.User;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "job_applications")
 public class JobApplication extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +43,7 @@ public class JobApplication extends Timestamped {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "application_date")
+    @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
     @Column(name = "experience_level")
