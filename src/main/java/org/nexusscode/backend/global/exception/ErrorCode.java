@@ -14,7 +14,6 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR"),
 
     INVALID_VALUE(HttpStatus.BAD_REQUEST,"유효하지 않은 값 입니다."),
-
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 거부되었습니다"),
@@ -35,9 +34,11 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 세션에 질문이 존재하지 않습니다"),
     TTS_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "TTS 변환에 실패했습니다."),
     S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "TTS S3 업로드에 실패했습니다."),
-    S3_PRESIGN_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3_PresignUrl 생성에 실패했습니다.")
-    ;
-
+    S3_PRESIGN_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3_PresignUrl 생성에 실패했습니다."),
+    NOT_FOUND_APPLICATION(HttpStatus.NOT_FOUND, "등록된 공고를 찾을 수 없습니다."),
+    NOT_FOUND_RESUME(HttpStatus.NOT_FOUND, "등록된 자소서를 찾을 수 없습니다."),
+    NOT_FOUND_RESUME_ITEM(HttpStatus.NOT_FOUND, "등록된 자소서 항목을 찾을 수 없습니다."),
+    NOT_FOUND_SURVEY_RESULT(HttpStatus.NOT_FOUND, "등록된 설문 결과를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
