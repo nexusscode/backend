@@ -19,6 +19,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
 
   data:
     redis:
@@ -35,3 +36,9 @@ org:
 saramin:
   access-key: ${SARAMIN_ACCESS_KEY}
   endpoint: https://oapi.saramin.co.kr/job-search
+
+aws:
+  s3:
+    bucket-name: demo-my-testbucket-277707098184
+    user-upload-path: uploads/audio
+    ai-upload-path: upload/aiAudio
