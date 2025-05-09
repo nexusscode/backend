@@ -8,6 +8,6 @@ import lombok.ToString;
 @Data
 @ToString
 public class InterviewQuestionDTO {
-    String question;
-    String intent;
+    private String question;
+    private String intent;
 }

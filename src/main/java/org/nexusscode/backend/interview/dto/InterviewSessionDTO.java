@@ -1,10 +1,13 @@
 package org.nexusscode.backend.interview.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class InterviewSessionDTO {
-    private String sessionId;
+    private Long sessionId;
+    private String title;
 }

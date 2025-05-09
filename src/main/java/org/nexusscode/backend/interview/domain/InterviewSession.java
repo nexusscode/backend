@@ -1,12 +1,13 @@
 package org.nexusscode.backend.interview.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.nexusscode.backend.global.Timestamped;
+import org.nexusscode.backend.interview.client.support.GptVoice;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,39 +16,69 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class InterviewSession {
+public class InterviewSession extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
+    @JsonBackReference
     private JobApplication application;
 
     private String title;
-    private LocalDateTime startedAt;
-    private LocalDateTime endedAt;
+
+    private int questionCount;
+
+    private boolean additionalQuestion;
 
     @Enumerated(EnumType.STRING)
-    private InterviewType interviewType;
+    private GptVoice voice;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    // 전체 저장에 저장되었는가 체크하는 컬럼
+    @Column(nullable = false)
+    private boolean isSaved;
 
     @OneToMany(mappedBy = "session", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
+    @JsonBackReference
     private List<InterviewQuestion> questions = new ArrayList<>();
 
-    public static InterviewSession createInterviewSession(JobApplication application, String title, List<InterviewQuestion> questions) {
+    public static InterviewSession createInterviewSession(
+            JobApplication application, String title, List<InterviewQuestion> questions, GptVoice interviewType
+    ) {
         InterviewSession build = InterviewSession.builder()
                 .application(application)
                 .title(title)
-                .startedAt(LocalDateTime.now())
+                .voice(interviewType)
                 .build();
 
         build.questions.addAll(questions);
 
+        build.questionCount = questions.size();
+
+        for (InterviewQuestion question : questions) {
+            question.saveSession(build);
+        }
+
         return build;
+    }
+
+    public void addQuestion(List<InterviewQuestion> questions) {
+        for (InterviewQuestion question : questions) {
+            this.questions.add(question);
+            question.saveSession(this);
+        }
+        this.questionCount = this.questions.size();
+        this.additionalQuestion = true;
+    }
+
+    public void saveSessionToArchive() {
+        this.isSaved = true;
+    }
+
+    public void deleteSessionToArchive() {
+        this.isSaved = false;
     }
 }

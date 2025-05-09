@@ -1,7 +1,9 @@
 package org.nexusscode.backend.interview.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.user.domain.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,23 +15,31 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class InterviewSummary {
+public class InterviewSummary extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")
+    @JsonBackReference
     private InterviewSession session;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    public static InterviewSummary createInterviewSummary(InterviewSession session, String summary) {
+        InterviewSummary interviewSummary = InterviewSummary.builder()
+                .session(session)
+                .summary(summary)
+                .build();
+
+        return interviewSummary;
+    }
 }
