@@ -62,9 +62,10 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @PostMapping("/detail")
-    public ResponseEntity<CommonResponse> uploadDetailImage(/*@PathVariable(name = "applicationId") Long applicationId,*/@RequestParam("file")MultipartFile file) {
-        String imageText = applicationService.uploadDetailImage(/*applicationId,*/file);
+    @Operation(summary = "상세 공고 이미지 ocr 업로드")
+    @PostMapping("/{applicationId}/detail")
+    public ResponseEntity<CommonResponse> uploadDetailImage(@PathVariable(name = "applicationId") Long applicationId,@RequestParam("file")MultipartFile file) {
+        String imageText = applicationService.uploadDetailImage(applicationId,file);
         CommonResponse response = new CommonResponse("상세 공고 이미지 업로드가 완료되었습니다.",200,imageText);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

@@ -154,8 +154,9 @@ public class ApplicationService {
         return applicationList.stream().map(ApplicationResponseDto::new).toList();
     }
 
-    public String uploadDetailImage(/*Long applicationId, */MultipartFile file) {
-        /*JobApplication application = findById(applicationId);*/
+    public String uploadDetailImage(Long applicationId, MultipartFile file) {
+        JobApplication application = findById(applicationId);
+        String imageText;
         try {
             BufferedImage image = ImageIO.read(file.getInputStream());
 
@@ -165,13 +166,15 @@ public class ApplicationService {
             tesseract.setLanguage("kor");
 
             // OCR 수행
-            String result = tesseract.doOCR(image);
-            return result;
+            imageText = tesseract.doOCR(image);
         } catch (Exception e){
             System.out.println("job ocr fail : "+e.getMessage());
             throw new CustomException(ErrorCode.JOB_OCR_FAILURE);
         }
+        application.updateJobDescription(imageText);
+        applicationRepository.save(application);
 
+        return imageText;
     }
 
     public JobApplication findById(Long id){
