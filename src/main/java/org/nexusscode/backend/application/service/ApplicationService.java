@@ -1,5 +1,6 @@
 package org.nexusscode.backend.application.service;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -8,7 +9,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
+import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nexusscode.backend.application.domain.JobApplication;
@@ -19,7 +24,11 @@ import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
@@ -144,6 +153,27 @@ public class ApplicationService {
 
         return applicationList.stream().map(ApplicationResponseDto::new).toList();
     }
+
+    public String uploadDetailImage(/*Long applicationId, */MultipartFile file) {
+        /*JobApplication application = findById(applicationId);*/
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            // Tesseract OCR 설정
+            ITesseract tesseract = new Tesseract();
+            tesseract.setDatapath("/opt/homebrew/share/tessdata");
+            tesseract.setLanguage("kor");
+
+            // OCR 수행
+            String result = tesseract.doOCR(image);
+            return result;
+        } catch (Exception e){
+            System.out.println("job ocr fail : "+e.getMessage());
+            throw new CustomException(ErrorCode.JOB_OCR_FAILURE);
+        }
+
+    }
+
     public JobApplication findById(Long id){
         return applicationRepository.findById(id).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_APPLICATION)
