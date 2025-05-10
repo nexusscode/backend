@@ -41,7 +41,9 @@ public class ResumeItemService {
 
     public List<ResumeItemResponseDto> getResume(Long resumeId) {
         Resume resume = resumeService.findById(resumeId);
-        List<ResumeItem> resumeItems = resumeItemRepository.findByResumeId(resume.getId());
+        List<ResumeItem> resumeItems = resumeItemRepository.findByResumeId(resume.getId()).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
+        );
 
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }

@@ -2,6 +2,8 @@ package org.nexusscode.backend.application.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
@@ -16,7 +18,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Application API", description = "공고 관련 API")
 @RestController
@@ -54,6 +59,13 @@ public class ApplicationController {
     public ResponseEntity<CommonResponse<List<ApplicationResponseDto>>> getAllApplication(){
         List<ApplicationResponseDto> responseDtoList = applicationService.getAllApplication();
         CommonResponse<List<ApplicationResponseDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @PostMapping("/detail")
+    public ResponseEntity<CommonResponse> uploadDetailImage(/*@PathVariable(name = "applicationId") Long applicationId,*/@RequestParam("file")MultipartFile file) {
+        String imageText = applicationService.uploadDetailImage(/*applicationId,*/file);
+        CommonResponse response = new CommonResponse("상세 공고 이미지 업로드가 완료되었습니다.",200,imageText);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
