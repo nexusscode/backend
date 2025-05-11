@@ -184,6 +184,12 @@ public class ApplicationService {
         return imageText;
     }
 
+    public List<ApplicationSimpleDto> searchApplication(String searchWord) {
+        List<JobApplication> jobApplicationList = applicationRepository.findByCompanyNameContainingIgnoreCaseOrJobTitleContainingIgnoreCase(searchWord,searchWord);
+
+        return jobApplicationList.stream().map(ApplicationSimpleDto::new).toList();
+    }
+
     public JobApplication findById(Long id){
         return applicationRepository.findById(id).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_APPLICATION)

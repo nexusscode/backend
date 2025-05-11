@@ -68,4 +68,12 @@ public class ApplicationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "공고 검색")
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponse<List<ApplicationSimpleDto>>> searchApplication(@RequestParam(name = "searchWord")String searchWord){
+        List<ApplicationSimpleDto> responseDtoList = applicationService.searchApplication(searchWord);
+        CommonResponse<List<ApplicationSimpleDto>> response = new CommonResponse<>("공고 검색이 완료되었습니다.",200,responseDtoList);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 }
