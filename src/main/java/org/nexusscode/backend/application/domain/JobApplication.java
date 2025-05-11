@@ -62,9 +62,10 @@ public class JobApplication extends Timestamped {
     private String jobDescription;
 
     @Builder
-    public JobApplication(String saraminJobId, String companyName, String jobTitle, Status status,
+    public JobApplication(User user, String saraminJobId, String companyName, String jobTitle, Status status,
         LocalDateTime expirationDate, String experienceLevel, String jobCode, String jobType,
         String requiredEducationLevel) {
+        this.user=user;
         this.saraminJobId = saraminJobId;
         this.companyName = companyName;
         this.jobTitle = jobTitle;

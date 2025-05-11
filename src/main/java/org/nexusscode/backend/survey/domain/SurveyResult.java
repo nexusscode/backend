@@ -59,10 +59,11 @@ public class SurveyResult extends Timestamped {
     private int developmentValuesScore;
 
     @Builder
-    public SurveyResult(int dominanceScore, int influenceScore, int steadinessScore,
+    public SurveyResult(User user,int dominanceScore, int influenceScore, int steadinessScore,
         int conscientiousnessScore, String primaryType, String secondaryType,
         int developmentApproachScore, int teamCollaborationScore, int problemSolvingScore,
         int developmentValuesScore) {
+        this.user=user;
         this.dominanceScore = dominanceScore;
         this.influenceScore = influenceScore;
         this.steadinessScore = steadinessScore;

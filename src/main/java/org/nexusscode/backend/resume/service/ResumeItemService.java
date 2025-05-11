@@ -1,9 +1,7 @@
 package org.nexusscode.backend.resume.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -11,11 +9,13 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
+import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
-import org.nexusscode.backend.resume.dto.ResumeResponseDto;
+import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -24,7 +24,10 @@ public class ResumeItemService {
 
     private final ResumeService resumeService;
     private final ResumeItemRepository resumeItemRepository;
+    private final ResumeItemFeedbackService resumeItemFeedbackService;
+    private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
 
+    @Transactional
     public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
         List<ResumeItemRequestDto> resumeItemRequestDtos) {
         Resume resume = resumeService.findById(resumeId);
@@ -39,6 +42,13 @@ public class ResumeItemService {
             resumeItems.add(resumeItem);
             resume.addResumeItem(resumeItem);
             resumeItemRepository.save(resumeItem);
+
+            String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+            ResumeItemFeedback feedback = ResumeItemFeedback.builder()
+                .resumeItem(resumeItem)
+                .feedbackText(feedbackText)
+                .build();
+            resumeItemFeedbackRepository.save(feedback);
         }
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
@@ -52,6 +62,7 @@ public class ResumeItemService {
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
 
+    @Transactional
     public ResumeItemResponseDto updateResumeItem(Long resumeItemId,
         ResumeItemRequestDto resumeItemRequestDto) {
         ResumeItem resumeItem = findById(resumeItemId);
@@ -61,11 +72,13 @@ public class ResumeItemService {
         return new ResumeItemResponseDto(resumeItem);
     }
 
+    @Transactional
     public void deleteResumeItem(Long resumeItemId) {
         ResumeItem resumeItem = findById(resumeItemId);
         resumeItemRepository.delete(resumeItem);
     }
 
+    @Transactional
     public List<ResumeItemResponseDto> uploadResumeFile(Long resumeId,MultipartFile file) {
         Resume resume = resumeService.findById(resumeId);
         try {
@@ -96,6 +109,13 @@ public class ResumeItemService {
                 resumeItems.add(resumeItem);
                 resume.addResumeItem(resumeItem);
                 resumeItemRepository.save(resumeItem);
+
+                String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),question,answer);
+                ResumeItemFeedback feedback = ResumeItemFeedback.builder()
+                    .resumeItem(resumeItem)
+                    .feedbackText(feedbackText)
+                    .build();
+                resumeItemFeedbackRepository.save(feedback);
             }
 
             return resumeItems.stream().map(ResumeItemResponseDto::new).toList();

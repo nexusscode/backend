@@ -13,6 +13,7 @@ import org.nexusscode.backend.resume.dto.ResumeRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class ResumeService {
     private final ApplicationService applicationService;
     private final ResumeRepository resumeRepository;
 
+    @Transactional
     public ResumeResponseDto createResume(Long applicationId, ResumeRequestDto resumeRequestDto) {
         JobApplication application = applicationService.findById(applicationId);
         Resume resume = Resume.builder()
@@ -38,6 +40,7 @@ public class ResumeService {
         return resumeList.stream().map(ResumeResponseDto::new).toList();
     }
 
+    @Transactional
     public ResumeResponseDto updateResume(Long resumeId, ResumeRequestDto resumeRequestDto) {
         Resume resume = findById(resumeId);
         resume.updateResume(resumeRequestDto.getTitle());
@@ -46,9 +49,31 @@ public class ResumeService {
         return new ResumeResponseDto(resume);
     }
 
+    @Transactional
     public void deleteResume(Long resumeId) {
         Resume resume = findById(resumeId);
         resumeRepository.delete(resume);
+    }
+
+    @Transactional
+    public void saveResumeInArchieve(Long resumeId) {
+        Resume resume = findById(resumeId);
+
+        if(resume.isSaved()){
+            throw new CustomException(ErrorCode.ALREADY_SAVED_RESUME);
+        }
+        resume.updateSaveStatus(true);
+        resumeRepository.save(resume);
+    }
+
+    @Transactional
+    public void cancelResumeFromArchieve(Long resumeId) {
+        Resume resume = findById(resumeId);
+        if(!resume.isSaved()){
+            throw new CustomException(ErrorCode.NOT_SAVED_RESUME);
+        }
+        resume.updateSaveStatus(false);
+        resumeRepository.save(resume);
     }
 
     public Resume findById(Long id) {

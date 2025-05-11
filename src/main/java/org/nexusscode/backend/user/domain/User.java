@@ -2,6 +2,7 @@ package org.nexusscode.backend.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.nexusscode.backend.global.Timestamped;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -12,10 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,10 +31,11 @@ public class User {
     @Column(nullable = false)
     private MemberRole role;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
+    @Builder
+    public User(String email, String password, String name, MemberRole role) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+    }
 }

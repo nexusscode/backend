@@ -40,7 +40,10 @@ public enum ErrorCode {
     NOT_FOUND_RESUME_ITEM(HttpStatus.NOT_FOUND, "등록된 자소서 항목을 찾을 수 없습니다."),
     NOT_FOUND_SURVEY_RESULT(HttpStatus.NOT_FOUND, "등록된 설문 결과를 찾을 수 없습니다."),
     JOB_OCR_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"공고 상세 이미지 분석에 실패하였습니다."),
-    UPLOAD_RESUME_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"자소서 파일 업로드에 실패하였습니다.");
+    UPLOAD_RESUME_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"자소서 파일 업로드에 실패하였습니다."),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다."),
+    ALREADY_SAVED_RESUME(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 자소서입니다."),
+    NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다.");
 
     private final HttpStatus status;
     private final String message;
