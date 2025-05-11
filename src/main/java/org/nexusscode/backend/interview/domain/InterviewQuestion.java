@@ -1,6 +1,8 @@
 package org.nexusscode.backend.interview.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
@@ -19,11 +21,11 @@ public class InterviewQuestion extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")
-    @JsonBackReference
+    @JsonBackReference("session-question")
     private InterviewSession session;
 
     @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonManagedReference("question-answer")
     private InterviewAnswer answer;
 
     @Column(columnDefinition = "TEXT")

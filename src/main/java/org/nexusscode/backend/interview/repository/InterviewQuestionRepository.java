@@ -22,6 +22,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     @Query("UPDATE InterviewQuestion q SET q.TTSFileName = :ttsUrl WHERE q.id = :id")
     void updateTTSUrlById(@Param("id") Long id, @Param("ttsUrl") String ttsUrl);
 
+
     @EntityGraph(attributePaths = {"answer", "session"})
     Optional<InterviewQuestion> findById(Long questionId);
 }
