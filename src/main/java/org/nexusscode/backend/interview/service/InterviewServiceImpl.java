@@ -109,13 +109,13 @@ public class InterviewServiceImpl implements InterviewService {
             InterviewQuestion result = interviewQuestionService.findQuestionAndHint(sessionId, seq)
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-            InterviewSession session = interviewSessionService.findById(sessionId).orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
+            InterviewSession session = interviewSessionService.findById(sessionId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
 
             interviewCacheService.cacheQuestionsAsync(session);
 
             return result;
         });
-
 
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())

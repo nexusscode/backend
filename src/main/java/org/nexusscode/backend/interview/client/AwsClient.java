@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
@@ -194,25 +195,26 @@ public class AwsClient {
 
 
     @Async
-    public Mono<String> uploadTtsAudio(byte[] audioData, String fileName) {
-        return Mono.fromCallable(() -> {
-                    String key = aiVoiceUploadPath + "/" + fileName;
+    public CompletableFuture<String> uploadTtsAudio(byte[] audioData, String fileName) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String key = aiVoiceUploadPath + "/" + fileName;
 
-                    PutObjectRequest putRequest = PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(key)
-                            .contentType("audio/mpeg")
-                            .build();
+                PutObjectRequest putRequest = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .contentType("audio/mpeg")
+                        .build();
 
-                    s3Client.putObject(putRequest, RequestBody.fromBytes(audioData));
+                s3Client.putObject(putRequest, RequestBody.fromBytes(audioData));
 
-                    return String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
-                }).subscribeOn(Schedulers.boundedElastic())
-                .onErrorMap(e -> {
-                    log.error("S3 업로드 실패 - fileName: {}", fileName, e);
-                    return new CustomException(ErrorCode.S3_UPLOAD_FAILED);
-                });
+                return String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
+            } catch (Exception e) {
+                throw new CustomException(ErrorCode.S3_UPLOAD_FAILED);
+            }
+        });
     }
+
 
 
 

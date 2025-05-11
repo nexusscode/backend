@@ -1,5 +1,6 @@
 package org.nexusscode.backend.global.config;
 
+import org.nexusscode.backend.global.aop.async.MdcTaskExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -22,6 +23,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(120);
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();
-        return executor;
+
+        return new MdcTaskExecutor(executor);
     }
 }
