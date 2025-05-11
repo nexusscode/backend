@@ -27,6 +27,9 @@ import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -154,11 +157,12 @@ public class ApplicationService {
         applicationRepository.delete(application);
     }
 
-    public List<ApplicationSimpleDto> getAllApplication() {
-        List<JobApplication> applicationList = applicationRepository.findAll();
+    public Page<ApplicationSimpleDto> getAllApplication(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<JobApplication> applicationPage = applicationRepository.findAll(pageable);
         // 추후 로그인 유저의 application 로만 리스트 조회
 
-        return applicationList.stream().map(ApplicationSimpleDto::new).toList();
+        return applicationPage.map(ApplicationSimpleDto::new);
     }
 
     public String uploadDetailImage(Long applicationId, MultipartFile file) {
@@ -184,10 +188,11 @@ public class ApplicationService {
         return imageText;
     }
 
-    public List<ApplicationSimpleDto> searchApplication(String searchWord) {
-        List<JobApplication> jobApplicationList = applicationRepository.findByCompanyNameContainingIgnoreCaseOrJobTitleContainingIgnoreCase(searchWord,searchWord);
+    public Page<ApplicationSimpleDto> searchApplication(int page, int size,String searchWord) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<JobApplication> jobApplicationPage = applicationRepository.findByCompanyNameContainingIgnoreCaseOrJobTitleContainingIgnoreCase(searchWord,searchWord,pageable);
 
-        return jobApplicationList.stream().map(ApplicationSimpleDto::new).toList();
+        return jobApplicationPage.map(ApplicationSimpleDto::new);
     }
 
     public JobApplication findById(Long id){
