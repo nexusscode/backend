@@ -17,9 +17,9 @@ spring:
       ddl-auto: update
     show-sql: true
     properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
+      hibernate.default_batch_fetch_size: 100
+      hibernate.format_sql: true
+
 
   data:
     redis:
@@ -42,4 +42,6 @@ aws:
     bucket-name: demo-my-testbucket-277707098184
     user-upload-path: uploads/audio
     ai-upload-path: upload/aiAudio
+
+
 
