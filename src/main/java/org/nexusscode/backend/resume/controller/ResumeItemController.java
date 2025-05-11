@@ -2,7 +2,12 @@ package org.nexusscode.backend.resume.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
@@ -18,7 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Resume Item API", description = "자소서 항목 관련 API")
 @RestController
@@ -69,5 +76,14 @@ public class ResumeItemController {
         resumeItemService.deleteResumeItem(resumeItemId);
         CommonResponse response = new CommonResponse<>("자소서 항목 삭제가 완료되었습니다.", 200, "");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/{resumeId}/upload/file")
+    public ResponseEntity<CommonResponse<List<ResumeItemResponseDto>>> uploadResumeFile(@PathVariable(name = "resumeId")Long resumeId,@RequestParam(name = "file")
+        MultipartFile file){
+        List<ResumeItemResponseDto> responseDtos = resumeItemService.uploadResumeFile(resumeId,file);
+        CommonResponse<List<ResumeItemResponseDto>> response = new CommonResponse<>("자소서 파일 업로드가 완료되었습니다.",200,responseDtos);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+
     }
 }
