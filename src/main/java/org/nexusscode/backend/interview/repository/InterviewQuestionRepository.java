@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface InterviewQuestionRepository extends JpaRepository<InterviewQuestion, Long> {
 
+    @EntityGraph(attributePaths = "answer")
     @Query("SELECT q FROM InterviewQuestion q WHERE q.session.id = :sessionId AND q.seq = :seq")
     Optional<InterviewQuestion> findBySessionIdAndSeq(@Param("sessionId") Long sessionId, @Param("seq") int seq);
 
@@ -21,6 +22,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     @Modifying(clearAutomatically = true)
     @Query("UPDATE InterviewQuestion q SET q.TTSFileName = :ttsUrl WHERE q.id = :id")
     void updateTTSUrlById(@Param("id") Long id, @Param("ttsUrl") String ttsUrl);
+
 
     @EntityGraph(attributePaths = {"answer", "session"})
     Optional<InterviewQuestion> findById(Long questionId);

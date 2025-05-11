@@ -23,12 +23,10 @@ public class InterviewSummary extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")
-    @JsonBackReference
     private InterviewSession session;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
     private User user;
 
     @Column(columnDefinition = "TEXT")
