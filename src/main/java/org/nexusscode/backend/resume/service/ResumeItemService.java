@@ -1,9 +1,7 @@
 package org.nexusscode.backend.resume.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -11,10 +9,10 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
-import org.nexusscode.backend.resume.domain.ResumeFeedback;
+import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
-import org.nexusscode.backend.resume.repository.ResumeFeedbackRepository;
+import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +24,8 @@ public class ResumeItemService {
 
     private final ResumeService resumeService;
     private final ResumeItemRepository resumeItemRepository;
-    private final ResumeFeedbackService resumeFeedbackService;
-    private final ResumeFeedbackRepository resumeFeedbackRepository;
+    private final ResumeItemFeedbackService resumeItemFeedbackService;
+    private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
 
     @Transactional
     public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
@@ -45,12 +43,12 @@ public class ResumeItemService {
             resume.addResumeItem(resumeItem);
             resumeItemRepository.save(resumeItem);
 
-            String feedbackText = resumeFeedbackService.createResumeFeedback(resume.getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
-            ResumeFeedback feedback = ResumeFeedback.builder()
+            String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+            ResumeItemFeedback feedback = ResumeItemFeedback.builder()
                 .resumeItem(resumeItem)
                 .feedbackText(feedbackText)
                 .build();
-            resumeFeedbackRepository.save(feedback);
+            resumeItemFeedbackRepository.save(feedback);
         }
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
@@ -112,12 +110,12 @@ public class ResumeItemService {
                 resume.addResumeItem(resumeItem);
                 resumeItemRepository.save(resumeItem);
 
-                String feedbackText = resumeFeedbackService.createResumeFeedback(resume.getApplication(),question,answer);
-                ResumeFeedback feedback = ResumeFeedback.builder()
+                String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),question,answer);
+                ResumeItemFeedback feedback = ResumeItemFeedback.builder()
                     .resumeItem(resumeItem)
                     .feedbackText(feedbackText)
                     .build();
-                resumeFeedbackRepository.save(feedback);
+                resumeItemFeedbackRepository.save(feedback);
             }
 
             return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
