@@ -72,6 +72,6 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
     """)
     Optional<List<InterviewSessionDTO>> findSessionListByApplicationId(@Param("applicationId") Long applicationId);
 
-    @EntityGraph(attributePaths = {"questions"})
+    @EntityGraph(attributePaths = {"questions", "questions.answer"})
     Optional<InterviewSession> findById(Long sessionId);
 }

@@ -117,7 +117,6 @@ public class InterviewServiceImpl implements InterviewService {
             return result;
         });
 
-
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())
                 .questionText(question.getQuestionText())
@@ -154,19 +153,18 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    //@Cacheable(value = "interviewFullDetailCache", key = "#sessionId")
+    @Cacheable(value = "interviewFullDetailCache", key = "#sessionId")
     public InterviewAllSessionDTO getFullSessionDetail(Long sessionId) {
         InterviewSession session = interviewSessionService.findById(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-//        List<InterviewQnADTO> questions = interviewSessionService.findInterviewQnA(sessionId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
-//
-//        String summary = interviewSummaryService.findBySessionId(sessionId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
-//
-//        return InterviewAllSessionDTO.createAllSessionDTO(session, questions, summary);
-        return null;
+        List<InterviewQnADTO> questions = interviewSessionService.findInterviewQnA(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
+
+        String summary = interviewSummaryService.findBySessionId(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
+
+        return InterviewAllSessionDTO.createAllSessionDTO(session, questions, summary);
     }
 
 

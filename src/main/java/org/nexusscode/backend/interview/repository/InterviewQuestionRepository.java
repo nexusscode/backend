@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface InterviewQuestionRepository extends JpaRepository<InterviewQuestion, Long> {
 
+    @EntityGraph(attributePaths = "answer")
     @Query("SELECT q FROM InterviewQuestion q WHERE q.session.id = :sessionId AND q.seq = :seq")
     Optional<InterviewQuestion> findBySessionIdAndSeq(@Param("sessionId") Long sessionId, @Param("seq") int seq);
 
