@@ -15,6 +15,7 @@ import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class SurveyResultService {
     private static final List<Integer> PROBLEM_SOLVING_QUESTIONS = List.of(31, 32, 33, 34, 35);
     private static final List<Integer> DEV_VALUES_QUESTIONS = List.of(36, 37, 38, 39, 40);
 
+    @Transactional
     public void submitSurvey(Long userId, List<SurveyRequestDto> surveyRequestDtoList) {
         User user = userService.findById(userId);
         // 각 유형별 점수 계산

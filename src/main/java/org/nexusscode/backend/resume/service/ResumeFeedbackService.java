@@ -19,6 +19,7 @@ import org.nexusscode.backend.user.domain.User;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +108,7 @@ public class ResumeFeedbackService {
         }
     }
 
+    @Transactional
     public void updateResumeFeedback(Long resumeItemId, ResumeItemRequestDto resumeItemRequestDto) {
         ResumeItem resumeItem = resumeItemRepository.findById(resumeItemId).orElseThrow(
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
