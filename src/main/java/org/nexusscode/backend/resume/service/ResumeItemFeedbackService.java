@@ -6,16 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
-import org.nexusscode.backend.resume.domain.Resume;
-import org.nexusscode.backend.resume.domain.ResumeFeedback;
+import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 import org.nexusscode.backend.resume.domain.ResumeItem;
-import org.nexusscode.backend.resume.dto.ResumeFeedbackResponseDto;
+import org.nexusscode.backend.resume.dto.ResumeItemFeedbackResponseDto;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
-import org.nexusscode.backend.resume.repository.ResumeFeedbackRepository;
+import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.service.SurveyResultService;
-import org.nexusscode.backend.user.domain.User;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
@@ -23,12 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ResumeFeedbackService {
+public class ResumeItemFeedbackService {
 
     private final SurveyResultService surveyResultService;
     private final ChatClient chatClient;
     private final ResumeItemRepository resumeItemRepository;
-    private final ResumeFeedbackRepository resumeFeedbackRepository;
+    private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
 
     private static final PromptTemplate FEEDBACK_PROMPT_TEMPLATE = new PromptTemplate("""
         [자기소개서 문항 피드백 요청]
@@ -118,12 +116,12 @@ public class ResumeFeedbackService {
         createResumeFeedback(resumeItem.getResume().getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
     }
 
-    public ResumeFeedbackResponseDto getResumeItemLatestFeedback(Long resumeItemId) {
+    public ResumeItemFeedbackResponseDto getResumeItemLatestFeedback(Long resumeItemId) {
         ResumeItem resumeItem = resumeItemRepository.findById(resumeItemId).orElseThrow(
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
-        ResumeFeedback resumeFeedback = resumeFeedbackRepository.findTopByResumeItemOrderByCreatedAtDesc(resumeItem);
-        return new ResumeFeedbackResponseDto(resumeFeedback);
+        ResumeItemFeedback resumeItemFeedback = resumeItemFeedbackRepository.findTopByResumeItemOrderByCreatedAtDesc(resumeItem);
+        return new ResumeItemFeedbackResponseDto(resumeItemFeedback);
     }
 
 }
