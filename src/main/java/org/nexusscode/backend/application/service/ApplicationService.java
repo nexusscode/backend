@@ -20,6 +20,7 @@ import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.application.domain.Status;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
+import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
@@ -153,11 +154,11 @@ public class ApplicationService {
         applicationRepository.delete(application);
     }
 
-    public List<ApplicationResponseDto> getAllApplication() {
+    public List<ApplicationSimpleDto> getAllApplication() {
         List<JobApplication> applicationList = applicationRepository.findAll();
         // 추후 로그인 유저의 application 로만 리스트 조회
 
-        return applicationList.stream().map(ApplicationResponseDto::new).toList();
+        return applicationList.stream().map(ApplicationSimpleDto::new).toList();
     }
 
     public String uploadDetailImage(Long applicationId, MultipartFile file) {

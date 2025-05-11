@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
+import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
 import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.springframework.http.HttpStatus;
@@ -53,9 +54,9 @@ public class ApplicationController {
 
     @Operation(summary = "전체 공고 조회")
     @GetMapping
-    public ResponseEntity<CommonResponse<List<ApplicationResponseDto>>> getAllApplication(){
-        List<ApplicationResponseDto> responseDtoList = applicationService.getAllApplication();
-        CommonResponse<List<ApplicationResponseDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
+    public ResponseEntity<CommonResponse<List<ApplicationSimpleDto>>> getAllApplication(){
+        List<ApplicationSimpleDto> responseDtoList = applicationService.getAllApplication();
+        CommonResponse<List<ApplicationSimpleDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
