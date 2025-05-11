@@ -109,7 +109,8 @@ public class InterviewServiceImpl implements InterviewService {
             InterviewQuestion result = interviewQuestionService.findQuestionAndHint(sessionId, seq)
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-            InterviewSession session = interviewSessionService.findById(sessionId).orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
+            InterviewSession session = interviewSessionService.findById(sessionId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
 
             interviewCacheService.cacheQuestionsAsync(session);
 
@@ -153,18 +154,19 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    @Cacheable(value = "interviewFullDetailCache", key = "#sessionId")
+    //@Cacheable(value = "interviewFullDetailCache", key = "#sessionId")
     public InterviewAllSessionDTO getFullSessionDetail(Long sessionId) {
         InterviewSession session = interviewSessionService.findById(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        List<InterviewQnADTO> questions = interviewSessionService.findInterviewQnA(sessionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
-
-        String summary = interviewSummaryService.findBySessionId(sessionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
-
-        return InterviewAllSessionDTO.createAllSessionDTO(session, questions, summary);
+//        List<InterviewQnADTO> questions = interviewSessionService.findInterviewQnA(sessionId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
+//
+//        String summary = interviewSummaryService.findBySessionId(sessionId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
+//
+//        return InterviewAllSessionDTO.createAllSessionDTO(session, questions, summary);
+        return null;
     }
 
 

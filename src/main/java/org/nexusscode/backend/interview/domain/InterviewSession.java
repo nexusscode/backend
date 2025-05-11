@@ -1,7 +1,6 @@
 package org.nexusscode.backend.interview.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
@@ -24,7 +23,6 @@ public class InterviewSession extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
-    @JsonBackReference
     private JobApplication application;
 
     private String title;
@@ -38,11 +36,11 @@ public class InterviewSession extends Timestamped {
 
     // 전체 저장에 저장되었는가 체크하는 컬럼
     @Column(nullable = false)
-    private boolean isSaved;
+    private boolean saved;
 
     @OneToMany(mappedBy = "session", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
-    @JsonBackReference
+    @JsonManagedReference("session-question")
     private List<InterviewQuestion> questions = new ArrayList<>();
 
     public static InterviewSession createInterviewSession(
@@ -75,10 +73,10 @@ public class InterviewSession extends Timestamped {
     }
 
     public void saveSessionToArchive() {
-        this.isSaved = true;
+        this.saved = true;
     }
 
     public void deleteSessionToArchive() {
-        this.isSaved = false;
+        this.saved = false;
     }
 }

@@ -18,7 +18,6 @@ public class AnswerFeedback extends Timestamped {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answer_id")
-    @JsonBackReference
     private InterviewAnswer answer;
 
     @Column(columnDefinition = "TEXT")

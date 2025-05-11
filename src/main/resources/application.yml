@@ -4,7 +4,7 @@ spring:
 
   ai:
     openai:
-      api-key: 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
+      api-key: ${OPEN_AI_APIKEY}
       model: gpt-3.5-turbo
 
   datasource:
@@ -42,3 +42,4 @@ aws:
     bucket-name: demo-my-testbucket-277707098184
     user-upload-path: uploads/audio
     ai-upload-path: upload/aiAudio
+
