@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResumeFeedbackController {
     private final ResumeFeedbackService resumeFeedbackService;
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<CommonResponse> createResumeFeedback(@RequestBody TestFeedbackDto testFeedbackDto){
         String feedback = resumeFeedbackService.getResumeFeedback(testFeedbackDto.getQuestion(),testFeedbackDto.getAnswer());
         CommonResponse response = new CommonResponse("자소서 피드백이 완료되었습니다.",200,feedback);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    }*/
 }

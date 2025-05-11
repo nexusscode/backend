@@ -42,7 +42,8 @@ public class ResumeItemService {
             resumeItems.add(resumeItem);
             resume.addResumeItem(resumeItem);
             resumeItemRepository.save(resumeItem);
-            String feedbackText = resumeFeedbackService.getResumeFeedback(resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+
+            String feedbackText = resumeFeedbackService.getResumeFeedback(resume.getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
             ResumeFeedback feedback = ResumeFeedback.builder()
                 .resumeItem(resumeItem)
                 .feedbackText(feedbackText)
@@ -105,6 +106,13 @@ public class ResumeItemService {
                 resumeItems.add(resumeItem);
                 resume.addResumeItem(resumeItem);
                 resumeItemRepository.save(resumeItem);
+
+                String feedbackText = resumeFeedbackService.getResumeFeedback(resume.getApplication(),question,answer);
+                ResumeFeedback feedback = ResumeFeedback.builder()
+                    .resumeItem(resumeItem)
+                    .feedbackText(feedbackText)
+                    .build();
+                resumeFeedbackRepository.save(feedback);
             }
 
             return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
