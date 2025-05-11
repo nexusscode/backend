@@ -2,8 +2,6 @@ package org.nexusscode.backend.application.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +28,9 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @Operation(summary = "공고 생성")
-    @PostMapping
-    public ResponseEntity<CommonResponse<ApplicationResponseDto>> createApplication(@RequestBody ApplicationRequestDto applicationRequestDto){
-        ApplicationResponseDto responseDto = applicationService.createApplication(applicationRequestDto);
+    @PostMapping("/{userId}")
+    public ResponseEntity<CommonResponse<ApplicationResponseDto>> createApplication(@PathVariable(name = "userId")Long userId, @RequestBody ApplicationRequestDto applicationRequestDto){
+        ApplicationResponseDto responseDto = applicationService.createApplication(userId,applicationRequestDto);
         CommonResponse<ApplicationResponseDto> response = new CommonResponse<>("공고 생성이 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

@@ -1,6 +1,8 @@
 package org.nexusscode.backend.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.global.exception.CustomException;
+import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.user.domain.MemberRole;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.dto.UserRequestDto;
@@ -20,5 +22,11 @@ public class UserService {
             .role(MemberRole.USER)
             .build();
         userRepository.save(user);
+    }
+
+    public User findById(Long userId){
+        return userRepository.findById(userId).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_USER)
+        );
     }
 }

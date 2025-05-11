@@ -23,6 +23,8 @@ import org.nexusscode.backend.application.dto.ApplicationResponseDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ApplicationService {
 
     private final JobApplicationRepository applicationRepository;
+    private final UserService userService;
 
     @Value("${saramin.access-key}")
     private String accessKey;
@@ -43,7 +46,9 @@ public class ApplicationService {
     @Value("${saramin.endpoint}")
     private String apiUrl;
 
-    public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
+    public ApplicationResponseDto createApplication(Long userId, ApplicationRequestDto applicationRequestDto) {
+        User user = userService.findById(userId);
+
         String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
             .queryParam("access-key", accessKey)
             .queryParam("id", applicationRequestDto.getSaraminJobId())
@@ -112,6 +117,7 @@ public class ApplicationService {
                 .optString("name", "학력 정보 없음");
 
             JobApplication application = JobApplication.builder()
+                .user(user)
                 .saraminJobId(applicationRequestDto.getSaraminJobId())
                 .companyName(companyName)
                 .jobTitle(title)
