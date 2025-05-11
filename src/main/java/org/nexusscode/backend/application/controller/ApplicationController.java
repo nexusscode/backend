@@ -9,6 +9,7 @@ import org.nexusscode.backend.application.dto.ApplicationResponseDto;
 import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
 import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.common.CommonResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,9 +55,9 @@ public class ApplicationController {
 
     @Operation(summary = "전체 공고 조회")
     @GetMapping
-    public ResponseEntity<CommonResponse<List<ApplicationSimpleDto>>> getAllApplication(){
-        List<ApplicationSimpleDto> responseDtoList = applicationService.getAllApplication();
-        CommonResponse<List<ApplicationSimpleDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
+    public ResponseEntity<CommonResponse<Page<ApplicationSimpleDto>>> getAllApplication(@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "10")int size){
+        Page<ApplicationSimpleDto> responseDtoList = applicationService.getAllApplication(page-1,size);
+        CommonResponse<Page<ApplicationSimpleDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -70,9 +71,9 @@ public class ApplicationController {
 
     @Operation(summary = "공고 검색")
     @GetMapping("/search")
-    public ResponseEntity<CommonResponse<List<ApplicationSimpleDto>>> searchApplication(@RequestParam(name = "searchWord")String searchWord){
-        List<ApplicationSimpleDto> responseDtoList = applicationService.searchApplication(searchWord);
-        CommonResponse<List<ApplicationSimpleDto>> response = new CommonResponse<>("공고 검색이 완료되었습니다.",200,responseDtoList);
+    public ResponseEntity<CommonResponse<Page<ApplicationSimpleDto>>> searchApplication(@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "10")int size,@RequestParam(name = "searchWord")String searchWord){
+        Page<ApplicationSimpleDto> responseDtoList = applicationService.searchApplication(page-1,size,searchWord);
+        CommonResponse<Page<ApplicationSimpleDto>> response = new CommonResponse<>("공고 검색이 완료되었습니다.",200,responseDtoList);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
