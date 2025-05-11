@@ -37,6 +37,6 @@ public class ResumeItem {
     public void updateResumeItem(ResumeItemRequestDto resumeItemRequestDto) {
         this.question = resumeItemRequestDto.getQuestion();
         this.answer = resumeItemRequestDto.getAnswer();
-        this.seq = resumeItemRequestDto.getSeq();
+        /*this.seq = resumeItemRequestDto.getSeq();*/
     }
 }
