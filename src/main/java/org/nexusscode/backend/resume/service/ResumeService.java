@@ -55,6 +55,27 @@ public class ResumeService {
         resumeRepository.delete(resume);
     }
 
+    @Transactional
+    public void saveResumeInArchieve(Long resumeId) {
+        Resume resume = findById(resumeId);
+
+        if(resume.isSaved()){
+            throw new CustomException(ErrorCode.ALREADY_SAVED_RESUME);
+        }
+        resume.updateSaveStatus(true);
+        resumeRepository.save(resume);
+    }
+
+    @Transactional
+    public void cancelResumeFromArchieve(Long resumeId) {
+        Resume resume = findById(resumeId);
+        if(!resume.isSaved()){
+            throw new CustomException(ErrorCode.NOT_SAVED_RESUME);
+        }
+        resume.updateSaveStatus(false);
+        resumeRepository.save(resume);
+    }
+
     public Resume findById(Long id) {
         return resumeRepository.findById(id).orElseThrow(
             () -> new CustomException(ErrorCode.NOT_FOUND_RESUME)

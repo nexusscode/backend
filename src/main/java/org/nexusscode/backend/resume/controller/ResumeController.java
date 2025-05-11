@@ -70,4 +70,20 @@ public class ResumeController {
         CommonResponse response = new CommonResponse<>("자소서 삭제가 완료되었습니다.", 200, "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "자소서 보관 저장")
+    @PutMapping("/resume/{resumeId}/save")
+    public ResponseEntity<CommonResponse> saveResumeInArchieve(@PathVariable(name = "resumeId")Long resumeId){
+        resumeService.saveResumeInArchieve(resumeId);
+        CommonResponse response = new CommonResponse<>("보관함에 자소서 저장이 완료되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "자소서 보관 취소")
+    @PutMapping("/resume/{resumeId}/unsave")
+    public ResponseEntity<CommonResponse> cancelResumeFromArchieve(@PathVariable(name = "resumeId")Long resumeId){
+        resumeService.cancelResumeFromArchieve(resumeId);
+        CommonResponse response = new CommonResponse<>("보관함에 자소서 저장이 취소되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
