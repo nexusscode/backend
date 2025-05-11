@@ -78,6 +78,7 @@ public class ResumeItemController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "자소서 파일 업로드 및 자소서 항목 생성")
     @PostMapping("/{resumeId}/upload/file")
     public ResponseEntity<CommonResponse<List<ResumeItemResponseDto>>> uploadResumeFile(@PathVariable(name = "resumeId")Long resumeId,@RequestParam(name = "file")
         MultipartFile file){
