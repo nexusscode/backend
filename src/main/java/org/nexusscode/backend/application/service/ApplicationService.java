@@ -20,14 +20,21 @@ import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.application.domain.Status;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
+import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,6 +43,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ApplicationService {
 
     private final JobApplicationRepository applicationRepository;
+    private final UserService userService;
 
     @Value("${saramin.access-key}")
     private String accessKey;
@@ -43,7 +51,10 @@ public class ApplicationService {
     @Value("${saramin.endpoint}")
     private String apiUrl;
 
-    public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
+    @Transactional
+    public ApplicationResponseDto createApplication(Long userId, ApplicationRequestDto applicationRequestDto) {
+        User user = userService.findById(userId);
+
         String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
             .queryParam("access-key", accessKey)
             .queryParam("id", applicationRequestDto.getSaraminJobId())
@@ -112,6 +123,7 @@ public class ApplicationService {
                 .optString("name", "학력 정보 없음");
 
             JobApplication application = JobApplication.builder()
+                .user(user)
                 .saraminJobId(applicationRequestDto.getSaraminJobId())
                 .companyName(companyName)
                 .jobTitle(title)
@@ -139,6 +151,7 @@ public class ApplicationService {
         return new ApplicationResponseDto(application);
     }
 
+    @Transactional
     public void deleteApplication(Long applicationId) {
         JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND)
@@ -147,13 +160,15 @@ public class ApplicationService {
         applicationRepository.delete(application);
     }
 
-    public List<ApplicationResponseDto> getAllApplication() {
-        List<JobApplication> applicationList = applicationRepository.findAll();
+    public Page<ApplicationSimpleDto> getAllApplication(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<JobApplication> applicationPage = applicationRepository.findAll(pageable);
         // 추후 로그인 유저의 application 로만 리스트 조회
 
-        return applicationList.stream().map(ApplicationResponseDto::new).toList();
+        return applicationPage.map(ApplicationSimpleDto::new);
     }
 
+    @Transactional
     public String uploadDetailImage(Long applicationId, MultipartFile file) {
         JobApplication application = findById(applicationId);
         String imageText;
@@ -175,6 +190,13 @@ public class ApplicationService {
         applicationRepository.save(application);
 
         return imageText;
+    }
+
+    public Page<ApplicationSimpleDto> searchApplication(int page, int size,String searchWord) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<JobApplication> jobApplicationPage = applicationRepository.findByCompanyNameContainingIgnoreCaseOrJobTitleContainingIgnoreCase(searchWord,searchWord,pageable);
+
+        return jobApplicationPage.map(ApplicationSimpleDto::new);
     }
 
     public JobApplication findById(Long id){

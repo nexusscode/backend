@@ -6,10 +6,6 @@ import java.util.List;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.global.Timestamped;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -30,6 +26,9 @@ public class Resume extends Timestamped {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResumeItem> resumeItems;
 
+    @Column(name = "is_saved")
+    private boolean isSaved;
+
     @Builder
     public Resume(JobApplication application, String title) {
         this.application = application;
@@ -46,6 +45,10 @@ public class Resume extends Timestamped {
         }
 
         this.resumeItems.add(resumeItem);
+    }
+
+    public void updateSaveStatus(boolean status) {
+        this.isSaved=status;
     }
 }
 

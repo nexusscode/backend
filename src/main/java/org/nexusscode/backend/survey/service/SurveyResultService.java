@@ -12,12 +12,16 @@ import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class SurveyResultService {
     private final SurveyResultRepository surveyResultRepository;
+    private final UserService userService;
 
     private static final List<Integer> D_TYPE_QUESTIONS = List.of(1, 2, 3, 4, 5);
     private static final List<Integer> I_TYPE_QUESTIONS = List.of(6, 7, 8, 9, 10);
@@ -29,7 +33,9 @@ public class SurveyResultService {
     private static final List<Integer> PROBLEM_SOLVING_QUESTIONS = List.of(31, 32, 33, 34, 35);
     private static final List<Integer> DEV_VALUES_QUESTIONS = List.of(36, 37, 38, 39, 40);
 
-    public void submitSurvey(List<SurveyRequestDto> surveyRequestDtoList) {
+    @Transactional
+    public void submitSurvey(Long userId, List<SurveyRequestDto> surveyRequestDtoList) {
+        User user = userService.findById(userId);
         // 각 유형별 점수 계산
         int dScore = calculateScoreForQuestions(surveyRequestDtoList, D_TYPE_QUESTIONS);
         int iScore = calculateScoreForQuestions(surveyRequestDtoList, I_TYPE_QUESTIONS);
@@ -77,6 +83,7 @@ public class SurveyResultService {
 
 
         SurveyResult surveyResult = SurveyResult.builder()
+            .user(user)
             .dominanceScore(dScore)
             .influenceScore(iScore)
             .steadinessScore(sScore)
@@ -106,9 +113,9 @@ public class SurveyResultService {
             .sum();
     }
 
-    public SurveyResponseDto getSurveyResult(Long resultId) {
-        //SurveyResult surveyResult = surveyResultRepository.findByUser(user);
-        SurveyResult surveyResult = findbyId(resultId);
+    public SurveyResponseDto getSurveyResult(Long userId) {
+        User user = userService.findById(userId);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
         return new SurveyResponseDto(surveyResult);
     }
 
@@ -116,5 +123,13 @@ public class SurveyResultService {
         return surveyResultRepository.findById(id).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
         );
+    }
+
+    public SurveyResult findByUser(User user) {
+        SurveyResult result = surveyResultRepository.findByUser(user);
+        if (result == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT);
+        }
+        return result;
     }
 }
