@@ -152,7 +152,6 @@ public class GeneratorService {
         throw new CustomException(ErrorCode.GPT_RESPONSE_ERROR);
     }
 
-    @Async
     public Mono<byte[]> generateQuestionVoiceAsync(InterviewQuestion question, GptVoice voiceType) {
         return openAITTSClient.textToSpeechAsync(question.getQuestionText(), voiceType)
                 .onErrorMap(e -> new CustomException(ErrorCode.TTS_FAILED));
