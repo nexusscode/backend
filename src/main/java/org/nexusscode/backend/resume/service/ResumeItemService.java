@@ -17,6 +17,7 @@ import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -28,6 +29,7 @@ public class ResumeItemService {
     private final ResumeFeedbackService resumeFeedbackService;
     private final ResumeFeedbackRepository resumeFeedbackRepository;
 
+    @Transactional
     public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
         List<ResumeItemRequestDto> resumeItemRequestDtos) {
         Resume resume = resumeService.findById(resumeId);
@@ -62,6 +64,7 @@ public class ResumeItemService {
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
 
+    @Transactional
     public ResumeItemResponseDto updateResumeItem(Long resumeItemId,
         ResumeItemRequestDto resumeItemRequestDto) {
         ResumeItem resumeItem = findById(resumeItemId);
@@ -71,11 +74,13 @@ public class ResumeItemService {
         return new ResumeItemResponseDto(resumeItem);
     }
 
+    @Transactional
     public void deleteResumeItem(Long resumeItemId) {
         ResumeItem resumeItem = findById(resumeItemId);
         resumeItemRepository.delete(resumeItem);
     }
 
+    @Transactional
     public List<ResumeItemResponseDto> uploadResumeFile(Long resumeId,MultipartFile file) {
         Resume resume = resumeService.findById(resumeId);
         try {

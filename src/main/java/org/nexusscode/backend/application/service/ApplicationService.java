@@ -34,6 +34,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,6 +51,7 @@ public class ApplicationService {
     @Value("${saramin.endpoint}")
     private String apiUrl;
 
+    @Transactional
     public ApplicationResponseDto createApplication(Long userId, ApplicationRequestDto applicationRequestDto) {
         User user = userService.findById(userId);
 
@@ -149,6 +151,7 @@ public class ApplicationService {
         return new ApplicationResponseDto(application);
     }
 
+    @Transactional
     public void deleteApplication(Long applicationId) {
         JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND)
@@ -165,6 +168,7 @@ public class ApplicationService {
         return applicationPage.map(ApplicationSimpleDto::new);
     }
 
+    @Transactional
     public String uploadDetailImage(Long applicationId, MultipartFile file) {
         JobApplication application = findById(applicationId);
         String imageText;
