@@ -58,6 +58,9 @@ public class JobApplication extends Timestamped {
     @Column(name = "required_education_level")
     private String requiredEducationLevel;
 
+    @Column(name = "job_description")
+    private String jobDescription;
+
     @Builder
     public JobApplication(String saraminJobId, String companyName, String jobTitle, Status status,
         LocalDateTime expirationDate, String experienceLevel, String jobCode, String jobType,
@@ -71,5 +74,9 @@ public class JobApplication extends Timestamped {
         this.jobCode = jobCode;
         this.jobType = jobType;
         this.requiredEducationLevel = requiredEducationLevel;
+    }
+
+    public void updateJobDescription(String imageText) {
+        this.jobDescription=imageText;
     }
 }
