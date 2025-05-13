@@ -43,5 +43,9 @@ aws:
     user-upload-path: uploads/audio
     ai-upload-path: upload/aiAudio
 
+coolsms:
+  api:
+    key: ${API_KEY}
+    secret: ${API_SECRET}
 
 
