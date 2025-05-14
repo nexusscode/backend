@@ -43,5 +43,9 @@ aws:
     user-upload-path: uploads/audio
     ai-upload-path: upload/aiAudio
 
+jwt:
+  secret: your-secure-jwt-secret-key-that-is-at-least-32-bytes
+  access-token-expire-minutes: 10
+  refresh-token-expire-minutes: 1440
 
 

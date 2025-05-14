@@ -2,6 +2,7 @@ package org.nexusscode.backend.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.json.HTTP;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -43,7 +44,14 @@ public enum ErrorCode {
     UPLOAD_RESUME_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"자소서 파일 업로드에 실패하였습니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다."),
     ALREADY_SAVED_RESUME(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 자소서입니다."),
-    NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다.");
+    NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다."),
+    MALFORMED_JWT(HttpStatus.BAD_REQUEST, "Malformed JWT"),
+    EXPIRED_JWT(HttpStatus.UNAUTHORIZED, "Expired JWT"),
+    INVALID_CLAIM(HttpStatus.UNAUTHORIZED, "Invalid JWT claims"),
+    NO_AUTH_HEADER(HttpStatus.UNAUTHORIZED, "Authorization 헤더가 없습니다."),
+    JWT_VALIDATION_ERROR(HttpStatus.UNAUTHORIZED, "JWT 토큰 검증 중 오류가 발생했습니다."),
+    TOKEN_TAMPERED(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 위조되었거나 재사용되었습니다.");
+
 
     private final HttpStatus status;
     private final String message;
