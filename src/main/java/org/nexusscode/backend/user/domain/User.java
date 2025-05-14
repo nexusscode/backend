@@ -3,16 +3,15 @@ package org.nexusscode.backend.user.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +26,19 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberRole role;
+    private boolean social;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<MemberRole> userRoleList = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String name, MemberRole role) {
+    public User(String email, String password, String name, List<MemberRole> userRoleList, boolean isSocial) {
         this.email = email;
         this.password = password;
         this.name = name;
-        this.role = role;
+        this.userRoleList = userRoleList;
+        this.social = isSocial;
     }
 }

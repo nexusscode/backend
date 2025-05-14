@@ -9,6 +9,8 @@ import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,7 +21,7 @@ public class UserService {
             .email(userRequestDto.getEmail())
             .password(userRequestDto.getPassword())
             .name(userRequestDto.getName())
-            .role(MemberRole.USER)
+            .userRoleList(List.of(MemberRole.USER))
             .build();
         userRepository.save(user);
     }
