@@ -87,4 +87,8 @@ public class InterviewSessionService {
         return interviewSessionRepository.findInterviewAdviceBySessionId(sessionId);
     }
 
+    public Boolean deleteSession(Long sessionId) {
+        interviewSessionRepository.deleteById(sessionId);
+        return true;
+    }
 }

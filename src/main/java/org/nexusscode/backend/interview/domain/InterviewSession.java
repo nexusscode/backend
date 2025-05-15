@@ -1,11 +1,13 @@
 package org.nexusscode.backend.interview.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.interview.client.support.GptVoice;
+import org.nexusscode.backend.user.domain.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +36,22 @@ public class InterviewSession extends Timestamped {
     @Enumerated(EnumType.STRING)
     private GptVoice voice;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     // 전체 저장에 저장되었는가 체크하는 컬럼
     @Column(nullable = false)
     private boolean saved;
 
-    @OneToMany(mappedBy = "session", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "session", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonManagedReference("session-question")
     private List<InterviewQuestion> questions = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private InterviewSummary summary;
 
     public static InterviewSession createInterviewSession(
             JobApplication application, String title, List<InterviewQuestion> questions, GptVoice interviewType

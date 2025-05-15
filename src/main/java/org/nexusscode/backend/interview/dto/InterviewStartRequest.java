@@ -16,4 +16,6 @@ public class InterviewStartRequest {
     private String title;
     @NotNull(message = "면접 타입을 선택해주세요.") //면접 타입없이 한번에 모두다 면접 진행할 것인지.
     private GptVoice interviewType;
+    @NotNull
+    private String email;
 }

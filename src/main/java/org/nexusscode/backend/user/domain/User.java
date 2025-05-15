@@ -41,4 +41,13 @@ public class User extends Timestamped {
         this.userRoleList = userRoleList;
         this.social = isSocial;
     }
+
+    public void change(String password, String name) {
+        this.password = password;
+        this.name = name;
+    }
+
+    public void addUserRole(MemberRole memberRole) {
+        userRoleList.add(memberRole);
+    }
 }

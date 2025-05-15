@@ -54,7 +54,6 @@ public class InterviewSummaryService {
         InterviewSummary updated = InterviewSummary.builder()
                 .id(summary.getId())
                 .session(summary.getSession())
-                .user(summary.getUser())
                 .summary(newSummaryText)
                 .build();
 

@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = {"userRoleList"})
     @Query("select s from User s where s.email = :email")
     Optional<User> getWithRoles(@Param("email")String email);
+
+    Optional<User> findByEmail(String email);
 }

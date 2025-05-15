@@ -8,6 +8,7 @@ import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.interview.dto.*;
 import org.nexusscode.backend.interview.service.InterviewService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,59 +25,75 @@ public class InterviewController {
 
 
     @Operation(summary = "면접 생성")
+    @PreAuthorize("request.email == authentication.name")
     @PostMapping("/start")
     public ResponseEntity<CommonResponse<Long>> startInterview(@RequestBody InterviewStartRequest request) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션이 시작되었습니다.", 200, interviewService.startInterview(request)));
     }
 
     @Operation(summary = "면접 생성시 생성된 sessionId를 통한 단일 질문 조회")
+    @PreAuthorize("email == authentication.name")
     @GetMapping("/{sessionId}/question")
-    public ResponseEntity<CommonResponse<QuestionAndHintDTO>> getQuestion(@PathVariable Long sessionId, @RequestParam Integer seq) {
+    public ResponseEntity<CommonResponse<QuestionAndHintDTO>> getQuestion(@PathVariable Long sessionId, @RequestParam Integer seq, @RequestParam String email) {
         return ResponseEntity.ok(new CommonResponse<>("질문 조회 성공", 200, interviewService.getQuestion(sessionId, seq)));
     }
 
     @Operation(summary = "하나의 applicationId에 대한 면접 리스트 전체 조회")
+    @PreAuthorize("email == authentication.name")
     @GetMapping("/list")
-    public ResponseEntity<CommonResponse<List<InterviewSessionDTO>>> list(@RequestParam Long applicationId) {
+    public ResponseEntity<CommonResponse<List<InterviewSessionDTO>>> list(@RequestParam Long applicationId, @RequestParam String email) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 리스트 조회 성공", 200, interviewService.getList(applicationId)));
     }
 
     @Operation(summary = "답변 저장")
+    @PreAuthorize("request.email == authentication.name")
     @PostMapping("/interview-answer")
     public ResponseEntity<CommonResponse<Long>> submitAnswer(@RequestBody InterviewAnswerRequest request) {
         return ResponseEntity.ok(new CommonResponse<>("답변 저장 완료", 200, interviewService.submitAnswer(request)));
     }
 
     @Operation(summary = "사용자 목소리를 업로드 시키기 위한 s3 접근 권한 presign")
+    @PreAuthorize("email == authentication.name")
     @GetMapping("/voice-presign")
-    public ResponseEntity<CommonResponse<Map<String, String>>> getUploadPresignUrlPath(@RequestParam String fileName) {
+    public ResponseEntity<CommonResponse<Map<String, String>>> getUploadPresignUrlPath(@RequestParam String fileName, @RequestParam String email) {
         Map<String, String> url = Map.of("url", interviewService.getUserVoicePreSignUrl(fileName));
         return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
     }
 
     @Operation(summary = "tts 파일 s3 접근 권한 presign")
+    @PreAuthorize("email == authentication.name")
     @GetMapping("/tts-presign")
-    public ResponseEntity<CommonResponse<Map<String, String>>> getAccessPresignUrlPath(@RequestParam String fileName) {
+    public ResponseEntity<CommonResponse<Map<String, String>>> getAccessPresignUrlPath(@RequestParam String fileName, @RequestParam String email) {
         Map<String, String> url = Map.of("url", interviewService.getAIVoicePreSignUrl(fileName));
         return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
     }
 
     @Operation(summary = "면접 세션에 대한 모든 정보 조회(질문, 답변, 결과지 포함)")
+    @PreAuthorize("email == authentication.name")
     @GetMapping("/{sessionId}/detail")
-    public ResponseEntity<CommonResponse<InterviewAllSessionDTO>> getFullSessionDetails(@PathVariable Long sessionId) {
+    public ResponseEntity<CommonResponse<InterviewAllSessionDTO>> getFullSessionDetails(@PathVariable Long sessionId, @RequestParam String email) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 전체 조회 성공", 200, interviewService.getFullSessionDetail(sessionId)));
     }
 
     @Operation(summary = "면접 세션 보관함에 저장")
-    @PutMapping("/{sessionId}/save")
-    public ResponseEntity<CommonResponse<Boolean>> saveSession(@PathVariable Long sessionId) {
+    @PreAuthorize("email == authentication.name")
+    @PutMapping("/{sessionId}/storage/save")
+    public ResponseEntity<CommonResponse<Boolean>> saveStorageSession(@PathVariable Long sessionId, @RequestParam String email) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함에 저장", 200, interviewService.saveSessionToArchive(sessionId)));
     }
 
     @Operation(summary = "면접 세션 보관함에서 삭제")
-    @DeleteMapping("/{sessionId}/delete")
-    public ResponseEntity<CommonResponse<Boolean>> deleteSession(@PathVariable Long sessionId) {
+    @PreAuthorize("email == authentication.name")
+    @DeleteMapping("/{sessionId}/storage/delete")
+    public ResponseEntity<CommonResponse<Boolean>> deleteStorageSession(@PathVariable Long sessionId, @RequestParam String email) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함에서 삭제", 200, interviewService.deleteSessionToArchive(sessionId)));
+    }
+
+    @Operation(summary = "면접 세션 삭제")
+    @PreAuthorize("email == authentication.name")
+    @DeleteMapping("/{sessionId}/delete")
+    public ResponseEntity<CommonResponse<Boolean>> deleteSession(@PathVariable Long sessionId, @RequestParam String email) {
+        return ResponseEntity.ok(new CommonResponse<>("면접 세션 삭제", 200, interviewService.deleteSession(sessionId)));
     }
 }
 

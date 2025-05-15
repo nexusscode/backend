@@ -43,4 +43,9 @@ public class UserDTO extends User {
 
     }
 
+    public void update(String password, String name) {
+        this.password = password;
+        this.name = name;
+    }
+
 }
