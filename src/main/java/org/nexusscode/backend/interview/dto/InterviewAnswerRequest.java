@@ -14,4 +14,5 @@ public class InterviewAnswerRequest {
     private String audioUrl;
     @NotNull(message = "컨닝 의심 결과를 입력하지 않았습니다.")
     private Boolean isCheated;  //프론트에서 텐서플로우로 컨닝의심 결과 컬럼
+    private String email;
 }

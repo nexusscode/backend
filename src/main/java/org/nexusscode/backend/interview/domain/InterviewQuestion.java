@@ -24,7 +24,7 @@ public class InterviewQuestion extends Timestamped {
     @JsonBackReference("session-question")
     private InterviewSession session;
 
-    @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("question-answer")
     private InterviewAnswer answer;
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.nexusscode.backend.security.dto.TokenResponseDTO;
 import org.nexusscode.backend.security.jwt.JWTProvider;
+import org.nexusscode.backend.security.repository.RedisRefreshTokenRepository;
 import org.nexusscode.backend.user.dto.UserDTO;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JWTProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private final RedisRefreshTokenRepository redisRefreshTokenRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -39,6 +41,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String accessToken = jwtProvider.generateAccessToken(claims);
         String refreshToken = jwtProvider.generateRefreshToken(claims);
+
+        String userId = (String) claims.get("userId");
+        redisRefreshTokenRepository.saveRefreshToken(userId, refreshToken, Duration.ofDays(1));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)

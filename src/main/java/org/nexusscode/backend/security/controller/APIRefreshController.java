@@ -1,5 +1,6 @@
 package org.nexusscode.backend.security.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,7 @@ import org.nexusscode.backend.security.jwt.JWTProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +30,14 @@ public class APIRefreshController {
     private final JWTProvider jwtProvider;
     private final RedisRepository redisRepository;
 
+    @Operation(summary = "token refresh 요청.")
     @RequestMapping("/api/member/refresh")
     public ResponseEntity<CommonResponse<TokenResponseDTO>> refresh(
             @RequestHeader("Authorization") String authHeader,
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
             HttpServletResponse response
     ) {
+
         if (refreshToken == null) {
             throw new CustomException(ErrorCode.TOKEN_INVALID);
         }

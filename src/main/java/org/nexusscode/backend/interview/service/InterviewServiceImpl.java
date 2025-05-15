@@ -189,5 +189,10 @@ public class InterviewServiceImpl implements InterviewService {
     public String getAIVoicePreSignUrl(String fileName) {
         return awsClient.generateAIVoicePresignedUrl(fileName, Duration.ofSeconds(90));
     }
+
+    @Override
+    public Boolean deleteSession(Long sessionId) {
+        return interviewSessionService.deleteSession(sessionId);
+    }
 }
 

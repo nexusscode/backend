@@ -44,8 +44,20 @@ aws:
     ai-upload-path: upload/aiAudio
 
 jwt:
-  secret: your-secure-jwt-secret-key-that-is-at-least-32-bytes
+  secret: RjYz0g4tJGLd/kkNntLsT7EW9SJGzdGaJuI3TI/BKzU=
   access-token-expire-minutes: 10
   refresh-token-expire-minutes: 1440
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /internal-actuator
+  endpoint:
+    health:
+      show-details: never
 
 

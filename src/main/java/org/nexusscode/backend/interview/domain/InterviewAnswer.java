@@ -1,6 +1,7 @@
 package org.nexusscode.backend.interview.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
@@ -24,9 +25,9 @@ public class InterviewAnswer extends Timestamped {
     @JsonBackReference("question-answer")
     private InterviewQuestion question;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JsonIgnore
+    @OneToOne(mappedBy = "answer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private AnswerFeedback answerFeedback;
 
     private String audioUrl;
 
