@@ -29,10 +29,15 @@ public class Resume extends Timestamped {
     @Column(name = "is_saved")
     private boolean isSaved;
 
+    @Column(name = "feedback_status")
+    private ResumeFeedbackStatus feedbackStatus;
+
     @Builder
     public Resume(JobApplication application, String title) {
         this.application = application;
         this.title = title;
+        this.isSaved=false;
+        this.feedbackStatus=ResumeFeedbackStatus.BEFORE_FEEDBACK;
     }
 
     public void updateResume(String title) {
@@ -49,6 +54,10 @@ public class Resume extends Timestamped {
 
     public void updateSaveStatus(boolean status) {
         this.isSaved=status;
+    }
+
+    public void updateFeedbackStatus() {
+        this.feedbackStatus=ResumeFeedbackStatus.AFTER_FEEDBACK;
     }
 }
 
