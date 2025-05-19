@@ -3,6 +3,7 @@ package org.nexusscode.backend.user.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
+import org.nexusscode.backend.user.dto.ProfileUpdateRequestDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -51,5 +52,12 @@ public class User extends Timestamped {
         this.phoneNumber=phoneNumber;
         this.devType=devType;
         this.experienceLevel=experienceLevel;
+    }
+
+    public void updateProfile(ProfileUpdateRequestDto profileUpdateRequestDto) {
+        this.name=profileUpdateRequestDto.getName();
+        this.phoneNumber=profileUpdateRequestDto.getPhoneNumber();
+        this.devType=DevType.from(profileUpdateRequestDto.getDevType());
+        this.experienceLevel=ExperienceLevel.from(profileUpdateRequestDto.getExperienceLevel());
     }
 }

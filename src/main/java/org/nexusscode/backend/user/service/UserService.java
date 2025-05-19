@@ -9,9 +9,12 @@ import org.nexusscode.backend.user.domain.MemberRole;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.dto.EmailFindRequestDto;
 import org.nexusscode.backend.user.dto.PasswordFindRequestDto;
+import org.nexusscode.backend.user.dto.ProfileResponseDto;
+import org.nexusscode.backend.user.dto.ProfileUpdateRequestDto;
 import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,5 +59,21 @@ public class UserService {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         return user.getPassword();
+    }
+
+    public ProfileResponseDto getProfile(Long userId) {
+        //로그인 유저 프로필 조회
+        User user = findById(userId);
+        return new ProfileResponseDto(user);
+
+    }
+
+    @Transactional
+    public ProfileResponseDto updateProfile(Long userId, ProfileUpdateRequestDto profileUpdateRequestDto) {
+        //로그인 유저 프로필 조회
+        User user = findById(userId);
+        user.updateProfile(profileUpdateRequestDto);
+        userRepository.save(user);
+        return new ProfileResponseDto(user);
     }
 }
