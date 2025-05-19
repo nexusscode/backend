@@ -115,6 +115,12 @@ public class SurveyResultService {
             .sum();
     }
 
+    public SurveyResponseDto getSurveyResult(Long userId) {
+        User user = userService.findById(userId);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        return new SurveyResponseDto(surveyResult);
+    }
+
     public DiscSurveyResponseDto getDiscSurveyResult(Long userId) {
         User user = userService.findById(userId);
         SurveyResult surveyResult = surveyResultRepository.findByUser(user);
