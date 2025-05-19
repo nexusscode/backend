@@ -16,6 +16,8 @@ public class SmsUtil {
     private String apiKey;
     @Value("${coolsms.api.secret}")
     private String apiSecretKey;
+    @Value("${coolsms.sender.phone-number}")
+    private String phoneNumber;
 
     private DefaultMessageService messageService;
 
@@ -26,7 +28,7 @@ public class SmsUtil {
 
     public SingleMessageSentResponse sendOne(String to, String verificationCode) {
         Message message = new Message();
-        message.setFrom("발신번호 입력");
+        message.setFrom(phoneNumber);
         message.setTo(to);
         message.setText("[nexuscode] 아래의 인증번호를 입력해주세요\n" + verificationCode);
 
