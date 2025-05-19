@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +49,21 @@ public class SurveyResultController {
         DevSurveyResponseDto responseDto = surveyResultService.getDevSurveyResult(userId);
         CommonResponse<DevSurveyResponseDto> response = new CommonResponse<>("개발자 특화 설문 결과 조회가 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @Operation(summary = "DISC 설문 수정")
+    @PutMapping("/disc/{userId}")
+    public ResponseEntity<CommonResponse> updateDiscSurvey(@PathVariable(name = "userId")Long userId,@RequestBody List<SurveyRequestDto> surveyRequestDtos){
+        surveyResultService.updateDiscSurvey(userId, surveyRequestDtos);
+        CommonResponse response = new CommonResponse<>("disc 설문 수정이 완료되었습니다.",200,"");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "개발자 특화 설문 수정")
+    @PutMapping("/dev/{userId}")
+    public ResponseEntity<CommonResponse> updateDevSurvey(@PathVariable(name = "userId")Long userId,@RequestBody List<SurveyRequestDto> surveyRequestDtos){
+        surveyResultService.updateDevSurvey(userId, surveyRequestDtos);
+        CommonResponse response = new CommonResponse<>("개발자 특화 설문 수정이 완료되었습니다.",200,"");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

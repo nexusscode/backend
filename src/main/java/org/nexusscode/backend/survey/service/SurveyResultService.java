@@ -127,7 +127,7 @@ public class SurveyResultService {
         return new DevSurveyResponseDto(surveyResult);
     }
 
-    public SurveyResult findbyId(Long id){
+    public SurveyResult findById(Long id){
         return surveyResultRepository.findById(id).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
         );
@@ -139,5 +139,63 @@ public class SurveyResultService {
             throw new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT);
         }
         return result;
+    }
+
+    @Transactional
+    public void updateDiscSurvey(Long userId, List<SurveyRequestDto> surveyRequestDtos) {
+        User user = userService.findById(userId);
+        SurveyResult surveyResult = findByUser(user);
+        int dScore = calculateScoreForQuestions(surveyRequestDtos, D_TYPE_QUESTIONS);
+        int iScore = calculateScoreForQuestions(surveyRequestDtos, I_TYPE_QUESTIONS);
+        int sScore = calculateScoreForQuestions(surveyRequestDtos, S_TYPE_QUESTIONS);
+        int cScore = calculateScoreForQuestions(surveyRequestDtos, C_TYPE_QUESTIONS);
+
+        Map<String, Integer> typeScores = new HashMap<>();
+        typeScores.put("D", dScore);
+        typeScores.put("I", iScore);
+        typeScores.put("S", sScore);
+        typeScores.put("C", cScore);
+
+        // 점수를 내림차순으로 정렬
+        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .collect(Collectors.toList());
+
+        // 최대 점수와 두 번째 점수 확인
+        int maxScore = sortedTypes.get(0).getValue();
+        Optional<Integer> secondScoreOpt = sortedTypes.stream()
+            .map(Map.Entry::getValue)
+            .filter(score -> score < maxScore)
+            .findFirst();
+
+        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
+
+        // 동점 항목 찾아서 문자열로 결합
+        String primaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == maxScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
+        String secondaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == secondScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.joining());
+
+        surveyResult.updateDisc(dScore,iScore,sScore,cScore,primaryType,secondaryType);
+        surveyResultRepository.save(surveyResult);
+    }
+
+    @Transactional
+    public void updateDevSurvey(Long userId, List<SurveyRequestDto> surveyRequestDtos) {
+        User user = userService.findById(userId);
+        SurveyResult surveyResult = findByUser(user);
+        int devApproachScore = calculateScoreForQuestions(surveyRequestDtos, DEV_APPROACH_QUESTIONS);
+        int teamCollabScore = calculateScoreForQuestions(surveyRequestDtos, TEAM_COLLAB_QUESTIONS);
+        int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtos, PROBLEM_SOLVING_QUESTIONS);
+        int devValuesScore = calculateScoreForQuestions(surveyRequestDtos, DEV_VALUES_QUESTIONS);
+        surveyResult.updateDev(devApproachScore,teamCollabScore,problemSolvingScore,devValuesScore);
+        surveyResultRepository.save(surveyResult);
     }
 }
