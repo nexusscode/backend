@@ -2,8 +2,11 @@ package org.nexusscode.backend.sms.service;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.nexusscode.backend.global.exception.CustomException;
+import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.sms.SmsUtil;
 import org.nexusscode.backend.sms.domain.SmsVerification;
+import org.nexusscode.backend.sms.dto.SmsVerifyRequestDto;
 import org.nexusscode.backend.sms.repository.SmsVerificationRepository;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +30,18 @@ public class SmsVerificationSerivce {
             .build();
 
         smsVerificationRepository.save(smsVerification);
+    }
+
+    public void verifySms(SmsVerifyRequestDto smsVerifyRequestDto) {
+        SmsVerification smsVerification = smsVerificationRepository.findByPhoneNumberAndVerificationCode(smsVerifyRequestDto.getPhoneNumber(),smsVerifyRequestDto.getCode());
+        if(smsVerification==null){
+            throw new CustomException(ErrorCode.NOT_FOUND_SMS_VERIFICATION);
+        }
+        if(smsVerification.getExpirationTime().isBefore(LocalDateTime.now())){
+            smsVerificationRepository.delete(smsVerification);
+            throw new CustomException(ErrorCode.EXPIRED_SMS_VERIFICATION);
+        }
+
+        smsVerificationRepository.delete(smsVerification);
     }
 }
