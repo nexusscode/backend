@@ -8,6 +8,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
+import org.nexusscode.backend.resume.domain.ResumeFeedbackStatus;
 import org.nexusscode.backend.resume.domain.ResumeItem;
 import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
@@ -31,6 +32,12 @@ public class ResumeItemService {
     public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
         List<ResumeItemRequestDto> resumeItemRequestDtos) {
         Resume resume = resumeService.findById(resumeId);
+
+        if (resume.getFeedbackStatus() == ResumeFeedbackStatus.BEFORE_FEEDBACK) {
+            resume.updateFeedbackStatus();
+            resumeService.save(resume);
+        }
+
         List<ResumeItem> resumeItems = new ArrayList<>();
 
         for (ResumeItemRequestDto resumeItemRequestDto : resumeItemRequestDtos) {
@@ -43,7 +50,9 @@ public class ResumeItemService {
             resume.addResumeItem(resumeItem);
             resumeItemRepository.save(resumeItem);
 
-            String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+            String feedbackText = resumeItemFeedbackService.createResumeFeedback(
+                resume.getApplication(), resumeItemRequestDto.getQuestion(),
+                resumeItemRequestDto.getAnswer());
             ResumeItemFeedback feedback = ResumeItemFeedback.builder()
                 .resumeItem(resumeItem)
                 .feedbackText(feedbackText)
@@ -55,9 +64,10 @@ public class ResumeItemService {
 
     public List<ResumeItemResponseDto> getResume(Long resumeId) {
         Resume resume = resumeService.findById(resumeId);
-        List<ResumeItem> resumeItems = resumeItemRepository.findByResumeId(resume.getId()).orElseThrow(
-            ()->new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
-        );
+        List<ResumeItem> resumeItems = resumeItemRepository.findByResumeId(resume.getId())
+            .orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
+            );
 
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
@@ -79,7 +89,7 @@ public class ResumeItemService {
     }
 
     @Transactional
-    public List<ResumeItemResponseDto> uploadResumeFile(Long resumeId,MultipartFile file) {
+    public List<ResumeItemResponseDto> uploadResumeFile(Long resumeId, MultipartFile file) {
         Resume resume = resumeService.findById(resumeId);
         try {
             PDDocument document = PDDocument.load(file.getInputStream());
@@ -94,7 +104,9 @@ public class ResumeItemService {
 
             for (String section : sections) {
                 section = section.trim();
-                if (section.isEmpty()) continue;
+                if (section.isEmpty()) {
+                    continue;
+                }
 
                 // 줄 나누기
                 String[] lines = section.split("\\R+", 2);
@@ -102,15 +114,16 @@ public class ResumeItemService {
                 String answer = (lines.length > 1) ? lines[1].trim() : "";
 
                 ResumeItem resumeItem = ResumeItem.builder()
-                        .resume(resume)
-                        .question(question)
-                        .answer(answer)
-                        .build();
+                    .resume(resume)
+                    .question(question)
+                    .answer(answer)
+                    .build();
                 resumeItems.add(resumeItem);
                 resume.addResumeItem(resumeItem);
                 resumeItemRepository.save(resumeItem);
 
-                String feedbackText = resumeItemFeedbackService.createResumeFeedback(resume.getApplication(),question,answer);
+                String feedbackText = resumeItemFeedbackService.createResumeFeedback(
+                    resume.getApplication(), question, answer);
                 ResumeItemFeedback feedback = ResumeItemFeedback.builder()
                     .resumeItem(resumeItem)
                     .feedbackText(feedbackText)

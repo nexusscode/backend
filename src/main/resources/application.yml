@@ -43,5 +43,11 @@ aws:
     user-upload-path: uploads/audio
     ai-upload-path: upload/aiAudio
 
+coolsms:
+  sender:
+    phone-number: ${SENDER_PHONE_NUMBER}
+  api:
+    key: ${COOLSMS_API_KEY}
+    secret: ${COOLSMS_API_SECRET}
 
 

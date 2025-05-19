@@ -122,6 +122,13 @@ public class ApplicationService {
                 .optJSONObject("required-education-level")
                 .optString("name", "학력 정보 없음");
 
+            String location = job.getJSONObject("position")
+                .optJSONObject("location")
+                .optString("name", "위치 정보 없음");
+
+            String salary = job.getJSONObject("salary")
+                .optString("name", "연봉 정보 없음");
+
             JobApplication application = JobApplication.builder()
                 .user(user)
                 .saraminJobId(applicationRequestDto.getSaraminJobId())
@@ -133,6 +140,8 @@ public class ApplicationService {
                 .jobCode(jobCode)
                 .jobType(jobType)
                 .requiredEducationLevel(educationLevel)
+                .location(location)
+                .salary(salary)
                 .build();
 
             applicationRepository.save(application);
