@@ -29,6 +29,7 @@ public class SmsVerificationController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "인증 문자 검증")
     @PostMapping("/verify")
     public ResponseEntity<CommonResponse> verifySms(@RequestBody SmsVerifyRequestDto smsVerifyRequestDto){
         smsVerificationSerivce.verifySms(smsVerifyRequestDto);
