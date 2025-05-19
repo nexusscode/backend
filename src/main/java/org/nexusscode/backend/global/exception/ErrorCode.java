@@ -43,7 +43,11 @@ public enum ErrorCode {
     UPLOAD_RESUME_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"자소서 파일 업로드에 실패하였습니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다."),
     ALREADY_SAVED_RESUME(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 자소서입니다."),
-    NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다.");
+    NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다."),
+    INCORRECT_DEV_TYPE(HttpStatus.BAD_REQUEST,"옳지 않은 개발 종류 입니다."),
+    INCORRECT_EXPERIENCE_LEVEL(HttpStatus.BAD_REQUEST,"옳지 않은 경험 종류 입니다."),
+    NOT_FOUND_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"인증 문자를 찾을 수 없습니다."),
+    EXPIRED_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"만료된 인증 문자 입니다.");
 
     private final HttpStatus status;
     private final String message;
