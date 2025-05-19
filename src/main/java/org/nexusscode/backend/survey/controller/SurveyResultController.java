@@ -35,6 +35,14 @@ public class SurveyResultController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "최초 설문 조회")
+    @GetMapping("/result/{userId}")
+    public ResponseEntity<CommonResponse<SurveyResponseDto>> getSurveyResult(@PathVariable(name = "userId")Long userId){
+        SurveyResponseDto responseDto = surveyResultService.getSurveyResult(userId);
+        CommonResponse<SurveyResponseDto> response = new CommonResponse<>("설문 결과 조회가 완료되었습니다.",200,responseDto);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
     @Operation(summary = "DISC 설문 조회")
     @GetMapping("/disc/result/{userId}")
     public ResponseEntity<CommonResponse<DiscSurveyResponseDto>> getDiscSurveyResult(@PathVariable(name = "userId")Long userId){
