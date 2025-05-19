@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.survey.domain.SurveyResult;
+import org.nexusscode.backend.survey.dto.DevSurveyResponseDto;
+import org.nexusscode.backend.survey.dto.DiscSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
@@ -113,10 +115,16 @@ public class SurveyResultService {
             .sum();
     }
 
-    public SurveyResponseDto getSurveyResult(Long userId) {
+    public DiscSurveyResponseDto getDiscSurveyResult(Long userId) {
         User user = userService.findById(userId);
         SurveyResult surveyResult = surveyResultRepository.findByUser(user);
-        return new SurveyResponseDto(surveyResult);
+        return new DiscSurveyResponseDto(surveyResult);
+    }
+
+    public DevSurveyResponseDto getDevSurveyResult(Long userId) {
+        User user = userService.findById(userId);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        return new DevSurveyResponseDto(surveyResult);
     }
 
     public SurveyResult findbyId(Long id){
