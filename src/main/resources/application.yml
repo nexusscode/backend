@@ -47,7 +47,7 @@ coolsms:
   sender:
     phone-number: ${SENDER_PHONE_NUMBER}
   api:
-    key: ${API_KEY}
-    secret: ${API_SECRET}
+    key: ${COOLSMS_API_KEY}
+    secret: ${COOLSMS_API_SECRET}
 
 
