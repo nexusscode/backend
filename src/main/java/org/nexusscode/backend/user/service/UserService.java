@@ -7,6 +7,8 @@ import org.nexusscode.backend.user.domain.DevType;
 import org.nexusscode.backend.user.domain.ExperienceLevel;
 import org.nexusscode.backend.user.domain.MemberRole;
 import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.dto.EmailFindRequestDto;
+import org.nexusscode.backend.user.dto.PasswordFindRequestDto;
 import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -38,5 +40,21 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_USER)
         );
+    }
+
+    public String findEmail(EmailFindRequestDto emailFindRequestDto) {
+        User user = userRepository.findByNameAndPhoneNumber(emailFindRequestDto.getName(),emailFindRequestDto.getPhoneNumber());
+        if(user==null){
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        return user.getEmail();
+    }
+
+    public String findPassword(PasswordFindRequestDto passwordFindRequestDto) {
+        User user = userRepository.findByEmailAndNameAndPhoneNumber(passwordFindRequestDto.getEmail(),passwordFindRequestDto.getName(),passwordFindRequestDto.getPhoneNumber());
+        if(user==null){
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        return user.getPassword();
     }
 }
