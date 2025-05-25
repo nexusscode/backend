@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface InterviewService {
 
-    Long startInterview(InterviewStartRequest request);
+    Long startInterview(InterviewStartRequest request, Long userId);
 
     List<InterviewSessionDTO> getList(Long applicationId);
 
     QuestionAndHintDTO getQuestion(Long sessionId, Integer seq);
 
-    Long submitAnswer(InterviewAnswerRequest request);
+    Long submitAnswer(InterviewAnswerRequest request, Long userId);
 
     InterviewAllSessionDTO getFullSessionDetail(Long sessionId);
 
@@ -23,4 +23,6 @@ public interface InterviewService {
     String getUserVoicePreSignUrl(String fileName);
 
     String getAIVoicePreSignUrl(String fileName);
+
+    Boolean deleteSession(Long sessionId);
 }

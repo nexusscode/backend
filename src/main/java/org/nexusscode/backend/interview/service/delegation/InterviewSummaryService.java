@@ -5,6 +5,7 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.domain.InterviewSummary;
+import org.nexusscode.backend.interview.dto.InterviewSummaryDTO;
 import org.nexusscode.backend.interview.repository.InterviewSessionRepository;
 import org.nexusscode.backend.interview.repository.InterviewSummaryRepository;
 import org.nexusscode.backend.user.repository.UserRepository;
@@ -17,27 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InterviewSummaryService {
     private final InterviewSummaryRepository interviewSummaryRepository;
-    private final InterviewSessionRepository interviewSessionRepository;
-    private final UserRepository userRepository;
 
-    public InterviewSummary createSummary(Long sessionId, Long userId, String summaryText) {
-        InterviewSession session = interviewSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
-
-        /*User user = userRepository.findById(userId).orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND)
-        );*/
-
-        InterviewSummary summary = InterviewSummary.builder()
-                .session(session)
-            //    .user(user)
-                .summary(summaryText)
-                .build();
-
-        return interviewSummaryRepository.save(summary);
-    }
-
-    public InterviewSummary createSummary(InterviewSession session, String context) {
+    public InterviewSummary createSummary(InterviewSession session, InterviewSummaryDTO context) {
         InterviewSummary interviewSummary = InterviewSummary.createInterviewSummary(session, context);
 
         try {
@@ -47,22 +29,8 @@ public class InterviewSummaryService {
         }
     }
 
-    public void updateSummary(Long summaryId, String newSummaryText) {
-        InterviewSummary summary = interviewSummaryRepository.findById(summaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
-
-        InterviewSummary updated = InterviewSummary.builder()
-                .id(summary.getId())
-                .session(summary.getSession())
-                .user(summary.getUser())
-                .summary(newSummaryText)
-                .build();
-
-        interviewSummaryRepository.save(updated);
-    }
-
     @Cacheable(value = "interview:summary", key = "#sessionId")
-    public Optional<String> findBySessionId(Long sessionId) {
+    public Optional<InterviewSummary> findBySessionId(Long sessionId) {
         return interviewSummaryRepository.findSummaryBySessionId(sessionId);
     }
 }

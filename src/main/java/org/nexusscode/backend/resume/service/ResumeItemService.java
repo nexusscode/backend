@@ -2,6 +2,8 @@ package org.nexusscode.backend.resume.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -143,5 +145,9 @@ public class ResumeItemService {
         return resumeItemRepository.findById(id).orElseThrow(
             () -> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
+    }
+
+    public Optional<List<ResumeItem>> findByResumeId(Long resumeId) {
+        return resumeItemRepository.findByResumeId(resumeId);
     }
 }

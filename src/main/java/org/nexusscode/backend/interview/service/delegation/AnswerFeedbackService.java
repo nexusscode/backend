@@ -15,11 +15,11 @@ import java.util.Optional;
 public class AnswerFeedbackService {
     private final AnswerFeedbackRepository answerFeedbackRepository;
 
-    public Long createFeedback(InterviewAnswer answer, String feedbackText, String blindKeywords) {
+    public Long createFeedback(InterviewAnswer answer, String feedbackText, String blindKeywords, boolean isCompleteAnswer, boolean isQuestionFulfilled) {
         if (feedbackText == null || feedbackText.isEmpty()) {
             throw new CustomException(ErrorCode.ANSWER_SAVE_FAILED);
         }
-        AnswerFeedback feedback = AnswerFeedback.createAnswerFeedback(answer, feedbackText, blindKeywords);
+        AnswerFeedback feedback = AnswerFeedback.createAnswerFeedback(answer, feedbackText, blindKeywords, isCompleteAnswer, isQuestionFulfilled);
 
         try {
             return answerFeedbackRepository.save(feedback).getId();

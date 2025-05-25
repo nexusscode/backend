@@ -1,5 +1,6 @@
 package org.nexusscode.backend.interview.repository;
 
+import jakarta.persistence.Entity;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.dto.InterviewAdviceDTO;
 import org.nexusscode.backend.interview.dto.InterviewQnADTO;
@@ -51,7 +52,7 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
 
     @Query("""
     SELECT new org.nexusscode.backend.interview.dto.InterviewQnADTO(
-        q.id, q.questionText, a.transcript, f.feedbackText, a.audioLength 
+        q.id, q.questionText, a.transcript, f.feedbackText, a.audioLength, a.cheated, f.completeAnswer, f.questionFulfilled, f.blindKeywords
     )
     FROM InterviewSession s
     JOIN s.questions q
@@ -64,7 +65,7 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
 
     @Query("""
         SELECT new org.nexusscode.backend.interview.dto.InterviewSessionDTO(
-            s.id, s.title
+            s.id, s.title, s.createdAt
         )
         FROM InterviewSession s
         WHERE s.application.id = :applicationId
@@ -72,6 +73,17 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
     """)
     Optional<List<InterviewSessionDTO>> findSessionListByApplicationId(@Param("applicationId") Long applicationId);
 
-    @EntityGraph(attributePaths = {"questions", "questions.answer"})
+    @EntityGraph(attributePaths = {"questions", "questions.answer", "summary"})
     Optional<InterviewSession> findById(Long sessionId);
+
+
+    @EntityGraph(attributePaths = {"summary"})
+    @Query("""
+
+        SELECT s 
+        FROM InterviewSession s
+        WHERE s.application.id = :applicationId
+        ORDER BY s.createdAt DESC
+""")
+    Optional<List<InterviewSession>> findByApplicationId(Long applicationId);
 }

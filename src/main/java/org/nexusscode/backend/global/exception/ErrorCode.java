@@ -2,6 +2,7 @@ package org.nexusscode.backend.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.json.HTTP;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -44,6 +45,16 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다."),
     ALREADY_SAVED_RESUME(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 자소서입니다."),
     NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다."),
+    MALFORMED_JWT(HttpStatus.BAD_REQUEST, "Malformed JWT"),
+    EXPIRED_JWT(HttpStatus.UNAUTHORIZED, "Expired JWT"),
+    INVALID_CLAIM(HttpStatus.UNAUTHORIZED, "Invalid JWT claims"),
+    NO_AUTH_HEADER(HttpStatus.UNAUTHORIZED, "Authorization 헤더가 없습니다."),
+    JWT_VALIDATION_ERROR(HttpStatus.UNAUTHORIZED, "JWT 토큰 검증 중 오류가 발생했습니다."),
+    TOKEN_TAMPERED(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 위조되었거나 재사용되었습니다."),
+    KAKAO_USER_FETCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 정보를 가져오지 못했습니다."),
+    EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "이메일 제공에 동의하지 않았거나 이메일 정보가 없습니다."),
+    API_RATE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, "요청 횟수를 초과했습니다."),
+    DUPLICATE_REQUEST(HttpStatus.CONFLICT, "중복 요청이 감지되었습니다.");
     INCORRECT_DEV_TYPE(HttpStatus.BAD_REQUEST,"옳지 않은 개발 종류 입니다."),
     INCORRECT_EXPERIENCE_LEVEL(HttpStatus.BAD_REQUEST,"옳지 않은 경험 종류 입니다."),
     NOT_FOUND_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"인증 문자를 찾을 수 없습니다."),

@@ -1,8 +1,11 @@
 package org.nexusscode.backend.interview.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.interview.dto.InterviewAnswerRequest;
 import org.nexusscode.backend.user.domain.User;
@@ -24,9 +27,9 @@ public class InterviewAnswer extends Timestamped {
     @JsonBackReference("question-answer")
     private InterviewQuestion question;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JsonIgnore
+    @OneToOne(mappedBy = "answer", fetch = FetchType.LAZY)
+    private AnswerFeedback answerFeedback;
 
     private String audioUrl;
 
@@ -34,9 +37,6 @@ public class InterviewAnswer extends Timestamped {
 
     @Column(nullable = false)
     private boolean cheated;
-
-    @Column(nullable = false)
-    private boolean end;
 
     @Column(columnDefinition = "TEXT")
     private String transcript;

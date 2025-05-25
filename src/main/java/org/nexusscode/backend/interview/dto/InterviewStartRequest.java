@@ -11,9 +11,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class InterviewStartRequest {
     @NotNull
-    private Long resumeId;
-    @NotNull(message = "면접 제목을 입력해주세요.")
-    private String title;
-    @NotNull(message = "면접 타입을 선택해주세요.") //면접 타입없이 한번에 모두다 면접 진행할 것인지.
+    private Long applicationId;
+    @NotNull(message = "면접 타입을 선택해주세요.")
     private GptVoice interviewType;
 }

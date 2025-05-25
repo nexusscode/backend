@@ -24,8 +24,8 @@ public class InterviewSessionService {
 
     private final InterviewSessionRepository interviewSessionRepository;
 
-    public InterviewSession createSession(String title, List<InterviewQuestion> questions, JobApplication application, GptVoice interviewType) {
-        InterviewSession session = InterviewSession.createInterviewSession(application, title, questions, interviewType);
+    public InterviewSession createSession(String title, List<InterviewQuestion> questions, JobApplication application, Long userId, GptVoice interviewType) {
+        InterviewSession session = InterviewSession.createInterviewSession(application, userId, title, questions, interviewType);
 
         try {
             InterviewSession result = interviewSessionRepository.save(session);
@@ -87,4 +87,12 @@ public class InterviewSessionService {
         return interviewSessionRepository.findInterviewAdviceBySessionId(sessionId);
     }
 
+    public Boolean deleteSession(Long sessionId) {
+        interviewSessionRepository.deleteById(sessionId);
+        return true;
+    }
+
+    public Optional<List<InterviewSession>> findByApplicationId(Long applicationId) {
+        return interviewSessionRepository.findByApplicationId(applicationId);
+    }
 }

@@ -1,6 +1,5 @@
 package org.nexusscode.backend.interview.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
@@ -26,10 +25,17 @@ public class AnswerFeedback extends Timestamped {
     @Column(columnDefinition = "TEXT")
     private String blindKeywords;
 
-    public static AnswerFeedback createAnswerFeedback(InterviewAnswer interviewAnswer, String feedbackText, String blindKeywords) {
+    private Boolean completeAnswer;
+
+    private Boolean questionFulfilled;
+
+
+    public static AnswerFeedback createAnswerFeedback(InterviewAnswer interviewAnswer, String feedbackText, String blindKeywords, boolean isCompleteAnswer, boolean isQuestionFulfilled) {
         AnswerFeedback result = AnswerFeedback.builder()
                 .answer(interviewAnswer)
                 .feedbackText(feedbackText)
+                .completeAnswer(isCompleteAnswer)
+                .questionFulfilled(isQuestionFulfilled)
                 .blindKeywords(blindKeywords)
                 .build();
 
