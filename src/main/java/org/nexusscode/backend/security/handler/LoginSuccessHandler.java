@@ -55,7 +55,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         response.setHeader("Set-Cookie", refreshCookie.toString());
 
-        TokenResponseDTO tokenResponse = new TokenResponseDTO(accessToken);
+        TokenResponseDTO tokenResponse = new TokenResponseDTO(accessToken, userId);
 
         response.setContentType("application/json; charset=UTF-8");
         objectMapper.writeValue(response.getWriter(), tokenResponse);

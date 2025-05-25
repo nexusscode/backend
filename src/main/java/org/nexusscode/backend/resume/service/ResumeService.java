@@ -81,4 +81,8 @@ public class ResumeService {
             () -> new CustomException(ErrorCode.NOT_FOUND_RESUME)
         );
     }
+
+    public List<Resume> findResumeListByApplicationId(Long applicationId) {
+        return resumeRepository.findAllByApplicationId(applicationId);
+    }
 }

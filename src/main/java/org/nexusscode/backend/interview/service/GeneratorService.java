@@ -13,18 +13,18 @@ import org.nexusscode.backend.interview.domain.InterviewType;
 import org.nexusscode.backend.interview.dto.InterviewAdviceDTO;
 import org.nexusscode.backend.interview.dto.InterviewQuestionDTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDetailDto;
+import org.nexusscode.backend.interview.dto.InterviewSummaryDTO;
 import org.nexusscode.backend.interview.service.support.PromptType;
 import org.nexusscode.backend.resume.domain.ResumeItem;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.nexusscode.backend.interview.service.support.InterviewServiceUtil.*;
 
@@ -96,17 +96,37 @@ public class GeneratorService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000)
     )
-    public String generateSummaryFromInterviewAdvice(List<InterviewAdviceDTO> responses) {
+    public InterviewSummaryDTO generateSummaryFromInterviewAdvice(List<InterviewAdviceDTO> responses, List<InterviewQuestion> questions) {
         String text = makeTextFromInterviewAdvice(responses);
+        StringBuilder builder = new StringBuilder();
+        if (questions == null) {
+            builder.append("이번이 첫 번째 응시입니다.");
+        } else {
+            for (InterviewQuestion question : questions) {
+                builder.append(makeTextFromInterviewQAndA(question));
+            }
+        }
 
         try {
-            String result = gptClient.generateSummary(text, buildPrompt(PromptType.SUMMARY, 0));
+            Map<String, String> summayMap = gptClient.generateSummary(text, builder.toString().trim(),  buildPrompt(PromptType.SUMMARY, 0));
+            log.info(summayMap);
 
-            if (result == null || result.isEmpty()) {
+            if (summayMap == null || summayMap.isEmpty()) {
                 throw new EmptyGPTResponseException("GPT returned empty questions");
             }
 
-            return result;
+            return InterviewSummaryDTO.builder()
+                    .strengths(summayMap.getOrDefault("강점", ""))
+                    .weaknesses(summayMap.getOrDefault("약점", ""))
+                    .overallAssessment(summayMap.getOrDefault("AI 면접관 종합 평가", ""))
+                    .comparisonWithPrevious(summayMap.getOrDefault("이전 응시 대비 변화 및 비교 평가", ""))
+                    .vocabularyRepeatedWords(summayMap.getOrDefault("어휘 평가 - 반복 단어", ""))
+                    .vocabularyLevelComment(summayMap.getOrDefault("어휘 평가 - 수준 평가", ""))
+                    .vocabularySuggestions(summayMap.getOrDefault("어휘 평가 - 개선 제안", ""))
+                    .workAttitude(summayMap.getOrDefault("업무 성향 분석", ""))
+                    .developerStyle(summayMap.getOrDefault("개발자 스타일 분석", ""))
+                    .build();
+
         } catch (Exception e) {
             throw new CustomException(ErrorCode.GPT_RESPONSE_ERROR);
         }
@@ -125,6 +145,7 @@ public class GeneratorService {
     )
     public Map<String, String> generateAdviceFromInterviewQAndA(InterviewQuestion question) {
         String text = makeTextFromInterviewQAndA(question);
+        log.info(text);
 
         Map<String, String> result = null;
         try {
@@ -152,9 +173,8 @@ public class GeneratorService {
         throw new CustomException(ErrorCode.GPT_RESPONSE_ERROR);
     }
 
-    public Mono<byte[]> generateQuestionVoiceAsync(InterviewQuestion question, GptVoice voiceType) {
-        return openAITTSClient.textToSpeechAsync(question.getQuestionText(), voiceType)
-                .onErrorMap(e -> new CustomException(ErrorCode.TTS_FAILED));
+    public CompletableFuture<byte[]> generateQuestionVoiceAsync(InterviewQuestion question, GptVoice voiceType) {
+        return openAITTSClient.textToSpeechAsync(question.getQuestionText(), voiceType);
     }
 
     public byte[] generateQuestionVoiceSync(InterviewQuestion question, GptVoice voiceType) {

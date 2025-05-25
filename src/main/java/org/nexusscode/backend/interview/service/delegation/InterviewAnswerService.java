@@ -16,7 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InterviewAnswerService {
     private final InterviewAnswerRepository interviewAnswerRepository;
-    private final InterviewQuestionRepository interviewQuestionRepository;
 
     public Long saveAnswer(InterviewAnswerRequest request, InterviewQuestion question) {
         InterviewAnswer answer = InterviewAnswer.createInterviewAnswer(request, question);

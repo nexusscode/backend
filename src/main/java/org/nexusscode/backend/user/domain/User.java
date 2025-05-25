@@ -30,6 +30,7 @@ public class User extends Timestamped {
     private boolean social;
 
     @ElementCollection(fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     private List<MemberRole> userRoleList = new ArrayList<>();
 

@@ -13,16 +13,17 @@ import java.util.stream.Collectors;
 
 @Getter
 public class UserDTO extends User {
-
+    private Long userId;
     private String email;
     private String password;
     private String name;
     private boolean social;
     private List<String> roleNames = new ArrayList<>();
 
-    public UserDTO(String email, String password, String name, boolean social, List<String> roleNames) {
+    public UserDTO(Long userId, String email, String password, String name, boolean social, List<String> roleNames) {
         super(email, password, roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_" + str)).collect(Collectors.toList()));
 
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.name = name;
@@ -33,6 +34,7 @@ public class UserDTO extends User {
     public Map<String, Object> getClaims() {
         Map<String, Object> dataMap = new HashMap<>();
 
+        dataMap.put("userId", userId);
         dataMap.put("email", email);
         dataMap.put("password", password);
         dataMap.put("name", name);

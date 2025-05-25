@@ -40,7 +40,7 @@ saramin:
 aws:
   s3:
     bucket-name: demo-my-testbucket-277707098184
-    user-upload-path: uploads/audio
+    user-upload-path: upload/audio
     ai-upload-path: upload/aiAudio
 
 jwt:

@@ -2,28 +2,31 @@ package org.nexusscode.backend.interview.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.nexusscode.backend.application.domain.JobApplication;
+import org.nexusscode.backend.global.aop.lock.RedissonLock;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.client.AwsClient;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
 import org.nexusscode.backend.interview.domain.InterviewSession;
+import org.nexusscode.backend.interview.domain.InterviewSummary;
 import org.nexusscode.backend.interview.dto.*;
+import org.nexusscode.backend.interview.event.AdviceGenerationEvent;
+import org.nexusscode.backend.interview.event.TtsProcessingEvent;
 import org.nexusscode.backend.interview.service.delegation.InterviewAnswerService;
 import org.nexusscode.backend.interview.service.delegation.InterviewQuestionService;
 import org.nexusscode.backend.interview.service.delegation.InterviewSessionService;
 import org.nexusscode.backend.interview.service.delegation.InterviewSummaryService;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
-import org.nexusscode.backend.resume.repository.ResumeItemRepository;
-import org.nexusscode.backend.resume.repository.ResumeRepository;
+import org.nexusscode.backend.resume.service.ResumeItemService;
+import org.nexusscode.backend.resume.service.ResumeService;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
@@ -34,8 +37,8 @@ import java.util.List;
 @Log4j2
 public class InterviewServiceImpl implements InterviewService {
 
-    private final ResumeRepository resumeRepository;
-    private final ResumeItemRepository resumeItemRepository;
+    private final ResumeService resumeService;
+    private final ResumeItemService resumeItemService;
 
     private final AwsClient awsClient;
     private final GeneratorService generatorService;
@@ -46,62 +49,59 @@ public class InterviewServiceImpl implements InterviewService {
     private final InterviewQuestionService interviewQuestionService;
     private final InterviewAnswerService interviewAnswerService;
     private final InterviewSummaryService interviewSummaryService;
-    private final InterviewAsyncFacadeService interviewAsyncFacadeService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
-    public Long startInterview(InterviewStartRequest request) {
-        //service로 교체
-        Resume resume = resumeRepository.findById(request.getResumeId())
-                .orElseThrow(() -> new CustomException(ErrorCode.RESUME_NOT_FOUND));
+    @RedissonLock(key = "'start:' + #userId + ':' + #request.applicationId")
+    public Long startInterview(InterviewStartRequest request, Long userId) {
+        Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId()).get(0);
+        List<InterviewQuestion> questions = generateQuestionsFromResume(resume);
 
-        List<ResumeItem> items = resumeItemRepository.findByResumeId(request.getResumeId())
-                .orElseThrow(() -> new CustomException(ErrorCode.RESUME_ITEM_NOT_FOUND));
-        //
+        JobApplication application = resume.getApplication();
+        InterviewSession session = interviewSessionService.createSession(
+                application.getCompanyName() + " " + application.getJobTitle() + "면접",
+                questions,
+                application,
+                application.getUser().getId(),
+                request.getInterviewType()
+        );
 
-        List<InterviewQuestion> questions = generatorService.generateQuestionsFromResume(items, 3);
+        processFirstQuestionTTS(questions.get(0), request);
 
-        InterviewQuestion firstQuestion = questions.get(0);
+        registerPostCommitAsyncProcessing(session, questions.subList(1, questions.size()), request);
 
+        return session.getId();
+    }
+
+    private List<InterviewQuestion> generateQuestionsFromResume(Resume resume) {
+        List<ResumeItem> items = resume.getResumeItems();
+        return generatorService.generateQuestionsFromResume(items, 3);
+    }
+
+    private void processFirstQuestionTTS(InterviewQuestion firstQuestion, InterviewStartRequest request) {
         byte[] voiceFile = generatorService.generateQuestionVoiceSync(firstQuestion, request.getInterviewType());
+        String fileName = awsService.uploadTtsAudio(voiceFile);
+        firstQuestion.saveTTSFileName(fileName);
+    }
 
-        String fileUrl = awsService.uploadTtsAudio(voiceFile);
-
-        firstQuestion.saveTTSFileName(fileUrl);
-
-        InterviewSession session = interviewSessionService.createSession(request.getTitle(), questions, resume.getApplication(), request.getInterviewType());
-
+    private void registerPostCommitAsyncProcessing(InterviewSession session, List<InterviewQuestion> remainingQuestions, InterviewStartRequest request) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
                 interviewCacheService.cacheQuestionsAsync(session);
-
-                List<InterviewQuestion> remainingQuestions = questions.subList(1, questions.size());
-
-                Flux.fromIterable(remainingQuestions)
-                        .flatMap(question ->
-                                        generatorService.generateQuestionVoiceAsync(question, request.getInterviewType())
-                                                .flatMap(voice -> Mono.fromCallable(() -> {
-                                                    String url = awsService.uploadTtsAudio(voice);
-
-                                                    question.saveTTSFileName(url);
-
-                                                    interviewQuestionService.updateQuestion(question);
-
-                                                    return true;
-                                                }).subscribeOn(Schedulers.boundedElastic()))
-                                                .onErrorResume(e -> {
-                                                    log.error("TTS 처리 실패 - questionId: {}", question.getId(), e);
-                                                    return Mono.just(false);
-                                                })
-                                , 10)
-                        .collectList()
-                        .block();
+                processRemainingQuestionsTTS(remainingQuestions, request);
             }
         });
-
-        return session.getId();
     }
+
+    private void processRemainingQuestionsTTS(List<InterviewQuestion> questions, InterviewStartRequest request) {
+        questions.forEach(q -> {
+            applicationEventPublisher.publishEvent(new TtsProcessingEvent(q, request.getInterviewType()));
+        });
+    }
+
 
     @Override
     public QuestionAndHintDTO getQuestion(Long sessionId, Integer seq) {
@@ -123,27 +123,33 @@ public class InterviewServiceImpl implements InterviewService {
                 .intentText(question.getIntentText())
                 .seq(question.getSeq())
                 .type(question.getInterviewType())
-                .ttsUrl(question.getTTSFileName())
+                .ttsUrl(question.getTtsFileName())
                 .build();
     }
 
     @Override
     @Transactional
-    public Long submitAnswer(InterviewAnswerRequest request) {
+    @RedissonLock(key = "'answer:' + #userId + ':' + #request.questionId")
+    public Long submitAnswer(InterviewAnswerRequest request, Long userId) {
         InterviewQuestion question = interviewQuestionService.findById(request.getQuestionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         Long answerId = interviewAnswerService.saveAnswer(request, question);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                interviewAsyncFacadeService.generateAdviceAsyncFacade(request.getQuestionId(), request.getAudioUrl());
-            }
-        });
+        processGenerateAdvice(request);
 
         return answerId;
     }
+
+    private void processGenerateAdvice(InterviewAnswerRequest request) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                applicationEventPublisher.publishEvent(new AdviceGenerationEvent(request.getQuestionId(), request.getAudioUrl()));
+            }
+        });
+    }
+
 
     @Override
     public List<InterviewSessionDTO> getList(Long applicationId) {
@@ -161,7 +167,7 @@ public class InterviewServiceImpl implements InterviewService {
         List<InterviewQnADTO> questions = interviewSessionService.findInterviewQnA(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
 
-        String summary = interviewSummaryService.findBySessionId(sessionId)
+        InterviewSummary summary = interviewSummaryService.findBySessionId(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
 
         return InterviewAllSessionDTO.createAllSessionDTO(session, questions, summary);

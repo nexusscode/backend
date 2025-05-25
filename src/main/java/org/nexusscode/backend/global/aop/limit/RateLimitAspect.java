@@ -1,4 +1,4 @@
-package org.nexusscode.backend.global.aop;
+package org.nexusscode.backend.global.aop.limit;
 
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;

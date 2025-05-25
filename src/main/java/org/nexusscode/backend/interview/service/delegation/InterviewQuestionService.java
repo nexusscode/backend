@@ -28,7 +28,7 @@ public class InterviewQuestionService {
                 .session(session)
                 .questionText(questionText)
                 .intentText(intentText)
-                .TTSFileName(ttsUrl)
+                .ttsFileName(ttsUrl)
                 .interviewType(type)
                 .seq(seq)
                 .build();
@@ -38,7 +38,7 @@ public class InterviewQuestionService {
 
     @Transactional
     public void updateQuestion(InterviewQuestion question) {
-        interviewQuestionRepository.updateTTSUrlById(question.getId(), question.getTTSFileName());
+        interviewQuestionRepository.updateTTSUrlById(question.getId(), question.getTtsFileName());
     }
 
     public Optional<InterviewQuestion> findById(Long questionId) {

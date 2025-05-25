@@ -104,6 +104,7 @@ public class UserService {
 
     public UserDTO entityToDTO(User member) {
         UserDTO dto = new UserDTO(
+                member.getId(),
                 member.getEmail(),
                 member.getPassword(),
                 member.getName(),
