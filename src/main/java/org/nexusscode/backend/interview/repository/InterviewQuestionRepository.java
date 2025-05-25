@@ -20,10 +20,10 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     Optional<List<InterviewQuestion>> findBySessionId(@Param("sessionId") Long sessionId);
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE InterviewQuestion q SET q.TTSFileName = :ttsUrl WHERE q.id = :id")
+    @Query("UPDATE InterviewQuestion q SET q.ttsFileName = :ttsUrl WHERE q.id = :id")
     void updateTTSUrlById(@Param("id") Long id, @Param("ttsUrl") String ttsUrl);
 
 
-    @EntityGraph(attributePaths = {"answer", "session"})
+    @EntityGraph(attributePaths = {"answer", "session", "session.summary", "answer.answerFeedback"})
     Optional<InterviewQuestion> findById(Long questionId);
 }

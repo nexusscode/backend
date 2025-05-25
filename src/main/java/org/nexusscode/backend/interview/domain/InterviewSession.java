@@ -50,14 +50,15 @@ public class InterviewSession extends Timestamped {
     private List<InterviewQuestion> questions = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "session", fetch = FetchType.LAZY)
     private InterviewSummary summary;
 
     public static InterviewSession createInterviewSession(
-            JobApplication application, String title, List<InterviewQuestion> questions, GptVoice interviewType
+            JobApplication application, Long userId, String title, List<InterviewQuestion> questions, GptVoice interviewType
     ) {
         InterviewSession build = InterviewSession.builder()
                 .application(application)
+                .user(User.builder().id(userId).build())
                 .title(title)
                 .voice(interviewType)
                 .build();

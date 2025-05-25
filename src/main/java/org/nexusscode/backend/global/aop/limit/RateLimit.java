@@ -1,4 +1,4 @@
-package org.nexusscode.backend.global.aop;
+package org.nexusscode.backend.global.aop.limit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

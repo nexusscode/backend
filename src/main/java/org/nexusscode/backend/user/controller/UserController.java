@@ -70,7 +70,7 @@ public class UserController {
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(newAccessToken);
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(newAccessToken, userId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -101,7 +101,7 @@ public class UserController {
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        TokenResponseDTO responseDTO = new TokenResponseDTO(accessToken);
+        TokenResponseDTO responseDTO = new TokenResponseDTO(accessToken, userId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())

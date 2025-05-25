@@ -28,6 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.getWithRoles(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserDTO userDTO = new UserDTO(
+                user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getName(),

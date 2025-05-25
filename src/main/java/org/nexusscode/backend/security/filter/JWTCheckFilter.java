@@ -33,7 +33,19 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private static final List<String> EXCLUDE_URLS = List.of(
-            "/api/" //커뮤니티나 인증 필요없는 부분 나중에 수정하기
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/configuration/**",
+             "/api/interview/**",
+             "/api/application/**",
+             "/api/saramin/**",
+             "/api/memos/**",
+             "/api/resume/**",
+             "/api/survey/**",
+             "/api/user/**"
+             //커뮤니티나 인증 필요없는 부분 나중에 수정하기
     );
 
     @Override
@@ -68,6 +80,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             log.info("JWT Claims: {}", claims);
 
+            Long userId = (Long) claims.get("userId");
             String email = (String) claims.get("email");
             String password = (String) claims.get("password");
             String name = (String) claims.get("name");
@@ -78,7 +91,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-            UserDTO memberDTO = new UserDTO(email, password, name, social, roleNames);
+            UserDTO memberDTO = new UserDTO(userId, email, password, name, social, roleNames);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(memberDTO, password, authorities);
