@@ -82,7 +82,12 @@ public class ResumeService {
         );
     }
 
+
     public List<Resume> findResumeListByApplicationId(Long applicationId) {
         return resumeRepository.findAllByApplicationId(applicationId);
+    }
+    public void save(Resume resume){
+        resumeRepository.save(resume);
+
     }
 }
