@@ -42,7 +42,6 @@ public class User extends Timestamped {
     @Column(name = "experience_level")
     private ExperienceLevel experienceLevel;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private boolean social;
 
@@ -52,10 +51,13 @@ public class User extends Timestamped {
     private List<MemberRole> userRoleList = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String name, List<MemberRole> userRoleList, boolean isSocial) {
+    public User(String email, String password, String name, String phoneNumber,DevType devType, ExperienceLevel experienceLevel,List<MemberRole> userRoleList, boolean isSocial) {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.phoneNumber=phoneNumber;
+        this.devType=devType;
+        this.experienceLevel=experienceLevel;
         this.userRoleList = userRoleList;
         this.social = isSocial;
     }
@@ -67,17 +69,6 @@ public class User extends Timestamped {
 
     public void addUserRole(MemberRole memberRole) {
         userRoleList.add(memberRole);
-    }
-  
-    @Builder
-    public User(String email, String password, String name, MemberRole role,String phoneNumber,DevType devType, ExperienceLevel experienceLevel) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.role = role;
-        this.phoneNumber=phoneNumber;
-        this.devType=devType;
-        this.experienceLevel=experienceLevel;
     }
 
     public void updateProfile(ProfileUpdateRequestDto profileUpdateRequestDto) {

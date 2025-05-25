@@ -54,7 +54,7 @@ public enum ErrorCode {
     KAKAO_USER_FETCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 정보를 가져오지 못했습니다."),
     EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "이메일 제공에 동의하지 않았거나 이메일 정보가 없습니다."),
     API_RATE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, "요청 횟수를 초과했습니다."),
-    DUPLICATE_REQUEST(HttpStatus.CONFLICT, "중복 요청이 감지되었습니다.");
+    DUPLICATE_REQUEST(HttpStatus.CONFLICT, "중복 요청이 감지되었습니다."),
     INCORRECT_DEV_TYPE(HttpStatus.BAD_REQUEST,"옳지 않은 개발 종류 입니다."),
     INCORRECT_EXPERIENCE_LEVEL(HttpStatus.BAD_REQUEST,"옳지 않은 경험 종류 입니다."),
     NOT_FOUND_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"인증 문자를 찾을 수 없습니다."),
