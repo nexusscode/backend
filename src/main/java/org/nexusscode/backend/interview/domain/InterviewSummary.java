@@ -1,14 +1,9 @@
 package org.nexusscode.backend.interview.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.nexusscode.backend.global.Timestamped;
-import org.nexusscode.backend.user.domain.User;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import org.nexusscode.backend.interview.dto.InterviewSummaryDTO;
 
 @Entity
 @Getter
@@ -21,23 +16,48 @@ public class InterviewSummary extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")
     private InterviewSession session;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(columnDefinition = "TEXT")
+    private String strengths;
 
     @Column(columnDefinition = "TEXT")
-    private String summary;
+    private String weaknesses;
 
-    public static InterviewSummary createInterviewSummary(InterviewSession session, String summary) {
-        InterviewSummary interviewSummary = InterviewSummary.builder()
+    @Column(name = "overall_assessment", columnDefinition = "TEXT")
+    private String overallAssessment;
+
+    @Column(name = "comparison_with_previous", columnDefinition = "TEXT")
+    private String comparisonWithPrevious;
+
+    @Embedded
+    private VocabularyEvaluation vocabularyEvaluation;
+
+    @Column(name = "work_attitude", columnDefinition = "TEXT")
+    private String workAttitude;
+
+    @Column(name = "developer_style", columnDefinition = "TEXT")
+    private String developerStyle;
+
+    public static InterviewSummary createInterviewSummary(InterviewSession session, InterviewSummaryDTO dto) {
+        return InterviewSummary.builder()
                 .session(session)
-                .summary(summary)
+                .strengths(dto.getStrengths())
+                .weaknesses(dto.getWeaknesses())
+                .overallAssessment(dto.getOverallAssessment())
+                .comparisonWithPrevious(dto.getComparisonWithPrevious())
+                .vocabularyEvaluation(
+                        VocabularyEvaluation.builder()
+                                .repeatedWordsSummary(dto.getVocabularyRepeatedWords())
+                                .levelComment(dto.getVocabularyLevelComment())
+                                .improvementSuggestions(dto.getVocabularySuggestions())
+                                .build()
+                )
+                .workAttitude(dto.getWorkAttitude())
+                .developerStyle(dto.getDeveloperStyle())
                 .build();
-
-        return interviewSummary;
     }
 }
+

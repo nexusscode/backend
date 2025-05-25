@@ -40,8 +40,26 @@ saramin:
 aws:
   s3:
     bucket-name: demo-my-testbucket-277707098184
-    user-upload-path: uploads/audio
+    user-upload-path: upload/audio
     ai-upload-path: upload/aiAudio
+
+
+jwt:
+  secret: RjYz0g4tJGLd/kkNntLsT7EW9SJGzdGaJuI3TI/BKzU=
+  access-token-expire-minutes: 10
+  refresh-token-expire-minutes: 1440
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /internal-actuator
+  endpoint:
+    health:
+      show-details: never
 
 coolsms:
   sender:

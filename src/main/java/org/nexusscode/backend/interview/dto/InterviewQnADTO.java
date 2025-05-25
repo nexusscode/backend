@@ -15,4 +15,8 @@ public class InterviewQnADTO {
     private String transcript;
     private String feedback;
     private int second;
+    private boolean cheated;
+    private boolean completeAnswer;
+    private boolean questionFulfilled;
+    private String blindKeywords;
 }
