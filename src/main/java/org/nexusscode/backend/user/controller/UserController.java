@@ -137,16 +137,17 @@ public class UserController {
         redisRefreshTokenRepository.deleteRefreshToken(userId);
 
         ResponseCookie expiredCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .sameSite("Strict")
-                .maxAge(0)
-                .build();
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .sameSite("Strict")
+            .maxAge(0)
+            .build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
-                .body(new CommonResponse<>("로그아웃이 완료되었습니다.", 200, true));
+            .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+            .body(new CommonResponse<>("로그아웃이 완료되었습니다.", 200, true));
+    }
 
     @Operation(summary = "아이디 찾기")
     @PostMapping("/find/email")
