@@ -16,6 +16,8 @@ public class ApplicationResponseDto {
     private String jobCode;
     private String jobType;
     private String requiredEducationLevel;
+    private String location;
+    private String salary;
 
     public ApplicationResponseDto(JobApplication application) {
         this.id=application.getId();
@@ -28,5 +30,7 @@ public class ApplicationResponseDto {
         this.jobCode= application.getJobCode();
         this.jobType= application.getJobType();
         this.requiredEducationLevel= application.getRequiredEducationLevel();
+        this.location=application.getLocation();
+        this.salary= application.getSalary();
     }
 }

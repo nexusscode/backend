@@ -43,6 +43,7 @@ aws:
     user-upload-path: upload/audio
     ai-upload-path: upload/aiAudio
 
+
 jwt:
   secret: RjYz0g4tJGLd/kkNntLsT7EW9SJGzdGaJuI3TI/BKzU=
   access-token-expire-minutes: 10
@@ -59,5 +60,12 @@ management:
   endpoint:
     health:
       show-details: never
+
+coolsms:
+  sender:
+    phone-number: ${SENDER_PHONE_NUMBER}
+  api:
+    key: ${COOLSMS_API_KEY}
+    secret: ${COOLSMS_API_SECRET}
 
 
