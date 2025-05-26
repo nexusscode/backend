@@ -18,6 +18,8 @@ public class ApplicationResponseDto {
     private String requiredEducationLevel;
     private String location;
     private String salary;
+    private LocalDateTime createdAt;
+    private String memo;
 
     public ApplicationResponseDto(JobApplication application) {
         this.id=application.getId();
@@ -32,5 +34,7 @@ public class ApplicationResponseDto {
         this.requiredEducationLevel= application.getRequiredEducationLevel();
         this.location=application.getLocation();
         this.salary= application.getSalary();
+        this.createdAt = application.getCreatedAt();
+        this.memo= application.getMemo();
     }
 }

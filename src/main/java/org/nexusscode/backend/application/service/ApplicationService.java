@@ -8,8 +8,6 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import net.sourceforge.tess4j.ITesseract;
@@ -21,6 +19,7 @@ import org.nexusscode.backend.application.domain.Status;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
 import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
+import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
@@ -30,9 +29,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -212,5 +208,13 @@ public class ApplicationService {
         return applicationRepository.findById(id).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND_APPLICATION)
         );
+    }
+
+    @Transactional
+    public void updateMemo(Long applicationId, MemoRequestDto memoRequestDto) {
+        JobApplication application = findById(applicationId);
+        application.updateMemo(memoRequestDto);
+        applicationRepository.save(application);
+
     }
 }
