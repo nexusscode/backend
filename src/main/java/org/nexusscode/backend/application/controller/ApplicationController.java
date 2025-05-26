@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
 import org.nexusscode.backend.application.dto.ApplicationSimpleDto;
+import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.springframework.data.domain.Page;
@@ -74,6 +75,14 @@ public class ApplicationController {
     public ResponseEntity<CommonResponse<Page<ApplicationSimpleDto>>> searchApplication(@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "10")int size,@RequestParam(name = "searchWord")String searchWord){
         Page<ApplicationSimpleDto> responseDtoList = applicationService.searchApplication(page-1,size,searchWord);
         CommonResponse<Page<ApplicationSimpleDto>> response = new CommonResponse<>("공고 검색이 완료되었습니다.",200,responseDtoList);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @Operation(summary = "공고 메모 업데이트")
+    @PostMapping("/{applicationId}/memo")
+    public ResponseEntity<CommonResponse> updateMemo(@PathVariable(name = "applicationId")Long applicationId,@RequestBody MemoRequestDto memoRequestDto){
+        applicationService.updateMemo(applicationId,memoRequestDto);
+        CommonResponse response = new CommonResponse("공고 메모 업데이트가 완료되었습니다.",200,"");
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
