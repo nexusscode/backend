@@ -25,9 +25,9 @@ public class ResumeItemFeedbackController {
 
     @Operation(summary = "단일 자소서 항목 피드백")
     @PostMapping("/{resumeItemId}")
-    public ResponseEntity<CommonResponse> updateResumeFeedback(@PathVariable(name = "resumeItemId")Long resumeItemId, @RequestBody ResumeItemRequestDto resumeItemRequestDto){
-        resumeItemFeedbackService.updateResumeFeedback(resumeItemId,resumeItemRequestDto);
-        CommonResponse response = new CommonResponse("단일 자소서 항목 피드백이 완료되었습니다.",200,"");
+    public ResponseEntity<CommonResponse<ResumeItemFeedbackResponseDto>> updateResumeFeedback(@PathVariable(name = "resumeItemId")Long resumeItemId, @RequestBody ResumeItemRequestDto resumeItemRequestDto){
+        ResumeItemFeedbackResponseDto resumeItemFeedbackResponseDto = resumeItemFeedbackService.updateResumeFeedback(resumeItemId,resumeItemRequestDto);
+        CommonResponse response = new CommonResponse("단일 자소서 항목 피드백이 완료되었습니다.",200,resumeItemFeedbackResponseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -60,6 +60,8 @@ public class ResumeItemService {
                 .feedbackText(feedbackText)
                 .build();
             resumeItemFeedbackRepository.save(feedback);
+            resume.updateAiCount();
+            resumeService.save(resume);
         }
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
@@ -80,6 +82,9 @@ public class ResumeItemService {
         ResumeItem resumeItem = findById(resumeItemId);
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItemRepository.save(resumeItem);
+
+        resumeItem.getResume().touch();
+        resumeService.save(resumeItem.getResume());
 
         return new ResumeItemResponseDto(resumeItem);
     }
@@ -131,6 +136,8 @@ public class ResumeItemService {
                     .feedbackText(feedbackText)
                     .build();
                 resumeItemFeedbackRepository.save(feedback);
+                resume.updateAiCount();
+                resumeService.save(resume);
             }
 
             return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
