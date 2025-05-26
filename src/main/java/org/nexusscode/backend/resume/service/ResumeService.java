@@ -7,8 +7,6 @@ import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
-import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
-import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
 import org.nexusscode.backend.resume.dto.ResumeRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeRepository;
@@ -23,31 +21,30 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
 
     @Transactional
-    public ResumeResponseDto createResume(Long applicationId, ResumeRequestDto resumeRequestDto) {
+    public ResumeResponseDto createResume(Long applicationId) {
         JobApplication application = applicationService.findById(applicationId);
         Resume resume = Resume.builder()
             .application(application)
-            .title(resumeRequestDto.getTitle())
             .build();
         resumeRepository.save(resume);
         return new ResumeResponseDto(resume);
     }
 
-    public List<ResumeResponseDto> getAllResumes(Long applicationId) {
+    public ResumeResponseDto getResume(Long applicationId) {
         JobApplication application = applicationService.findById(applicationId);
-        List<Resume> resumeList = resumeRepository.findAllByApplication(application);
+        Resume resume = resumeRepository.findByApplication(application);
 
-        return resumeList.stream().map(ResumeResponseDto::new).toList();
+        return new ResumeResponseDto(resume);
     }
 
-    @Transactional
+   /* @Transactional
     public ResumeResponseDto updateResume(Long resumeId, ResumeRequestDto resumeRequestDto) {
         Resume resume = findById(resumeId);
         resume.updateResume(resumeRequestDto.getTitle());
         resumeRepository.save(resume);
 
         return new ResumeResponseDto(resume);
-    }
+    }*/
 
     @Transactional
     public void deleteResume(Long resumeId) {

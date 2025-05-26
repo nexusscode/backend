@@ -1,6 +1,7 @@
 package org.nexusscode.backend.resume.domain;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
@@ -17,11 +18,9 @@ public class Resume extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "application_id")
     private JobApplication application;
-
-    private String title;
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResumeItem> resumeItems;
@@ -32,16 +31,14 @@ public class Resume extends Timestamped {
     @Column(name = "feedback_status")
     private ResumeFeedbackStatus feedbackStatus;
 
+    @Column(name = "ai_count", columnDefinition = "BIGINT DEFAULT 0")
+    private Long aiCount=0L;
+
     @Builder
-    public Resume(JobApplication application, String title) {
+    public Resume(JobApplication application) {
         this.application = application;
-        this.title = title;
         this.isSaved=false;
         this.feedbackStatus=ResumeFeedbackStatus.BEFORE_FEEDBACK;
-    }
-
-    public void updateResume(String title) {
-        this.title = title;
     }
 
     public void addResumeItem(ResumeItem resumeItem) {
@@ -58,6 +55,14 @@ public class Resume extends Timestamped {
 
     public void updateFeedbackStatus() {
         this.feedbackStatus=ResumeFeedbackStatus.AFTER_FEEDBACK;
+    }
+
+    public void updateAiCount() {
+        this.aiCount++;
+    }
+
+    public void touch() {
+        this.isSaved = this.isSaved;
     }
 }
 

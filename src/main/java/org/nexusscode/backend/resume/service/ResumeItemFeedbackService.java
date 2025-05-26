@@ -107,13 +107,19 @@ public class ResumeItemFeedbackService {
     }
 
     @Transactional
-    public void updateResumeFeedback(Long resumeItemId, ResumeItemRequestDto resumeItemRequestDto) {
+    public ResumeItemFeedbackResponseDto updateResumeFeedback(Long resumeItemId, ResumeItemRequestDto resumeItemRequestDto) {
         ResumeItem resumeItem = resumeItemRepository.findById(resumeItemId).orElseThrow(
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItemRepository.save(resumeItem);
-        createResumeFeedback(resumeItem.getResume().getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+        String feedbackText = createResumeFeedback(resumeItem.getResume().getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
+        ResumeItemFeedback feedback = ResumeItemFeedback.builder()
+            .resumeItem(resumeItem)
+            .feedbackText(feedbackText)
+            .build();
+        resumeItemFeedbackRepository.save(feedback);
+        return new ResumeItemFeedbackResponseDto(feedback);
     }
 
     public ResumeItemFeedbackResponseDto getResumeItemLatestFeedback(Long resumeItemId) {
