@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.user.domain.User;
 
@@ -65,6 +66,8 @@ public class JobApplication extends Timestamped {
     @Column(name = "job_description")
     private String jobDescription;
 
+    private String memo;
+
     @Builder
     public JobApplication(User user, String saraminJobId, String companyName, String jobTitle, Status status,
         LocalDateTime expirationDate, String experienceLevel, String jobCode, String jobType,
@@ -85,5 +88,9 @@ public class JobApplication extends Timestamped {
 
     public void updateJobDescription(String imageText) {
         this.jobDescription=imageText;
+    }
+
+    public void updateMemo(MemoRequestDto memoRequestDto) {
+        this.memo=memoRequestDto.getMemo();
     }
 }
