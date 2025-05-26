@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ResumeItemFeedbackService {
 
+    private final ResumeService resumeService;
     private final SurveyResultService surveyResultService;
     private final ChatClient chatClient;
     private final ResumeItemRepository resumeItemRepository;
@@ -119,6 +120,8 @@ public class ResumeItemFeedbackService {
             .feedbackText(feedbackText)
             .build();
         resumeItemFeedbackRepository.save(feedback);
+        resumeItem.getResume().updateAiCount();
+        resumeService.save(resumeItem.getResume());
         return new ResumeItemFeedbackResponseDto(feedback);
     }
 
