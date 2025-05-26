@@ -113,6 +113,7 @@ public class ResumeItemFeedbackService {
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
         resumeItem.updateResumeItem(resumeItemRequestDto);
+        resumeItem.updateAiCount();
         resumeItemRepository.save(resumeItem);
         String feedbackText = createResumeFeedback(resumeItem.getResume().getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
         ResumeItemFeedback feedback = ResumeItemFeedback.builder()
