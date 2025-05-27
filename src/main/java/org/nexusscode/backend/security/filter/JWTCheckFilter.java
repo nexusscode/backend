@@ -38,7 +38,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/webjars/**",
             "/configuration/**",
-             "/api/interview/**",
              "/api/application/**",
              "/api/saramin/**",
              "/api/memos/**",
@@ -80,7 +79,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             log.info("JWT Claims: {}", claims);
 
-            Long userId = (Long) claims.get("userId");
+            Long userId = ((Number) claims.get("userId")).longValue();
             String email = (String) claims.get("email");
             String password = (String) claims.get("password");
             String name = (String) claims.get("name");
