@@ -6,7 +6,8 @@ import org.nexusscode.backend.application.domain.JobApplication;
 
 @Getter
 public class ApplicationResponseDto {
-    private Long id;
+    private Long applicationId;
+    private Long userId;
     private String saraminJobId;
     private String companyName;
     private String jobTitle;
@@ -22,7 +23,8 @@ public class ApplicationResponseDto {
     private String memo;
 
     public ApplicationResponseDto(JobApplication application) {
-        this.id=application.getId();
+        this.applicationId=application.getId();
+        this.userId=application.getUser().getId();
         this.saraminJobId= application.getSaraminJobId();
         this.companyName=application.getCompanyName();
         this.jobTitle= application.getJobTitle();
