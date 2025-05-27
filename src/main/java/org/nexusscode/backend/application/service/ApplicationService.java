@@ -148,32 +148,38 @@ public class ApplicationService {
         }
     }
 
-    public ApplicationResponseDto getApplication(Long applicationId) {
+    public ApplicationResponseDto getApplication(Long userId, Long applicationId) {
+        User user = userService.findById(userId);
         JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND)
         );
-        // 추후 로그인 유저의 application 맞는지 확인 필요
+        if(application.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_APPLICATION);
+        }
         return new ApplicationResponseDto(application);
     }
 
     @Transactional
-    public void deleteApplication(Long applicationId) {
+    public void deleteApplication(Long userId, Long applicationId) {
+        User user = userService.findById(userId);
         JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
             ()->new CustomException(ErrorCode.NOT_FOUND)
         );
-        // 추후 로그인 유저의 application 맞는지 확인 필요
+        if(application.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_APPLICATION);
+        }
         applicationRepository.delete(application);
     }
 
-    public Page<ApplicationSimpleDto> getAllApplication(int page, int size) {
+    public Page<ApplicationSimpleDto> getAllApplication(Long userId, int page, int size) {
+        User user = userService.findById(userId);
         Pageable pageable = PageRequest.of(page, size);
-        Page<JobApplication> applicationPage = applicationRepository.findAll(pageable);
-        // 추후 로그인 유저의 application 로만 리스트 조회
+        Page<JobApplication> applicationPage = applicationRepository.findAllByUser(user,pageable);
 
         return applicationPage.map(ApplicationSimpleDto::new);
     }
 
-    @Transactional
+    /*@Transactional
     public String uploadDetailImage(Long applicationId, MultipartFile file) {
         JobApplication application = findById(applicationId);
         String imageText;
@@ -195,11 +201,12 @@ public class ApplicationService {
         applicationRepository.save(application);
 
         return imageText;
-    }
+    }*/
 
-    public Page<ApplicationSimpleDto> searchApplication(int page, int size,String searchWord) {
+    public Page<ApplicationSimpleDto> searchApplication(Long userId, int page, int size,String searchWord) {
+        User user = userService.findById(userId);
         Pageable pageable = PageRequest.of(page, size);
-        Page<JobApplication> jobApplicationPage = applicationRepository.findByCompanyNameContainingIgnoreCaseOrJobTitleContainingIgnoreCase(searchWord,searchWord,pageable);
+        Page<JobApplication> jobApplicationPage = applicationRepository.searchByUserAndCompanyOrTitle(user,searchWord,pageable);
 
         return jobApplicationPage.map(ApplicationSimpleDto::new);
     }
@@ -211,8 +218,12 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void updateMemo(Long applicationId, MemoRequestDto memoRequestDto) {
+    public void updateMemo(Long userId, Long applicationId, MemoRequestDto memoRequestDto) {
+        User user = userService.findById(userId);
         JobApplication application = findById(applicationId);
+        if(application.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_APPLICATION);
+        }
         application.updateMemo(memoRequestDto);
         applicationRepository.save(application);
 
