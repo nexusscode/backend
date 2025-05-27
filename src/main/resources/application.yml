@@ -63,7 +63,7 @@ management:
 
 coolsms:
   sender:
-    phone-number: ${SENDER_PHONE_NUMBER}
+    phone-number: ${SENDER_PHONE_NUMB ER}
   api:
     key: ${COOLSMS_API_KEY}
     secret: ${COOLSMS_API_SECRET}
