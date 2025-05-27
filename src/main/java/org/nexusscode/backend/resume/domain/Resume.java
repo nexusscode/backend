@@ -33,6 +33,7 @@ public class Resume extends Timestamped {
     @Column(name = "is_saved")
     private boolean isSaved;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "feedback_status")
     private ResumeFeedbackStatus feedbackStatus;
 

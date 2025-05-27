@@ -17,6 +17,8 @@ import org.nexusscode.backend.resume.dto.ResumeItemRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeItemResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,19 +27,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ResumeItemService {
 
+    private final UserService userService;
     private final ResumeService resumeService;
     private final ResumeItemRepository resumeItemRepository;
     private final ResumeItemFeedbackService resumeItemFeedbackService;
     private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
 
     @Transactional
-    public List<ResumeItemResponseDto> createResumeItems(Long resumeId,
+    public List<ResumeItemResponseDto> createResumeItems(Long userId,Long resumeId,
         List<ResumeItemRequestDto> resumeItemRequestDtos) {
+        User user = userService.findById(userId);
         Resume resume = resumeService.findById(resumeId);
-
-        if (resume.getFeedbackStatus() == ResumeFeedbackStatus.BEFORE_FEEDBACK) {
-            resume.updateFeedbackStatus();
-            resumeService.save(resume);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
         }
 
         List<ResumeItem> resumeItems = new ArrayList<>();
@@ -63,11 +65,47 @@ public class ResumeItemService {
             resume.updateAiCount();
             resumeService.save(resume);
         }
+        resume.updateFeedbackStatus();
+        resumeService.save(resume);
         return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
     }
 
-    public List<ResumeItemResponseDto> getResume(Long resumeId) {
+    @Transactional
+    public ResumeItemResponseDto createResumeItem(Long userId, Long resumeId, ResumeItemRequestDto resumeItemRequestDto) {
+        User user = userService.findById(userId);
         Resume resume = resumeService.findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
+
+        ResumeItem resumeItem = ResumeItem.builder()
+            .resume(resume)
+            .question(resumeItemRequestDto.getQuestion())
+            .answer(resumeItemRequestDto.getAnswer())
+            .build();
+        resume.addResumeItem(resumeItem);
+        resumeItemRepository.save(resumeItem);
+
+        String feedbackText = resumeItemFeedbackService.createResumeFeedback(
+            resume.getApplication(), resumeItemRequestDto.getQuestion(),
+            resumeItemRequestDto.getAnswer());
+        ResumeItemFeedback feedback = ResumeItemFeedback.builder()
+            .resumeItem(resumeItem)
+            .feedbackText(feedbackText)
+            .build();
+        resumeItemFeedbackRepository.save(feedback);
+        resume.updateAiCount();
+        resumeService.save(resume);
+
+        return new ResumeItemResponseDto(resumeItem);
+    }
+
+    public List<ResumeItemResponseDto> getResumeItems(Long userId,Long resumeId) {
+        User user = userService.findById(userId);
+        Resume resume = resumeService.findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         List<ResumeItem> resumeItems = resumeItemRepository.findByResumeId(resume.getId())
             .orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
@@ -77,9 +115,14 @@ public class ResumeItemService {
     }
 
     @Transactional
-    public ResumeItemResponseDto updateResumeItem(Long resumeItemId,
+    public ResumeItemResponseDto updateResumeItem(Long userId, Long resumeItemId,
         ResumeItemRequestDto resumeItemRequestDto) {
+        User user = userService.findById(userId);
         ResumeItem resumeItem = findById(resumeItemId);
+        if(resumeItem.getResume().getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
+
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItemRepository.save(resumeItem);
 
@@ -90,14 +133,23 @@ public class ResumeItemService {
     }
 
     @Transactional
-    public void deleteResumeItem(Long resumeItemId) {
+    public void deleteResumeItem(Long userId, Long resumeItemId) {
+        User user = userService.findById(userId);
         ResumeItem resumeItem = findById(resumeItemId);
+        if(resumeItem.getResume().getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
+
         resumeItemRepository.delete(resumeItem);
     }
 
     @Transactional
-    public List<ResumeItemResponseDto> uploadResumeFile(Long resumeId, MultipartFile file) {
+    public List<ResumeItemResponseDto> uploadResumeItemsFromFile(Long userId, Long resumeId, MultipartFile file) {
+        User user = userService.findById(userId);
         Resume resume = resumeService.findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         try {
             PDDocument document = PDDocument.load(file.getInputStream());
             PDFTextStripper stripper = new PDFTextStripper();
@@ -139,6 +191,8 @@ public class ResumeItemService {
                 resume.updateAiCount();
                 resumeService.save(resume);
             }
+            resume.updateFeedbackStatus();
+            resumeService.save(resume);
 
             return resumeItems.stream().map(ResumeItemResponseDto::new).toList();
         } catch (Exception e) {
