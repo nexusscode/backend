@@ -38,10 +38,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/webjars/**",
             "/configuration/**",
-             "/api/saramin/**",
              "/api/memos/**",
-             "/api/resume/**",
-             "/api/survey/**",
              "/api/user/**"
              //커뮤니티나 인증 필요없는 부분 나중에 수정하기
     );

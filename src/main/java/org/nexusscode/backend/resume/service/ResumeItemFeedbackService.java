@@ -14,6 +14,8 @@ import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.service.SurveyResultService;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ResumeItemFeedbackService {
 
+    private final UserService userService;
     private final ResumeService resumeService;
     private final SurveyResultService surveyResultService;
     private final ChatClient chatClient;
@@ -48,24 +51,26 @@ public class ResumeItemFeedbackService {
         - 공고명: {jobTitle}
         - 공고유형: {jobCode}
 
-        <DISC 성격유형 검사 결과>
+        <사용자의 DISC 성격유형 검사 결과>
         - D형 점수: {dominanceScore}
         - I형 점수: {influenceScore}
         - S형 점수: {steadinessScore}
         - C형 점수: {conscientiousnessScore}
         - 주요 유형: {primaryType}, 보조 유형: {secondaryType}
 
-        <개발자 특성 검사 결과>
+        <사용자의 개발자 특성 검사 결과>
         - 개발 접근 방식: {developmentApproachScore}
         - 팀 협업: {teamCollaborationScore}
         - 문제 해결: {problemSolvingScore}
         - 개발 가치관: {developmentValuesScore}
 
         [피드백 응답 형식 예시]
-        - 질문 관련성 평가: ...
-        - 맞춤법 및 문장 수정: ...
-        - 표현 개선 제안: ...
-        - 종합 평가: ...
+        - 질문 관련성 평가 : ...
+        - 맞춤법 및 문장 수정 : ...
+        - 표현 개선 제안 : ...
+        - 사용자 성향 기반 피드백 : ...
+        - 공고 정보 기반 피드백 : ...
+        - 종합 평가 : ...
         """);
 
     public String createResumeFeedback(JobApplication application, String question, String answer) {
@@ -106,10 +111,14 @@ public class ResumeItemFeedbackService {
     }
 
     @Transactional
-    public ResumeItemFeedbackResponseDto updateResumeFeedback(Long resumeItemId, ResumeItemRequestDto resumeItemRequestDto) {
+    public ResumeItemFeedbackResponseDto updateResumeItemFeedback(Long userId, Long resumeItemId, ResumeItemRequestDto resumeItemRequestDto) {
+        User user = userService.findById(userId);
         ResumeItem resumeItem = resumeItemRepository.findById(resumeItemId).orElseThrow(
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
+        if(resumeItem.getResume().getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItem.updateAiCount();
         resumeItemRepository.save(resumeItem);
@@ -124,10 +133,14 @@ public class ResumeItemFeedbackService {
         return new ResumeItemFeedbackResponseDto(feedback);
     }
 
-    public ResumeItemFeedbackResponseDto getResumeItemLatestFeedback(Long resumeItemId) {
+    public ResumeItemFeedbackResponseDto getResumeItemLatestFeedback(Long userId,Long resumeItemId) {
+        User user = userService.findById(userId);
         ResumeItem resumeItem = resumeItemRepository.findById(resumeItemId).orElseThrow(
             ()-> new CustomException(ErrorCode.NOT_FOUND_RESUME_ITEM)
         );
+        if(resumeItem.getResume().getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         ResumeItemFeedback resumeItemFeedback = resumeItemFeedbackRepository.findTopByResumeItemOrderByCreatedAtDesc(resumeItem);
         return new ResumeItemFeedbackResponseDto(resumeItemFeedback);
     }
