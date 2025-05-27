@@ -42,7 +42,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtProvider.generateAccessToken(claims);
         String refreshToken = jwtProvider.generateRefreshToken(claims);
 
-        String userId = (String) claims.get("userId");
+        String userId = claims.get("userId").toString();
         redisRefreshTokenRepository.saveRefreshToken(userId, refreshToken, Duration.ofDays(1));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
