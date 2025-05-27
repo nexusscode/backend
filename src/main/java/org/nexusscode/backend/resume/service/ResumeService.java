@@ -23,9 +23,10 @@ public class ResumeService {
     private final UserService userService;
 
     @Transactional
-    public ResumeResponseDto createResume(Long applicationId, Long userId) {
-        JobApplication application = applicationService.findById(applicationId);
+    public ResumeResponseDto createResume(Long userId,Long applicationId) {
         User user = userService.findById(userId);
+        JobApplication application = applicationService.findById(applicationId);
+
         Resume resume = Resume.builder()
             .application(application)
             .user(user)
@@ -34,8 +35,12 @@ public class ResumeService {
         return new ResumeResponseDto(resume);
     }
 
-    public ResumeResponseDto getResume(Long applicationId) {
+    public ResumeResponseDto getResume(Long userId, Long applicationId) {
+        User user = userService.findById(userId);
         JobApplication application = applicationService.findById(applicationId);
+        if(application.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_APPLICATION);
+        }
         Resume resume = resumeRepository.findByApplication(application);
 
         return new ResumeResponseDto(resume);
@@ -51,14 +56,22 @@ public class ResumeService {
     }*/
 
     @Transactional
-    public void deleteResume(Long resumeId) {
+    public void deleteResume(Long userId,Long resumeId) {
+        User user = userService.findById(userId);
         Resume resume = findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         resumeRepository.delete(resume);
     }
 
     @Transactional
-    public void saveResumeInArchieve(Long resumeId) {
+    public void saveResumeInArchieve(Long userId,Long resumeId) {
+        User user = userService.findById(userId);
         Resume resume = findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
 
         if(resume.isSaved()){
             throw new CustomException(ErrorCode.ALREADY_SAVED_RESUME);
@@ -68,8 +81,12 @@ public class ResumeService {
     }
 
     @Transactional
-    public void cancelResumeFromArchieve(Long resumeId) {
+    public void cancelResumeFromArchieve(Long userId,Long resumeId) {
+        User user = userService.findById(userId);
         Resume resume = findById(resumeId);
+        if(resume.getUser()!=user){
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
         if(!resume.isSaved()){
             throw new CustomException(ErrorCode.NOT_SAVED_RESUME);
         }
