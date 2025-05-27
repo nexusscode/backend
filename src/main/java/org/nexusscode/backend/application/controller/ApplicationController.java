@@ -2,7 +2,6 @@ package org.nexusscode.backend.application.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.dto.ApplicationRequestDto;
 import org.nexusscode.backend.application.dto.ApplicationResponseDto;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Application API", description = "공고 관련 API")
 @RestController

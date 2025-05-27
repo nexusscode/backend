@@ -63,8 +63,8 @@ public class JobApplication extends Timestamped {
 
     private String location;
 
-    @Column(name = "job_description")
-    private String jobDescription;
+    /*@Column(name = "job_description")
+    private String jobDescription;*/
 
     private String memo;
 
@@ -86,9 +86,9 @@ public class JobApplication extends Timestamped {
         this.salary=salary;
     }
 
-    public void updateJobDescription(String imageText) {
+    /*public void updateJobDescription(String imageText) {
         this.jobDescription=imageText;
-    }
+    }*/
 
     public void updateMemo(MemoRequestDto memoRequestDto) {
         this.memo=memoRequestDto.getMemo();
