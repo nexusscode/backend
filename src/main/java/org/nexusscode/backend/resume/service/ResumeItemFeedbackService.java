@@ -47,7 +47,6 @@ public class ResumeItemFeedbackService {
         - 회사명: {companyName}
         - 공고명: {jobTitle}
         - 공고유형: {jobCode}
-        - 공고내용: {jobDescription}
 
         <DISC 성격유형 검사 결과>
         - D형 점수: {dominanceScore}
@@ -77,7 +76,6 @@ public class ResumeItemFeedbackService {
             variables.put("companyName", application.getCompanyName());
             variables.put("jobTitle", application.getJobTitle());
             variables.put("jobCode", application.getJobCode());
-            variables.put("jobDescription", application.getJobDescription());
 
             variables.put("dominanceScore", surveyResult.getDominanceScore());
             variables.put("influenceScore", surveyResult.getInfluenceScore());
