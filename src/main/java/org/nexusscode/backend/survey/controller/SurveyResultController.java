@@ -30,7 +30,7 @@ public class SurveyResultController {
     private final SurveyResultService surveyResultService;
 
     @Operation(summary = "최초 설문 제출")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PostMapping("/submit")
     public ResponseEntity<CommonResponse> submitSurvey(@RequestHeader Long userId,@RequestBody List<SurveyRequestDto> surveyRequestDtos){
         surveyResultService.submitSurvey(userId, surveyRequestDtos);
@@ -39,7 +39,7 @@ public class SurveyResultController {
     }
 
     @Operation(summary = "최초 설문 조회")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @GetMapping("/result")
     public ResponseEntity<CommonResponse<SurveyResponseDto>> getSurveyResult(@RequestHeader Long userId){
         SurveyResponseDto responseDto = surveyResultService.getSurveyResult(userId);
@@ -48,7 +48,7 @@ public class SurveyResultController {
     }
 
     @Operation(summary = "DISC 설문 조회")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @GetMapping("/disc/result")
     public ResponseEntity<CommonResponse<DiscSurveyResponseDto>> getDiscSurveyResult(@RequestHeader Long userId){
         DiscSurveyResponseDto responseDto = surveyResultService.getDiscSurveyResult(userId);
@@ -57,7 +57,7 @@ public class SurveyResultController {
     }
 
     @Operation(summary = "개발자 특화 설문 조회")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @GetMapping("/dev/result")
     public ResponseEntity<CommonResponse<DevSurveyResponseDto>> getDevSurveyResult(@RequestHeader Long userId){
         DevSurveyResponseDto responseDto = surveyResultService.getDevSurveyResult(userId);
@@ -66,7 +66,7 @@ public class SurveyResultController {
     }
 
     @Operation(summary = "DISC 설문 수정")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PutMapping("/disc")
     public ResponseEntity<CommonResponse> updateDiscSurvey(@RequestHeader Long userId,@RequestBody List<SurveyRequestDto> surveyRequestDtos){
         surveyResultService.updateDiscSurvey(userId, surveyRequestDtos);
@@ -75,7 +75,7 @@ public class SurveyResultController {
     }
 
     @Operation(summary = "개발자 특화 설문 수정")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PutMapping("/dev")
     public ResponseEntity<CommonResponse> updateDevSurvey(@RequestHeader Long userId,@RequestBody List<SurveyRequestDto> surveyRequestDtos){
         surveyResultService.updateDevSurvey(userId, surveyRequestDtos);
