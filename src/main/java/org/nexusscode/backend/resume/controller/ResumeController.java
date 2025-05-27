@@ -27,7 +27,7 @@ public class ResumeController {
     private final ResumeService resumeService;
 
     @Operation(summary = "자소서 생성")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PostMapping("/{applicationId}/resume")
     public ResponseEntity<CommonResponse<ResumeResponseDto>> createResume(
         @RequestHeader Long userId,@PathVariable(name = "applicationId") Long applicationId) {
@@ -38,7 +38,7 @@ public class ResumeController {
     }
 
     @Operation(summary = "특정 공고에 대한 생성된 자소서 조회")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @GetMapping("/{applicationId}/resume")
     public ResponseEntity<CommonResponse<ResumeResponseDto>> getResume(
         @RequestHeader Long userId,@PathVariable(name = "applicationId") Long applicationId) {
@@ -60,7 +60,7 @@ public class ResumeController {
     }*/
 
     @Operation(summary = "자소서 삭제")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @DeleteMapping("/resume/{resumeId}")
     public ResponseEntity<CommonResponse> deleteResume(
         @RequestHeader Long userId,@PathVariable(name = "resumeId") Long resumeId) {
@@ -70,7 +70,7 @@ public class ResumeController {
     }
 
     @Operation(summary = "자소서 보관 저장")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PutMapping("/resume/{resumeId}/save")
     public ResponseEntity<CommonResponse> saveResumeInArchieve(@RequestHeader Long userId,@PathVariable(name = "resumeId")Long resumeId){
         resumeService.saveResumeInArchieve(userId,resumeId);
@@ -79,7 +79,7 @@ public class ResumeController {
     }
 
     @Operation(summary = "자소서 보관 취소")
-    @PreAuthorize("userId == principal.userId")
+    @PreAuthorize("#userId == principal.userId")
     @PutMapping("/resume/{resumeId}/unsave")
     public ResponseEntity<CommonResponse> cancelResumeFromArchieve(@RequestHeader Long userId,@PathVariable(name = "resumeId")Long resumeId){
         resumeService.cancelResumeFromArchieve(userId,resumeId);
