@@ -7,9 +7,10 @@ import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
-import org.nexusscode.backend.resume.dto.ResumeRequestDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeRepository;
+import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,15 @@ public class ResumeService {
 
     private final ApplicationService applicationService;
     private final ResumeRepository resumeRepository;
+    private final UserService userService;
 
     @Transactional
-    public ResumeResponseDto createResume(Long applicationId) {
+    public ResumeResponseDto createResume(Long applicationId, Long userId) {
         JobApplication application = applicationService.findById(applicationId);
+        User user = userService.findById(userId);
         Resume resume = Resume.builder()
             .application(application)
+            .user(user)
             .build();
         resumeRepository.save(resume);
         return new ResumeResponseDto(resume);
