@@ -40,7 +40,7 @@ public class UserService {
         System.out.println(experienceLevel);
         User user = User.builder()
                 .email(userRequestDto.getEmail())
-                .password(userRequestDto.getPassword())
+                .password(passwordEncoder.encode(userRequestDto.getPassword()))
                 .name(userRequestDto.getName())
                 .phoneNumber(userRequestDto.getPhoneNumber())
                 .devType(devType)
