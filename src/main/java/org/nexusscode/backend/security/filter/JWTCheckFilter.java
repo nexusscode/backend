@@ -38,7 +38,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/webjars/**",
             "/configuration/**",
-             "/api/application/**",
              "/api/saramin/**",
              "/api/memos/**",
              "/api/resume/**",
