@@ -8,11 +8,14 @@ import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.service.ResumeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,10 +28,11 @@ public class ResumeController {
     private final ResumeService resumeService;
 
     @Operation(summary = "자소서 생성")
+    @PreAuthorize("userId == principal.userId")
     @PostMapping("/{applicationId}/resume")
     public ResponseEntity<CommonResponse<ResumeResponseDto>> createResume(
-        @PathVariable(name = "applicationId") Long applicationId) {
-        ResumeResponseDto responseDto = resumeService.createResume(applicationId);
+        @PathVariable(name = "applicationId") Long applicationId,@RequestHeader Long userId) {
+        ResumeResponseDto responseDto = resumeService.createResume(applicationId,userId);
         CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 생성이 완료되었습니다.", 200,
             responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);

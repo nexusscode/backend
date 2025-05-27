@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.*;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.global.Timestamped;
+import org.nexusscode.backend.user.domain.User;
 
 @Entity
 @Getter
@@ -22,6 +23,10 @@ public class Resume extends Timestamped {
     @JoinColumn(name = "application_id")
     private JobApplication application;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResumeItem> resumeItems;
 
@@ -35,8 +40,9 @@ public class Resume extends Timestamped {
     private Long aiCount=0L;
 
     @Builder
-    public Resume(JobApplication application) {
+    public Resume(JobApplication application,User user) {
         this.application = application;
+        this.user=user;
         this.isSaved=false;
         this.feedbackStatus=ResumeFeedbackStatus.BEFORE_FEEDBACK;
     }
