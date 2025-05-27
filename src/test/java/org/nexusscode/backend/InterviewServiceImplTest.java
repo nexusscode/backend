@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.nexusscode.backend.interview.client.AwsClient;
-import org.nexusscode.backend.interview.client.support.GptVoice;
 import org.nexusscode.backend.interview.domain.InterviewAnswer;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
 import org.nexusscode.backend.interview.domain.InterviewSession;
@@ -63,7 +62,6 @@ class InterviewServiceImplTest {
     void startInterview_success() {
         // given
         InterviewStartRequest request = InterviewStartRequest.builder()
-                .resumeId(1L).title("title").interviewType(GptVoice.FABLE)
                 .build();
         Resume resume = mock(Resume.class);
         when(resumeRepository.findById(1L)).thenReturn(Optional.of(resume));
@@ -76,7 +74,7 @@ class InterviewServiceImplTest {
         when(interviewSessionRepository.save(any())).thenReturn(session);
 
         // when
-        Long sessionId = interviewService.startInterview(request);
+        Long sessionId = interviewService.startInterview(request, 1L);
 
         // then
         assertThat(sessionId).isEqualTo(10L);
@@ -131,7 +129,7 @@ class InterviewServiceImplTest {
         when(interviewAnswerRepository.save(any())).thenReturn(savedAnswer);
 
         // when
-        Long answerId = interviewService.submitAnswer(request);
+        Long answerId = interviewService.submitAnswer(request, 1L);
 
         // then
         assertThat(answerId).isEqualTo(100L);
