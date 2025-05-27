@@ -9,14 +9,14 @@ import org.nexusscode.backend.resume.domain.ResumeItem;
 @Getter
 public class ResumeResponseDto {
 
-    private Long id;
+    private Long resumeId;
     private Long applicationId;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Long aiCount;
 
     public ResumeResponseDto(Resume resume) {
-        this.id = resume.getId();
+        this.resumeId = resume.getId();
         this.applicationId = resume.getApplication().getId();
         this.createdAt=resume.getCreatedAt();
         this.modifiedAt=resume.getModifiedAt();
