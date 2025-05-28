@@ -10,10 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface ResumeRepository extends JpaRepository<Resume, Long> {
 
-    List<Resume> findAllByApplication(JobApplication application);
-
     @EntityGraph(attributePaths = {"application", "resumeItems"})
     @Query("select r from Resume r where r.application.id = :applicationId")
     List<Resume> findAllByApplicationId(@Param("applicationId") Long applicationId);
 
+    Resume findByApplication(JobApplication application);
 }
