@@ -6,20 +6,17 @@ import org.nexusscode.backend.resume.domain.ResumeItem;
 @Getter
 public class ResumeItemResponseDto {
 
-    private Long id;
+    private Long resumeItemId;
     private Long resumeId;
     private String question;
     private String answer;
-    /*private int seq;*/
+    private Long aiCount;
 
     public ResumeItemResponseDto(ResumeItem resumeItem) {
-        this.id = resumeItem.getId();
+        this.resumeItemId = resumeItem.getId();
         this.resumeId = resumeItem.getResume().getId();
         this.question = resumeItem.getQuestion();
         this.answer = resumeItem.getAnswer();
-        /*this.seq = resumeItem.getSeq();*/
-    }
-
-    public ResumeItemResponseDto(String question, String answer) {
+        this.aiCount=resumeItem.getAiCount();
     }
 }

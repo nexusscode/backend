@@ -5,12 +5,12 @@ import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 
 @Getter
 public class ResumeItemFeedbackResponseDto {
-    private Long id;
+    private Long feedbackId;
     private Long resumeItemId;
     private String feedbackText;
 
     public ResumeItemFeedbackResponseDto(ResumeItemFeedback resumeItemFeedback) {
-        this.id= resumeItemFeedback.getId();
+        this.feedbackId= resumeItemFeedback.getId();
         this.resumeItemId= resumeItemFeedback.getResumeItem().getId();
         this.feedbackText= resumeItemFeedback.getFeedbackText();
     }
