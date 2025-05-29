@@ -58,9 +58,10 @@ jobs:
             java -version || echo "Java 없음"
 
             echo "새 앱 실행 중..."
-            nohup java -jar /home/ec2-user/backend-0.0.1-SNAPSHOT.jar > log.txt 2>&1 &
+            nohup java -jar /home/ec2-user/backend-0.0.1-SNAPSHOT.jar > /home/ec2-user/app/log.txt 2>&1 &
 
             sleep 5
 
             echo "실행 로그:"
-            tail -n 30 /home/ec2-user/log.txt
+            tail -n 30 /home/ec2-user/app/log.txt
+          
