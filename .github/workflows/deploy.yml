@@ -57,6 +57,9 @@ jobs:
             echo "Java 버전 확인"
             java -version || echo "Java 없음"
 
+            echo "로그 디렉토리 생성"
+            mkdir -p /home/ec2-user/app
+
             echo "새 앱 실행 중..."
             nohup java -jar /home/ec2-user/backend-0.0.1-SNAPSHOT.jar > /home/ec2-user/app/log.txt 2>&1 &
 
@@ -64,4 +67,5 @@ jobs:
 
             echo "실행 로그:"
             tail -n 30 /home/ec2-user/app/log.txt
+          
           
