@@ -27,7 +27,7 @@ jobs:
           strip_components: 2
           debug: true
 
-      - name: 🛑 Kill Existing Spring Boot Process
+      - name: Kill Spring Boot Process
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -35,14 +35,14 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo "기존 프로세스 종료 시도"
-            PID=$(pgrep -f 'java -jar')
-            if [ -n "$PID" ]; then
-              echo "PID: $PID 종료"
-              sudo kill -9 $PID || true
+            PIDS=$(pgrep -f 'java -jar' | grep -v $$)
+            if [ -n "$PIDS" ]; then
+              echo "PID 목록: $PIDS"
+              echo "$PIDS" | xargs -r sudo kill -9
             else
               echo "종료할 프로세스 없음"
             fi
-            exit 0 
+            exit 0
 
       - name: Start Spring Boot Application
         uses: appleboy/ssh-action@v1.0.0
