@@ -2,7 +2,8 @@ spring:
   application:
     name: backend
 
-
+  config:
+    import: "aws-parameterstore:/myapp/"
 
   ai:
     openai:
