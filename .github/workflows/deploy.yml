@@ -31,5 +31,5 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            pkill -f 'java -jar' || true
+            PID=$(pgrep -f 'java -jar') && sudo kill -9 $PID || echo "No process to kill"
             nohup java -jar /home/ec2-user/backend-0.0.1-SNAPSHOT.jar > log.txt 2>&1 &
