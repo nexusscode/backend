@@ -15,14 +15,17 @@ jobs:
       - name: Build JAR
         run: ./gradlew clean build
 
-      - name: Upload to EC2
+      - name: Upload JAR to EC2 (overwrite exact path)
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build/libs/backend-0.0.1-SNAPSHOT.jar"
-          target: "/home/ec2-user"
+          target: "/home/ec2-user/backend-0.0.1-SNAPSHOT.jar"
+          overwrite: true
+          strip_components: 2
+          debug: true
 
       - name: Restart Spring Boot
         uses: appleboy/ssh-action@v1.0.0
@@ -38,4 +41,5 @@ jobs:
             nohup java -jar /home/ec2-user/backend-0.0.1-SNAPSHOT.jar > log.txt 2>&1 &
 
             sleep 5
+            echo "실행 로그:"
             tail -n 20 /home/ec2-user/log.txt
