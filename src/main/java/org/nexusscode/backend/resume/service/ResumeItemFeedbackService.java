@@ -152,8 +152,9 @@ public class ResumeItemFeedbackService {
 
     public Long getRemainingCount(Long userId) {
         String key = "resume_ai_feedback:" + userId + ":" + LocalDate.now();
-        Long count = (Long) redisTemplate.opsForValue().get(key);
-        long remaining = Math.max(0, 20 - (count == null ? 0 : count));
+        Number number = (Number) redisTemplate.opsForValue().get(key);
+        long count = (number != null) ? number.longValue() : 0L;
+        long remaining = Math.max(0, 20 - count);
         return remaining;
     }
 }
