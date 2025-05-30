@@ -107,8 +107,15 @@ public class InterviewController {
     @Operation(summary = "면접 요약 후처리를 위한 sse 커넥션")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/subscribe/{sessionId}")
-    public SseEmitter subscribe(@PathVariable Long sessionId, @RequestHeader Long userId) {
-        return notifier.register(sessionId);
+    public ResponseEntity<CommonResponse<SseEmitter>> subscribe(@PathVariable Long sessionId, @RequestHeader Long userId) {
+        return ResponseEntity.ok(new CommonResponse<>("sse 커넥션", 200, notifier.register(sessionId)));
+    }
+
+    @Operation(summary = "최근 면접 세션 부여를 위한 메서드")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/{application}/connection")
+    public ResponseEntity<CommonResponse<InterviewRecentSessionDTO>> getConnection(@PathVariable Long applicationId, @RequestHeader Long userId) {
+        return ResponseEntity.ok(new CommonResponse<>("최근 면접 세션 재연결", 200, interviewService.getRecentSession(applicationId)));
     }
 }
 

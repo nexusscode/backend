@@ -77,7 +77,7 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
     Optional<InterviewSession> findById(Long sessionId);
 
 
-    @EntityGraph(attributePaths = {"summary"})
+    @EntityGraph(attributePaths = {"summary", "question", "question.answer"})
     @Query("""
 
         SELECT s 

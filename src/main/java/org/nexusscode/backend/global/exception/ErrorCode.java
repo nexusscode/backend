@@ -60,7 +60,8 @@ public enum ErrorCode {
     NOT_FOUND_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"인증 문자를 찾을 수 없습니다."),
     EXPIRED_SMS_VERIFICATION(HttpStatus.NOT_FOUND,"만료된 인증 문자 입니다."),
     NOT_UNAUTHORIZED_APPLICATION(HttpStatus.FORBIDDEN,"접근 권한이 없는 공고입니다."),
-    NOT_UNAUTHORIZED_RESUME(HttpStatus.FORBIDDEN,"접근 권한이 없는 자소서입니다.");
+    NOT_UNAUTHORIZED_RESUME(HttpStatus.FORBIDDEN,"접근 권한이 없는 자소서입니다."),
+    NOT_CONNECT_SESSION(HttpStatus.NOT_FOUND, "최근에 끊긴 세션이 없습니다.");
 
     private final HttpStatus status;
     private final String message;
