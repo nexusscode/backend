@@ -68,6 +68,10 @@ coolsms:
     key: ${coolsms.api-key}
     secret: ${coolsms.api-secret}
 
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
 
 ---
 
