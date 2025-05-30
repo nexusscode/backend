@@ -19,7 +19,6 @@ import org.nexusscode.backend.interview.service.delegation.InterviewSessionServi
 import org.nexusscode.backend.interview.service.delegation.InterviewSummaryService;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
-import org.nexusscode.backend.resume.service.ResumeItemService;
 import org.nexusscode.backend.resume.service.ResumeService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,7 +37,6 @@ import java.util.List;
 public class InterviewServiceImpl implements InterviewService {
 
     private final ResumeService resumeService;
-    private final ResumeItemService resumeItemService;
 
     private final AwsClient awsClient;
     private final GeneratorService generatorService;
@@ -199,6 +197,21 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     public Boolean deleteSession(Long sessionId) {
         return interviewSessionService.deleteSession(sessionId);
+    }
+
+    @Override
+    public InterviewRecentSessionDTO getRecentSession(Long applicationId) {
+        InterviewSession session = interviewSessionService.findByApplicationId(applicationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND)).get(0);
+
+        List<InterviewQuestion> questions = session.getQuestions();
+
+        for (InterviewQuestion question : questions) {
+            if (question.getAnswer() == null) {
+                return InterviewRecentSessionDTO.builder().sessionId(session.getId()).seq(question.getSeq()).build();
+            }
+        }
+        throw new CustomException(ErrorCode.NOT_CONNECT_SESSION);
     }
 }
 
