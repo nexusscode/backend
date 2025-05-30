@@ -54,7 +54,7 @@ public class ResumeItemFeedbackController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @Operation(summary = "전체 자소서 AI피드백 횟수 조회")
+    @Operation(summary = "전체 자소서 AI피드백 총 횟수 조회")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/total")
     public ResponseEntity<CommonResponse> getResumeFeedbackTotalCount(@RequestHeader Long userId) {
