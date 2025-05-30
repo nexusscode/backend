@@ -16,14 +16,14 @@ public class ResumeFeedbackLimiterService {
 
     private static final int DAILY_LIMIT = 20;
 
-    public void checkLimit(String userId) {
+    public void checkLimit(Long userId) {
         String key = "resume_ai_feedback:" + userId + ":" + LocalDate.now();
 
         // 현재까지 요청 횟수 조회
         Long count = (Long) redisTemplate.opsForValue().get(key);
         if (count == null) count = 0L;
 
-        // 호출 횟수가 제한 이상이면 예외 발생
+        // 호출 횟수가 제한 초과이면 예외 발생
         if (count > DAILY_LIMIT) {
             throw new CustomException(ErrorCode.API_RATE_LIMIT_EXCEEDED);
         }

@@ -32,6 +32,7 @@ public class ResumeItemService {
     private final ResumeItemRepository resumeItemRepository;
     private final ResumeItemFeedbackService resumeItemFeedbackService;
     private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
+    private final ResumeFeedbackLimiterService resumeFeedbackLimiterService;
 
     @Transactional
     public List<ResumeItemResponseDto> createResumeItems(Long userId,Long resumeId,
@@ -45,6 +46,7 @@ public class ResumeItemService {
         List<ResumeItem> resumeItems = new ArrayList<>();
 
         for (ResumeItemRequestDto resumeItemRequestDto : resumeItemRequestDtos) {
+            resumeFeedbackLimiterService.checkLimit(user.getId());
             ResumeItem resumeItem = ResumeItem.builder()
                 .resume(resume)
                 .question(resumeItemRequestDto.getQuestion())
@@ -63,7 +65,6 @@ public class ResumeItemService {
                 .build();
             resumeItemFeedbackRepository.save(feedback);
             resume.updateAiCount();
-            resumeService.save(resume);
         }
         resume.updateFeedbackStatus();
         resumeService.save(resume);
@@ -77,6 +78,7 @@ public class ResumeItemService {
         if(resume.getUser()!=user){
             throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
         }
+        resumeFeedbackLimiterService.checkLimit(user.getId());
 
         ResumeItem resumeItem = ResumeItem.builder()
             .resume(resume)
