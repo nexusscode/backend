@@ -39,7 +39,7 @@ public class ResumeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "특정 공고에 대한 생성된 자소서 조회")
+    @Operation(summary = "특정 공고 자소서 조회")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/{applicationId}/resume")
     public ResponseEntity<CommonResponse<ResumeResponseDto>> getResume(
