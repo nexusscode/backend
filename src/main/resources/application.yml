@@ -2,9 +2,6 @@ spring:
   application:
     name: backend
 
-  config:
-    import: "aws-parameterstore:/myapp/"
-
   ai:
     openai:
       api-key: ${openai.apikey}
@@ -71,4 +68,12 @@ coolsms:
     key: ${coolsms.api-key}
     secret: ${coolsms.api-secret}
 
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: "aws-parameterstore:/myapp/"
 
