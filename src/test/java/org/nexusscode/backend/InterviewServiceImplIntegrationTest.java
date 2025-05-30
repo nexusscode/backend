@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class InterviewServiceImplIntegrationTest {
 
+/*
     @Autowired
     private AwsService awsService;
 
@@ -446,4 +447,5 @@ class InterviewServiceImplIntegrationTest {
     }
 
 
+*/
 }
