@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
+import org.nexusscode.backend.resume.dto.RecentResumeResponseDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.service.ResumeService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -84,6 +86,15 @@ public class ResumeController {
     public ResponseEntity<CommonResponse> cancelResumeFromArchieve(@RequestHeader Long userId,@PathVariable(name = "resumeId")Long resumeId){
         resumeService.cancelResumeFromArchieve(userId,resumeId);
         CommonResponse response = new CommonResponse<>("보관함에 자소서 저장이 취소되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "최근 검사한 자소서 조회")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/resume/recent")
+    public ResponseEntity<CommonResponse<RecentResumeResponseDto>> getRecentResume(@RequestHeader Long userId){
+        RecentResumeResponseDto responseDto = resumeService.getRecentResume(userId);
+        CommonResponse response = new CommonResponse<>("최근 검사한 자소서 조회가 완료되었습니다.", 200, responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

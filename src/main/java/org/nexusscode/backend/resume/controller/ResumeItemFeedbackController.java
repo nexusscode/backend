@@ -45,12 +45,21 @@ public class ResumeItemFeedbackController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @Operation(summary = "유저별 자소서 피드백 사용량 확인 (하루 최대 20회 제한)")
+    @Operation(summary = "자소서 피드백 사용량 확인 (하루 최대 20회 제한)")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/remaining")
     public ResponseEntity<CommonResponse> getRemainingCount(@RequestHeader Long userId) {
         Long count = resumeItemFeedbackService.getRemainingCount(userId);
         CommonResponse response = new CommonResponse("유저별 자소서 피드백 사용량 확인이 완료되었습니다.",200,count);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @Operation(summary = "전체 자소서 AI피드백 횟수 조회")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/total")
+    public ResponseEntity<CommonResponse> getResumeFeedbackTotalCount(@RequestHeader Long userId) {
+        Long count = resumeItemFeedbackService.getResumeFeedbackTotalCount(userId);
+        CommonResponse response = new CommonResponse("전체 자소서 AI피드백 횟수 조회가 완료되었습니다.",200,count);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
