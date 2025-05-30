@@ -1,5 +1,6 @@
 package org.nexusscode.backend.resume.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,8 @@ public class ResumeItemFeedbackService {
     private final ChatClient chatClient;
     private final ResumeItemRepository resumeItemRepository;
     private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
+    private final ResumeFeedbackLimiterService resumeFeedbackLimiterService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static final PromptTemplate FEEDBACK_PROMPT_TEMPLATE = new PromptTemplate("""
         [자기소개서 문항 피드백 요청]
@@ -119,6 +123,7 @@ public class ResumeItemFeedbackService {
         if(resumeItem.getResume().getUser()!=user){
             throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
         }
+        resumeFeedbackLimiterService.checkLimit(user.getId());
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItem.updateAiCount();
         resumeItemRepository.save(resumeItem);
@@ -145,5 +150,11 @@ public class ResumeItemFeedbackService {
         return new ResumeItemFeedbackResponseDto(resumeItemFeedback);
     }
 
+    public Long getRemainingCount(Long userId) {
+        String key = "resume_ai_feedback:" + userId + ":" + LocalDate.now();
+        Long count = (Long) redisTemplate.opsForValue().get(key);
+        long remaining = Math.max(0, 20 - (count == null ? 0 : count));
+        return remaining;
+    }
 }
 

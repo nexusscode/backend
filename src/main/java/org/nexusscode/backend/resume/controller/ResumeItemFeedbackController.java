@@ -2,6 +2,7 @@ package org.nexusscode.backend.resume.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.resume.dto.ResumeItemFeedbackResponseDto;
@@ -43,4 +44,14 @@ public class ResumeItemFeedbackController {
             resumeItemFeedbackResponseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
+    @Operation(summary = "유저별 자소서 피드백 사용량 확인 (하루 최대 20회 제한)")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/remaining")
+    public ResponseEntity<CommonResponse> getRemainingCount(@RequestHeader Long userId) {
+        Long count = resumeItemFeedbackService.getRemainingCount(userId);
+        CommonResponse response = new CommonResponse("유저별 자소서 피드백 사용량 확인이 완료되었습니다.",200,count);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 }
