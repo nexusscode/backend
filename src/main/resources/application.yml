@@ -80,4 +80,3 @@ spring:
     activate:
       on-profile: prod
     import: "aws-parameterstore:/myapp/"
-

@@ -77,7 +77,7 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
     Optional<InterviewSession> findById(Long sessionId);
 
 
-    @EntityGraph(attributePaths = {"summary"})
+    @EntityGraph(attributePaths = {"summary", "question", "question.answer"})
     @Query("""
 
         SELECT s 
@@ -86,4 +86,14 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
         ORDER BY s.createdAt DESC
 """)
     Optional<List<InterviewSession>> findByApplicationId(Long applicationId);
+
+    @Query("""
+        SELECT new org.nexusscode.backend.interview.dto.InterviewSessionDTO(
+            s.id, s.title, s.createdAt
+        )
+        from InterviewSession s  
+        join s.application.user u 
+        where u.id = :userId
+""")
+    InterviewSessionDTO findRecentSessionByUserId(Long userId);
 }
