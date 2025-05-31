@@ -7,6 +7,7 @@ import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.resume.domain.Resume;
+import org.nexusscode.backend.resume.dto.RecentResumeResponseDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
 import org.nexusscode.backend.resume.repository.ResumeRepository;
 import org.nexusscode.backend.user.domain.User;
@@ -107,5 +108,15 @@ public class ResumeService {
     public void save(Resume resume){
         resumeRepository.save(resume);
 
+    }
+
+    public RecentResumeResponseDto getRecentResume(Long userId) {
+        User user = userService.findById(userId);
+        Resume resume = resumeRepository.findTopByUserOrderByModifiedAtDesc(user);
+        return new RecentResumeResponseDto(resume.getId(),resume.getApplication().getJobTitle(),resume.getModifiedAt());
+    }
+
+    public Long sumAiCountByUser(User user) {
+        return resumeRepository.sumAiCountByUser(user);
     }
 }
