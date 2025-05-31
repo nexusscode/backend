@@ -25,4 +25,10 @@ public interface InterviewService {
     String getAIVoicePreSignUrl(String fileName);
 
     Boolean deleteSession(Long sessionId);
+
+    InterviewRecentSessionDTO getRecentSession(Long applicationId);
+
+    InterviewSessionDTO getRecentInterviewSessionByUserId(Long userId);
+
+    Integer getInterviewCallCount(Long userId);
 }
