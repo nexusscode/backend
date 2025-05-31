@@ -95,4 +95,8 @@ public class InterviewSessionService {
     public Optional<List<InterviewSession>> findByApplicationId(Long applicationId) {
         return interviewSessionRepository.findByApplicationId(applicationId);
     }
+
+    public InterviewSessionDTO findRecentSessionByUserId(Long userId) {
+        return interviewSessionRepository.findRecentSessionByUserId(userId);
+    }
 }

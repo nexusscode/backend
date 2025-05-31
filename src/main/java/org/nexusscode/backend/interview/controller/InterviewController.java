@@ -117,5 +117,20 @@ public class InterviewController {
     public ResponseEntity<CommonResponse<InterviewRecentSessionDTO>> getConnection(@PathVariable Long applicationId, @RequestHeader Long userId) {
         return ResponseEntity.ok(new CommonResponse<>("최근 면접 세션 재연결", 200, interviewService.getRecentSession(applicationId)));
     }
+
+    @Operation(summary = "가장 최근 면접 호출")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/recent")
+    public ResponseEntity<CommonResponse<InterviewSessionDTO>> getRecentInterviewSession(@RequestHeader Long userId) {
+        return ResponseEntity.ok(new CommonResponse<>("가장 최근에 본 면접 세션을 호출하였습니다.", 200, interviewService.getRecentInterviewSessionByUserId(userId)));
+    }
+
+    @Operation(summary = "여태까지 호출한 횟수 조회")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/total")
+    public ResponseEntity<CommonResponse<Integer>> getTotalInterviewCall(@RequestHeader Long userId) {
+        return ResponseEntity.ok(new CommonResponse<>("면접 횟수 조회", 200, interviewService.getInterviewCallCount(userId)));
+    }
+
 }
 

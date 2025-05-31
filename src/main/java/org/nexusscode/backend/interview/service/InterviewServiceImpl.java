@@ -3,6 +3,7 @@ package org.nexusscode.backend.interview.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.nexusscode.backend.application.domain.JobApplication;
+import org.nexusscode.backend.global.aop.limit.RateLimit;
 import org.nexusscode.backend.global.aop.lock.RedissonLock;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
@@ -20,6 +21,7 @@ import org.nexusscode.backend.interview.service.delegation.InterviewSummaryServi
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
 import org.nexusscode.backend.resume.service.ResumeService;
+import org.nexusscode.backend.user.service.UserStatService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -37,6 +40,7 @@ import java.util.List;
 public class InterviewServiceImpl implements InterviewService {
 
     private final ResumeService resumeService;
+    private final UserStatService userStatService;
 
     private final AwsClient awsClient;
     private final GeneratorService generatorService;
@@ -52,6 +56,7 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional
+    @RateLimit(limit = 10, duration = 24, timeUnit = ChronoUnit.HOURS)
     @RedissonLock(key = "'start:' + #userId + ':' + #request.applicationId")
     public Long startInterview(InterviewStartRequest request, Long userId) {
         Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId()).get(0);
@@ -68,7 +73,9 @@ public class InterviewServiceImpl implements InterviewService {
 
         processFirstQuestionTTS(questions.get(0), request);
 
-        registerPostCommitAsyncProcessing(session, questions.subList(1, questions.size()), request);
+        registerPostCommitAsyncProcessing(session, questions.subList(1, questions.size()), request, userId);
+
+        userStatService.getUserStatAndIncrement(userId);
 
         return session.getId();
     }
@@ -84,7 +91,7 @@ public class InterviewServiceImpl implements InterviewService {
         firstQuestion.saveTTSFileName(fileName);
     }
 
-    private void registerPostCommitAsyncProcessing(InterviewSession session, List<InterviewQuestion> remainingQuestions, InterviewStartRequest request) {
+    private void registerPostCommitAsyncProcessing(InterviewSession session, List<InterviewQuestion> remainingQuestions, InterviewStartRequest request, Long userId) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -212,6 +219,16 @@ public class InterviewServiceImpl implements InterviewService {
             }
         }
         throw new CustomException(ErrorCode.NOT_CONNECT_SESSION);
+    }
+
+    @Override
+    public InterviewSessionDTO getRecentInterviewSessionByUserId(Long userId) {
+        return interviewSessionService.findRecentSessionByUserId(userId);
+    }
+
+    @Override
+    public Integer getInterviewCallCount(Long userId) {
+        return userStatService.getUserStat(userId).getTotalInterviews();
     }
 }
 
