@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
-import org.nexusscode.backend.user.domain.DevType;
-import org.nexusscode.backend.user.domain.ExperienceLevel;
-import org.nexusscode.backend.user.domain.MemberRole;
-import org.nexusscode.backend.user.domain.User;
+import org.nexusscode.backend.user.domain.*;
 import org.nexusscode.backend.user.dto.*;
 import org.nexusscode.backend.user.dto.EmailFindRequestDto;
 import org.nexusscode.backend.user.dto.PasswordFindRequestDto;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 @Log4j2
 public class UserService {
     private final UserRepository userRepository;
+    private final UserStatService userStatService;
     private final PasswordEncoder passwordEncoder;
 
     public void signup(UserRequestDto userRequestDto) {
@@ -47,6 +45,8 @@ public class UserService {
                 .experienceLevel(experienceLevel)
                 .build();
 
+        userStatService.createUserStat(user);
+
         user.addUserRole(MemberRole.USER);
 
         userRepository.save(user);
@@ -57,7 +57,6 @@ public class UserService {
             ()->new CustomException(ErrorCode.NOT_FOUND_USER)
         );
     }
-
 
     public void modifyUser(UserModifyDTO userModifyDTO) {
         User user = userRepository.findByEmail(userModifyDTO.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));

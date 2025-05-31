@@ -4,13 +4,13 @@ spring:
 
   ai:
     openai:
-      api-key: ${OPEN_AI_APIKEY}
+      api-key: ${openai.apikey}
       model: gpt-3.5-turbo
 
   datasource:
-    url: jdbc:mysql://localhost:3306/${MYSQL_DATABASE}
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/${mysql.database}
+    username: ${mysql.user}
+    password: ${mysql.password}
 
   jpa:
     hibernate:
@@ -34,7 +34,7 @@ org:
       whisper-endpoint: https://api.openai.com/v1/audio/transcriptions
 
 saramin:
-  access-key: ${SARAMIN_ACCESS_KEY}
+  access-key: ${saramin.access-key}
   endpoint: https://oapi.saramin.co.kr/job-search
 
 aws:
@@ -63,9 +63,20 @@ management:
 
 coolsms:
   sender:
-    phone-number: ${SENDER_PHONE_NUMBER}
+    phone-number: ${coolsms.sender-phone}
   api:
-    key: ${COOLSMS_API_KEY}
-    secret: ${COOLSMS_API_SECRET}
+    key: ${coolsms.api-key}
+    secret: ${coolsms.api-secret}
 
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: "aws-parameterstore:/myapp/"

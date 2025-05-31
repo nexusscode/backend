@@ -34,10 +34,8 @@ public class RateLimitAspect {
 
         String key = "rate:" + methodName + ":" + userId;
 
-        Long count = (Long) redisTemplate.opsForValue().get(key);
-        if (count == null) {
-            count = 0L;
-        }
+        Object raw = redisTemplate.opsForValue().get(key);
+        Long count = raw != null ? ((Number) raw).longValue() : 0L;
 
         count++;
         redisTemplate.opsForValue().set(key, count);
