@@ -48,9 +48,9 @@ public class ApplicationMemoController {
     // 메모 하나 상세보기
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<MemoResponseDTO>> getMemoDetail(@RequestHeader Long userId,
-                                                         @PathVariable Long id) {
+                                                         @PathVariable Long memoId) {
         // 특정 메모 ID로 상세정보 조회
-        MemoResponseDTO response = memoService.getMemoDetail(userId, id);
+        MemoResponseDTO response = memoService.getMemoDetail(userId, memoId);
         return ResponseEntity.ok(new CommonResponse<>("메모 상세 조회 성공", 200, response));
     }
 
@@ -67,9 +67,9 @@ public class ApplicationMemoController {
     // 메모 삭제하기
     @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse<Object>> deleteMemo(@RequestHeader Long userId,
-                                           @PathVariable Long id) {
+                                           @PathVariable Long memoId) {
         // 메모 ID로 삭제 기능 호출
-        memoService.deleteMemo(userId, id);
+        memoService.deleteMemo(userId, memoId);
         // 삭제 완료 응답
         return ResponseEntity.ok(new CommonResponse<>("메모가 삭제되었습니다.", 200, null));
     }
