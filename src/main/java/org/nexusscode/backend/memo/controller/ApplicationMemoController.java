@@ -29,7 +29,7 @@ public class ApplicationMemoController {
     @Operation(summary = "지원서 메모 생성", description = "새로운 지원서 메모를 생성합니다.")
     @PreAuthorize("#userId == principal.userId")
     @PostMapping
-    public ResponseEntity<CommonResponse<MemoResponseDTO>> createMemo(@RequestHeader("X-USER-ID") Long userId,
+    public ResponseEntity<CommonResponse<MemoResponseDTO>> createMemo(@RequestHeader Long userId,
                                                       @RequestBody MemoRequestDTO requestDTO) {
         // 메모 작성 기능 호출 (사용자 ID와 메모 내용 전달)
         MemoResponseDTO response = memoService.createMemo(userId, requestDTO);
@@ -39,7 +39,7 @@ public class ApplicationMemoController {
 
     // 내 메모 전체 리스트 가져오기
     @GetMapping
-    public ResponseEntity<CommonResponse<List<MemoResponseDTO>>> getUserMemos(@RequestHeader("X-USER-ID") Long userId) {
+    public ResponseEntity<CommonResponse<List<MemoResponseDTO>>> getUserMemos(@RequestHeader Long userId) {
         // 사용자 ID로 메모 리스트 조회
         List<MemoResponseDTO> response = memoService.getUserMemos(userId);
         return ResponseEntity.ok(new CommonResponse<>("사용자 메모 목록 조회 성공", 200, response));
@@ -47,7 +47,7 @@ public class ApplicationMemoController {
 
     // 메모 하나 상세보기
     @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<MemoResponseDTO>> getMemoDetail(@RequestHeader("X-USER-ID") Long userId,
+    public ResponseEntity<CommonResponse<MemoResponseDTO>> getMemoDetail(@RequestHeader Long userId,
                                                          @PathVariable Long id) {
         // 특정 메모 ID로 상세정보 조회
         MemoResponseDTO response = memoService.getMemoDetail(userId, id);
@@ -56,7 +56,7 @@ public class ApplicationMemoController {
 
     // 메모 수정하기
     @PutMapping("/{id}")
-    public ResponseEntity<CommonResponse<MemoResponseDTO>> updateMemo(@RequestHeader("X-USER-ID") Long userId,
+    public ResponseEntity<CommonResponse<MemoResponseDTO>> updateMemo(@RequestHeader Long userId,
                                                       @PathVariable Long id,
                                                       @RequestBody MemoRequestDTO requestDto) {
         // 메모 ID와 수정할 내용으로 메모 업데이트
@@ -66,7 +66,7 @@ public class ApplicationMemoController {
 
     // 메모 삭제하기
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<Object>> deleteMemo(@RequestHeader("X-USER-ID") Long userId,
+    public ResponseEntity<CommonResponse<Object>> deleteMemo(@RequestHeader Long userId,
                                            @PathVariable Long id) {
         // 메모 ID로 삭제 기능 호출
         memoService.deleteMemo(userId, id);
