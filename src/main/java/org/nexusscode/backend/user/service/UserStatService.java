@@ -5,6 +5,7 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.domain.UserStat;
+import org.nexusscode.backend.user.dto.AiCountResponsedto;
 import org.nexusscode.backend.user.repository.UserRepository;
 import org.nexusscode.backend.user.repository.UserStatRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class UserStatService {
     public UserStat createUserStat(User user) {
         UserStat stat = UserStat.builder()
                 .user(user)
+                .totalResumes(0)
                 .totalInterviews(0)
                 .build();
 
@@ -53,6 +55,13 @@ public class UserStatService {
         return result;
     }
 
+    public void incrementResumeCount(Long userId) {
+        UserStat stat = userStatRepository.findById(userId)
+            .orElseGet(() -> createUserStatByUserId(userId));
+
+        stat.increaseResumeCount();
+        userStatRepository.save(stat);
+    }
 
     public void incrementInterviewCount(Long userId) {
         UserStat stat = userStatRepository.findById(userId)
@@ -63,5 +72,15 @@ public class UserStatService {
 
     public void deleteUserStat(Long userId) {
         userStatRepository.deleteById(userId);
+    }
+
+    public AiCountResponsedto getFeedbackCount(Long userId) {
+        UserStat userStat = getUserStat(userId);
+        int resumeAiCount = userStat.getTotalResumes();
+        int interviewAiCount = userStat.getTotalInterviews();
+        int totalAiCount = resumeAiCount+interviewAiCount;
+
+        return new AiCountResponsedto(resumeAiCount,interviewAiCount,totalAiCount);
+
     }
 }

@@ -19,12 +19,18 @@ public class UserStat extends Timestamped {
     private Long userId;
 
     @Column(nullable = false)
+    private int totalResumes = 0;
+
+    @Column(nullable = false)
     private int totalInterviews = 0;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     private User user;
 
+    public void increaseResumeCount() {
+        this.totalResumes++;
+    }
     public void increaseInterviewCount() {
         this.totalInterviews++;
     }
