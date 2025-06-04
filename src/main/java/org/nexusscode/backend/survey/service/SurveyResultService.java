@@ -1,5 +1,6 @@
 package org.nexusscode.backend.survey.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
-import org.nexusscode.backend.survey.domain.DiscEnum;
+import org.nexusscode.backend.survey.domain.DeveloperType;
 import org.nexusscode.backend.survey.domain.DiscType;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.dto.DevSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.DiscSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
+import org.nexusscode.backend.survey.repository.DeveloperTypeRepository;
 import org.nexusscode.backend.survey.repository.DiscTypeRepository;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.nexusscode.backend.user.domain.User;
@@ -28,6 +30,7 @@ public class SurveyResultService {
     private final SurveyResultRepository surveyResultRepository;
     private final UserService userService;
     private final DiscTypeRepository discTypeRepository;
+    private final DeveloperTypeRepository developerTypeRepository;
 
     private static final List<Integer> D_TYPE_QUESTIONS = List.of(1, 2, 3, 4, 5);
     private static final List<Integer> I_TYPE_QUESTIONS = List.of(6, 7, 8, 9, 10);
@@ -54,28 +57,10 @@ public class SurveyResultService {
         int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtoList, PROBLEM_SOLVING_QUESTIONS);
         int devValuesScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_VALUES_QUESTIONS);
 
-        Map<String, Integer> typeScores = new HashMap<>();
-        typeScores.put("D", dScore);
-        typeScores.put("I", iScore);
-        typeScores.put("S", sScore);
-        typeScores.put("C", cScore);
-
-        // 점수를 내림차순으로 정렬
-        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
-            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toList());
-
-        // 최대 점수와 두 번째 점수 확인
-        int maxScore = sortedTypes.get(0).getValue();
-
-        String primaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == maxScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .findFirst()
-            .orElse(null);
-
-        DiscType discType = checkDiscType(primaryType);
+        DiscType discType = determineDiscType(dScore,iScore,sScore,cScore);
+        DeveloperType developerType = determineDeveloperType(
+            devApproachScore, teamCollabScore, problemSolvingScore, devValuesScore
+        );
 
         SurveyResult surveyResult = SurveyResult.builder()
             .user(user)
@@ -88,16 +73,55 @@ public class SurveyResultService {
             .teamCollaborationScore(teamCollabScore)
             .problemSolvingScore(problemSolvingScore)
             .developmentValuesScore(devValuesScore)
+            .developerType(developerType)
             .build();
 
         surveyResultRepository.save(surveyResult);
     }
 
-    private DiscType checkDiscType(String primaryType) {
-        DiscEnum discEnum = DiscEnum.valueOf(primaryType);
+    private DiscType determineDiscType(int dScore,int iScore,int sScore,int cScore) {
+        Map<String, Integer> typeScores = new HashMap<>();
+        typeScores.put("주도형(D)", dScore);
+        typeScores.put("사교형(I)", iScore);
+        typeScores.put("안정형(S)", sScore);
+        typeScores.put("신중형(C)", cScore);
 
-        return discTypeRepository.findByDisc(discEnum)
+        // 점수를 내림차순으로 정렬
+        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .collect(Collectors.toList());
+
+        // 최대 점수 확인
+        int maxScore = sortedTypes.get(0).getValue();
+
+        String primaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == maxScore)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .findFirst()
+            .orElse(null);
+
+        return discTypeRepository.findByName(primaryType)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DISC_TYPE));
+    }
+
+    private DeveloperType determineDeveloperType(int devApproach, int teamCollab, int problemSolving, int devValues){
+        Map<String, Integer> devScores = new HashMap<>();
+        devScores.put("실행 중심 개발자", devApproach);
+        devScores.put("협업형 개발자", teamCollab);
+        devScores.put("문제 해결형 개발자", problemSolving);
+        devScores.put("가치 지향 개발자", devValues);
+
+        int max = Collections.max(devScores.values());
+
+        String primaryType = devScores.entrySet().stream()
+            .filter(e -> e.getValue() == max)
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
+
+        return developerTypeRepository.findByName(primaryType)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DEV_TYPE));
     }
 
     private int calculateScoreForQuestions(List<SurveyRequestDto> surveyRequestDtoList, List<Integer> questionIds) {
