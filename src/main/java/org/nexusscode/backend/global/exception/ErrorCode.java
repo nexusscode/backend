@@ -62,7 +62,8 @@ public enum ErrorCode {
     NOT_UNAUTHORIZED_APPLICATION(HttpStatus.FORBIDDEN,"접근 권한이 없는 공고입니다."),
     NOT_UNAUTHORIZED_RESUME(HttpStatus.FORBIDDEN,"접근 권한이 없는 자소서입니다."),
     NOT_CONNECT_SESSION(HttpStatus.NOT_FOUND, "최근에 끊긴 세션이 없습니다."),
-    NOT_FOUND_DISC_TYPE(HttpStatus.NOT_FOUND,"DISC 유형을 찾을 수 없습니다.");
+    NOT_FOUND_DISC_TYPE(HttpStatus.NOT_FOUND,"DISC 유형을 찾을 수 없습니다."),
+    NOT_FOUND_DEV_TYPE(HttpStatus.NOT_FOUND,"개발 유형을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

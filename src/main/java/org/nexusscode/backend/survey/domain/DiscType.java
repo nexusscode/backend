@@ -4,8 +4,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,11 +22,7 @@ public class DiscType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
-    private DiscEnum disc;
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -39,8 +33,8 @@ public class DiscType {
     private List<String> keywords;
 
     @Builder
-    public DiscType(DiscEnum disc, String description, List<String> keywords) {
-        this.disc = disc;
+    public DiscType(String name, String description, List<String> keywords) {
+        this.name = name;
         this.description = description;
         this.keywords = keywords;
     }
