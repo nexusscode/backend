@@ -28,7 +28,7 @@ public class ResumeController {
 
     private final ResumeService resumeService;
 
-    @Operation(summary = "자소서 생성")
+    /*@Operation(summary = "자소서 생성")
     @PreAuthorize("#userId == principal.userId")
     @PostMapping("/{applicationId}/resume")
     public ResponseEntity<CommonResponse<ResumeResponseDto>> createResume(
@@ -37,7 +37,7 @@ public class ResumeController {
         CommonResponse<ResumeResponseDto> response = new CommonResponse<>("자소서 생성이 완료되었습니다.", 200,
             responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    }*/
 
     @Operation(summary = "특정 공고 자소서 조회")
     @PreAuthorize("#userId == principal.userId")

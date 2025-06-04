@@ -3,6 +3,7 @@ package org.nexusscode.backend.resume.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.application.domain.JobApplication;
+import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.application.service.ApplicationService;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
@@ -19,30 +20,28 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ResumeService {
 
-    private final ApplicationService applicationService;
+    private final JobApplicationRepository applicationRepository;
     private final ResumeRepository resumeRepository;
     private final UserService userService;
 
     @Transactional
-    public ResumeResponseDto createResume(Long userId,Long applicationId) {
-        User user = userService.findById(userId);
-        JobApplication application = applicationService.findById(applicationId);
-
+    public void createResume(User user ,JobApplication application) {
         Resume resume = Resume.builder()
             .application(application)
             .user(user)
             .build();
         resumeRepository.save(resume);
-        return new ResumeResponseDto(resume);
     }
 
     public ResumeResponseDto getResume(Long userId, Long applicationId) {
         User user = userService.findById(userId);
-        JobApplication application = applicationService.findById(applicationId);
+        JobApplication application = applicationRepository.findById(applicationId).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_APPLICATION)
+        );
         if(application.getUser()!=user){
             throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_APPLICATION);
         }
-        Resume resume = resumeRepository.findByApplication(application);
+        Resume resume = findResumeByApplication(application);
 
         return new ResumeResponseDto(resume);
     }
@@ -118,5 +117,9 @@ public class ResumeService {
 
     public Long sumAiCountByUser(User user) {
         return resumeRepository.sumAiCountByUser(user);
+    }
+
+    public Resume findResumeByApplication(JobApplication application){
+        return resumeRepository.findByApplication(application);
     }
 }
