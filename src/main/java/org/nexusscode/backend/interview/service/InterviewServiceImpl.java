@@ -59,7 +59,7 @@ public class InterviewServiceImpl implements InterviewService {
     @RateLimit(limit = 10, duration = 24, timeUnit = ChronoUnit.HOURS)
     @RedissonLock(key = "'start:' + #userId + ':' + #request.applicationId")
     public Long startInterview(InterviewStartRequest request, Long userId) {
-        Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId()).get(0);
+        Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId());
         List<InterviewQuestion> questions = generateQuestionsFromResume(resume);
 
         JobApplication application = resume.getApplication();

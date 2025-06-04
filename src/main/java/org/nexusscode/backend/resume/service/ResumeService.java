@@ -102,9 +102,10 @@ public class ResumeService {
     }
 
 
-    public List<Resume> findResumeListByApplicationId(Long applicationId) {
-        return resumeRepository.findAllByApplicationId(applicationId);
+    public Resume findResumeListByApplicationId(Long applicationId) {
+        return resumeRepository.findByApplicationId(applicationId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RESUME));
     }
+
     public void save(Resume resume){
         resumeRepository.save(resume);
 
