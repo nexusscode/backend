@@ -64,6 +64,8 @@ jobs:
 
             echo "로그 디렉토리 생성"
             mkdir -p /home/ec2-user/app
+            
+            cd /home/ec2-user/app
 
             echo "새 앱 실행 중..."
             nohup java -jar app.jar --spring.profiles.active=prod > $LOG_FILE 2>&1 &
