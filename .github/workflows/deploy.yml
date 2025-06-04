@@ -64,7 +64,7 @@ jobs:
             mkdir -p /home/ec2-user/app
 
             echo "새 앱 실행 중..."
-            nohup java -jar /home/ec2-user/app/app.jar > $LOG_FILE 2>&1 &
+            nohup java -jar app.jar --spring.profiles.active=prod > $LOG_FILE 2>&1 &
 
             sleep 5
 
