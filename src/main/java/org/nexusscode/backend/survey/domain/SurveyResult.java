@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -46,6 +47,10 @@ public class SurveyResult extends Timestamped {
     @Column(name = "secondary_type")
     private String secondaryType;
 
+    @ManyToOne
+    @JoinColumn(name = "disc_type")
+    private DiscType discType;
+
     @Column(name = "development_approach_scroe")
     private int developmentApproachScore;
 
@@ -57,6 +62,10 @@ public class SurveyResult extends Timestamped {
 
     @Column(name = "development_values_score")
     private int developmentValuesScore;
+
+    @ManyToOne
+    @JoinColumn(name = "developer_type")
+    private DeveloperType developerType;
 
     @Builder
     public SurveyResult(User user,int dominanceScore, int influenceScore, int steadinessScore,
