@@ -10,6 +10,7 @@ import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.security.dto.TokenResponseDTO;
 import org.nexusscode.backend.security.jwt.JWTProvider;
 import org.nexusscode.backend.security.repository.RedisRefreshTokenRepository;
+import org.nexusscode.backend.user.dto.AiCountResponsedto;
 import org.nexusscode.backend.user.dto.UserDTO;
 import org.nexusscode.backend.user.dto.UserModifyDTO;
 import org.nexusscode.backend.user.dto.EmailFindRequestDto;
@@ -18,6 +19,7 @@ import org.nexusscode.backend.user.dto.ProfileResponseDto;
 import org.nexusscode.backend.user.dto.ProfileUpdateRequestDto;
 import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.service.UserService;
+import org.nexusscode.backend.user.service.UserStatService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -46,6 +48,7 @@ public class UserController {
     private final UserService userService;
     private final JWTProvider jwtProvider;
     private final RedisRefreshTokenRepository redisRefreshTokenRepository;
+    private final UserStatService userStatService;
 
     @Operation(summary = "회원 가입 메서드")
     @PreAuthorize("permitAll()")
@@ -165,18 +168,29 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @Operation(summary = "프로필 조회")
-    @GetMapping("/{userId}")
-    public ResponseEntity<CommonResponse<ProfileResponseDto>> getProfile(@PathVariable(name = "userId")Long userId){
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping
+    public ResponseEntity<CommonResponse<ProfileResponseDto>> getProfile(@RequestHeader Long userId){
         ProfileResponseDto responseDto = userService.getProfile(userId);
         CommonResponse<ProfileResponseDto> response = new CommonResponse<>("프로필 조회가 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     @Operation(summary = "프로필 수정")
-    @PutMapping("/{userId}")
-    public ResponseEntity<CommonResponse<ProfileResponseDto>> updateProfile(@PathVariable(name = "userId")Long userId,@RequestBody
+    @PreAuthorize("#userId == principal.userId")
+    @PutMapping
+    public ResponseEntity<CommonResponse<ProfileResponseDto>> updateProfile(@RequestHeader Long userId,@RequestBody
         ProfileUpdateRequestDto profileUpdateRequestDto){
         ProfileResponseDto responseDto = userService.updateProfile(userId, profileUpdateRequestDto);
         CommonResponse<ProfileResponseDto> response = new CommonResponse<>("프로필 수정이 완료되었습니다.",200,responseDto);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @Operation(summary = "유저별 총 AI피드백 횟수 조회")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/feedback-count")
+    public ResponseEntity<CommonResponse<AiCountResponsedto>> getFeedbackCount(@RequestHeader Long userId){
+        AiCountResponsedto responseDto = userStatService.getFeedbackCount(userId);
+        CommonResponse<AiCountResponsedto> response = new CommonResponse<>("AI피드백 횟수 조회가 완료되었습니다.",200,responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
