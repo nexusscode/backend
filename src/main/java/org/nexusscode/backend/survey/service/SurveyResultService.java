@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.survey.domain.DiscEnum;
+import org.nexusscode.backend.survey.domain.DiscType;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.dto.DevSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.DiscSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
+import org.nexusscode.backend.survey.repository.DiscTypeRepository;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyResultService {
     private final SurveyResultRepository surveyResultRepository;
     private final UserService userService;
+    private final DiscTypeRepository discTypeRepository;
 
     private static final List<Integer> D_TYPE_QUESTIONS = List.of(1, 2, 3, 4, 5);
     private static final List<Integer> I_TYPE_QUESTIONS = List.of(6, 7, 8, 9, 10);
@@ -63,26 +67,15 @@ public class SurveyResultService {
 
         // 최대 점수와 두 번째 점수 확인
         int maxScore = sortedTypes.get(0).getValue();
-        Optional<Integer> secondScoreOpt = sortedTypes.stream()
-            .map(Map.Entry::getValue)
-            .filter(score -> score < maxScore)
-            .findFirst();
 
-        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
-
-        // 동점 항목 찾아서 문자열로 결합
         String primaryType = typeScores.entrySet().stream()
             .filter(e -> e.getValue() == maxScore)
             .map(Map.Entry::getKey)
             .sorted()
-            .collect(Collectors.joining());
+            .findFirst()
+            .orElse(null);
 
-        String secondaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == secondScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .collect(Collectors.joining());
-
+        DiscType discType = checkDiscType(primaryType);
 
         SurveyResult surveyResult = SurveyResult.builder()
             .user(user)
@@ -90,8 +83,7 @@ public class SurveyResultService {
             .influenceScore(iScore)
             .steadinessScore(sScore)
             .conscientiousnessScore(cScore)
-            .primaryType(primaryType)
-            .secondaryType(secondaryType)
+            .discType(discType)
             .developmentApproachScore(devApproachScore)
             .teamCollaborationScore(teamCollabScore)
             .problemSolvingScore(problemSolvingScore)
@@ -99,6 +91,13 @@ public class SurveyResultService {
             .build();
 
         surveyResultRepository.save(surveyResult);
+    }
+
+    private DiscType checkDiscType(String primaryType) {
+        DiscEnum discEnum = DiscEnum.valueOf(primaryType);
+
+        return discTypeRepository.findByDisc(discEnum)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DISC_TYPE));
     }
 
     private int calculateScoreForQuestions(List<SurveyRequestDto> surveyRequestDtoList, List<Integer> questionIds) {
