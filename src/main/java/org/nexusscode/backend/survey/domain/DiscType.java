@@ -22,13 +22,16 @@ public class DiscType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "disc_type_keywords", joinColumns = @JoinColumn(name = "disc_type"))
+    @CollectionTable(name = "disc_type_keywords", joinColumns = @JoinColumn(name = "disc_type_id"))
     @Column(name = "keyword")
     private List<String> keywords;
 
