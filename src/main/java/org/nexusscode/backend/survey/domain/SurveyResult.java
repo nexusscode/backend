@@ -63,18 +63,20 @@ public class SurveyResult extends Timestamped {
 
     @Builder
     public SurveyResult(User user,int dominanceScore, int influenceScore, int steadinessScore,
-        int conscientiousnessScore,
+        int conscientiousnessScore,DiscType discType,
         int developmentApproachScore, int teamCollaborationScore, int problemSolvingScore,
-        int developmentValuesScore) {
+        int developmentValuesScore,DeveloperType developerType) {
         this.user=user;
         this.dominanceScore = dominanceScore;
         this.influenceScore = influenceScore;
         this.steadinessScore = steadinessScore;
         this.conscientiousnessScore = conscientiousnessScore;
+        this.discType=discType;
         this.developmentApproachScore = developmentApproachScore;
         this.teamCollaborationScore = teamCollaborationScore;
         this.problemSolvingScore = problemSolvingScore;
         this.developmentValuesScore = developmentValuesScore;
+        this.developerType=developerType;
     }
 
     public void updateDisc(int dScore, int iScore, int sScore, int cScore) {
