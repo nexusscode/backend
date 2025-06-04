@@ -8,7 +8,7 @@ spring:
       model: gpt-3.5-turbo
 
   datasource:
-    url: jdbc:mysql://localhost:3306/${mysql.database}
+    url: jdbc:mysql://${mysql.host}/${mysql.database}
     username: ${mysql.user}
     password: ${mysql.password}
 
