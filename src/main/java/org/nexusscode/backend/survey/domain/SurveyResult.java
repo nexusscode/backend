@@ -41,12 +41,6 @@ public class SurveyResult extends Timestamped {
     @Column(name = "conscientiousness_score")
     private int conscientiousnessScore;
 
-    @Column(name = "primary_type")
-    private String primaryType;
-
-    @Column(name = "secondary_type")
-    private String secondaryType;
-
     @ManyToOne
     @JoinColumn(name = "disc_type")
     private DiscType discType;
@@ -69,7 +63,7 @@ public class SurveyResult extends Timestamped {
 
     @Builder
     public SurveyResult(User user,int dominanceScore, int influenceScore, int steadinessScore,
-        int conscientiousnessScore, String primaryType, String secondaryType,
+        int conscientiousnessScore,
         int developmentApproachScore, int teamCollaborationScore, int problemSolvingScore,
         int developmentValuesScore) {
         this.user=user;
@@ -77,21 +71,17 @@ public class SurveyResult extends Timestamped {
         this.influenceScore = influenceScore;
         this.steadinessScore = steadinessScore;
         this.conscientiousnessScore = conscientiousnessScore;
-        this.primaryType = primaryType;
-        this.secondaryType = secondaryType;
         this.developmentApproachScore = developmentApproachScore;
         this.teamCollaborationScore = teamCollaborationScore;
         this.problemSolvingScore = problemSolvingScore;
         this.developmentValuesScore = developmentValuesScore;
     }
 
-    public void updateDisc(int dScore, int iScore, int sScore, int cScore, String primaryType, String secondaryType) {
+    public void updateDisc(int dScore, int iScore, int sScore, int cScore) {
         this.dominanceScore=dScore;
         this.influenceScore=iScore;
         this.steadinessScore=sScore;
         this.conscientiousnessScore=cScore;
-        this.primaryType=primaryType;
-        this.secondaryType=secondaryType;
     }
 
     public void updateDev(int devApproachScore, int teamCollabScore, int problemSolvingScore, int devValuesScore) {

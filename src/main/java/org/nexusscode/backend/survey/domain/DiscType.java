@@ -22,7 +22,7 @@ public class DiscType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String name;
+    private DiscEnum disc;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -33,8 +33,8 @@ public class DiscType {
     private List<String> keywords;
 
     @Builder
-    public DiscType(String name, String description, List<String> keywords) {
-        this.name = name;
+    public DiscType(DiscEnum disc, String description, List<String> keywords) {
+        this.disc = disc;
         this.description = description;
         this.keywords = keywords;
     }
