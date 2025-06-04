@@ -59,6 +59,8 @@ jobs:
 
             echo "Java 버전 확인"
             java -version || echo "Java 없음"
+            
+            LOG_FILE=/home/ec2-user/app/app.log
 
             echo "로그 디렉토리 생성"
             mkdir -p /home/ec2-user/app
