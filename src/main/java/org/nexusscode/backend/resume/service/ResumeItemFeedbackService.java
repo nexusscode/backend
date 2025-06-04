@@ -60,13 +60,14 @@ public class ResumeItemFeedbackService {
         - I형 점수: {influenceScore}
         - S형 점수: {steadinessScore}
         - C형 점수: {conscientiousnessScore}
-        - 주요 유형: {primaryType}, 보조 유형: {secondaryType}
+        - 주요 유형: {discType}
 
         <사용자의 개발자 특성 검사 결과>
         - 개발 접근 방식: {developmentApproachScore}
         - 팀 협업: {teamCollaborationScore}
         - 문제 해결: {problemSolvingScore}
         - 개발 가치관: {developmentValuesScore}
+        - 주요 유형: {developType}
 
         [피드백 응답 형식 예시]
         - 질문 관련성 평가 : ...
@@ -90,13 +91,13 @@ public class ResumeItemFeedbackService {
             variables.put("influenceScore", surveyResult.getInfluenceScore());
             variables.put("steadinessScore", surveyResult.getSteadinessScore());
             variables.put("conscientiousnessScore", surveyResult.getConscientiousnessScore());
-            variables.put("primaryType", surveyResult.getPrimaryType());
-            variables.put("secondaryType", surveyResult.getSecondaryType());
+            variables.put("discType", surveyResult.getDiscType().getName());
 
             variables.put("developmentApproachScore", surveyResult.getDevelopmentApproachScore());
             variables.put("teamCollaborationScore", surveyResult.getTeamCollaborationScore());
             variables.put("problemSolvingScore", surveyResult.getProblemSolvingScore());
             variables.put("developmentValuesScore", surveyResult.getDevelopmentValuesScore());
+            variables.put("developType", surveyResult.getDeveloperType().getName());
 
             variables.put("question", question);
             variables.put("answer", answer);

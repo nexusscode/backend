@@ -79,17 +79,19 @@ public class SurveyResult extends Timestamped {
         this.developerType=developerType;
     }
 
-    public void updateDisc(int dScore, int iScore, int sScore, int cScore) {
+    public void updateDisc(int dScore, int iScore, int sScore, int cScore,DiscType discType) {
         this.dominanceScore=dScore;
         this.influenceScore=iScore;
         this.steadinessScore=sScore;
         this.conscientiousnessScore=cScore;
+        this.discType=discType;
     }
 
-    public void updateDev(int devApproachScore, int teamCollabScore, int problemSolvingScore, int devValuesScore) {
+    public void updateDev(int devApproachScore, int teamCollabScore, int problemSolvingScore, int devValuesScore,DeveloperType developerType) {
         this.developmentApproachScore=devApproachScore;
         this.teamCollaborationScore=teamCollabScore;
         this.problemSolvingScore=problemSolvingScore;
         this.developmentValuesScore=devValuesScore;
+        this.developerType=developerType;
     }
 }
