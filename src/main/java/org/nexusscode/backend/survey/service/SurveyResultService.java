@@ -1,5 +1,6 @@
 package org.nexusscode.backend.survey.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,11 +9,15 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.survey.domain.DeveloperType;
+import org.nexusscode.backend.survey.domain.DiscType;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.dto.DevSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.DiscSurveyResponseDto;
 import org.nexusscode.backend.survey.dto.SurveyRequestDto;
 import org.nexusscode.backend.survey.dto.SurveyResponseDto;
+import org.nexusscode.backend.survey.repository.DeveloperTypeRepository;
+import org.nexusscode.backend.survey.repository.DiscTypeRepository;
 import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
@@ -24,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyResultService {
     private final SurveyResultRepository surveyResultRepository;
     private final UserService userService;
+    private final DiscTypeRepository discTypeRepository;
+    private final DeveloperTypeRepository developerTypeRepository;
 
     private static final List<Integer> D_TYPE_QUESTIONS = List.of(1, 2, 3, 4, 5);
     private static final List<Integer> I_TYPE_QUESTIONS = List.of(6, 7, 8, 9, 10);
@@ -50,39 +57,10 @@ public class SurveyResultService {
         int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtoList, PROBLEM_SOLVING_QUESTIONS);
         int devValuesScore = calculateScoreForQuestions(surveyRequestDtoList, DEV_VALUES_QUESTIONS);
 
-        Map<String, Integer> typeScores = new HashMap<>();
-        typeScores.put("D", dScore);
-        typeScores.put("I", iScore);
-        typeScores.put("S", sScore);
-        typeScores.put("C", cScore);
-
-        // 점수를 내림차순으로 정렬
-        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
-            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toList());
-
-        // 최대 점수와 두 번째 점수 확인
-        int maxScore = sortedTypes.get(0).getValue();
-        Optional<Integer> secondScoreOpt = sortedTypes.stream()
-            .map(Map.Entry::getValue)
-            .filter(score -> score < maxScore)
-            .findFirst();
-
-        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
-
-        // 동점 항목 찾아서 문자열로 결합
-        String primaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == maxScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .collect(Collectors.joining());
-
-        String secondaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == secondScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .collect(Collectors.joining());
-
+        DiscType discType = determineDiscType(dScore,iScore,sScore,cScore);
+        DeveloperType developerType = determineDeveloperType(
+            devApproachScore, teamCollabScore, problemSolvingScore, devValuesScore
+        );
 
         SurveyResult surveyResult = SurveyResult.builder()
             .user(user)
@@ -90,15 +68,55 @@ public class SurveyResultService {
             .influenceScore(iScore)
             .steadinessScore(sScore)
             .conscientiousnessScore(cScore)
-            .primaryType(primaryType)
-            .secondaryType(secondaryType)
+            .discType(discType)
             .developmentApproachScore(devApproachScore)
             .teamCollaborationScore(teamCollabScore)
             .problemSolvingScore(problemSolvingScore)
             .developmentValuesScore(devValuesScore)
+            .developerType(developerType)
             .build();
 
         surveyResultRepository.save(surveyResult);
+    }
+
+    private DiscType determineDiscType(int dScore,int iScore,int sScore,int cScore) {
+        Map<String, Integer> typeScores = new HashMap<>();
+        typeScores.put("주도형(D)", dScore);
+        typeScores.put("사교형(I)", iScore);
+        typeScores.put("안정형(S)", sScore);
+        typeScores.put("신중형(C)", cScore);
+
+        int max = Collections.max(typeScores.values());
+
+        String primaryType = typeScores.entrySet().stream()
+            .filter(e -> e.getValue() == max)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .findFirst()
+            .orElse(null);
+
+        return discTypeRepository.findByName(primaryType)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DISC_TYPE));
+    }
+
+    private DeveloperType determineDeveloperType(int devApproach, int teamCollab, int problemSolving, int devValues){
+        Map<String, Integer> devScores = new HashMap<>();
+        devScores.put("실행 중심 개발자", devApproach);
+        devScores.put("협업형 개발자", teamCollab);
+        devScores.put("문제 해결형 개발자", problemSolving);
+        devScores.put("가치 지향 개발자", devValues);
+
+        int max = Collections.max(devScores.values());
+
+        String primaryType = devScores.entrySet().stream()
+            .filter(e -> e.getValue() == max)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .findFirst()
+            .orElse(null);
+
+        return developerTypeRepository.findByName(primaryType)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DEV_TYPE));
     }
 
     private int calculateScoreForQuestions(List<SurveyRequestDto> surveyRequestDtoList, List<Integer> questionIds) {
@@ -156,40 +174,9 @@ public class SurveyResultService {
         int sScore = calculateScoreForQuestions(surveyRequestDtos, S_TYPE_QUESTIONS);
         int cScore = calculateScoreForQuestions(surveyRequestDtos, C_TYPE_QUESTIONS);
 
-        Map<String, Integer> typeScores = new HashMap<>();
-        typeScores.put("D", dScore);
-        typeScores.put("I", iScore);
-        typeScores.put("S", sScore);
-        typeScores.put("C", cScore);
+        DiscType discType = determineDiscType(dScore,iScore,sScore,cScore);
 
-        // 점수를 내림차순으로 정렬
-        List<Map.Entry<String, Integer>> sortedTypes = typeScores.entrySet().stream()
-            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toList());
-
-        // 최대 점수와 두 번째 점수 확인
-        int maxScore = sortedTypes.get(0).getValue();
-        Optional<Integer> secondScoreOpt = sortedTypes.stream()
-            .map(Map.Entry::getValue)
-            .filter(score -> score < maxScore)
-            .findFirst();
-
-        int secondScore = secondScoreOpt.orElse(-1); // 없으면 -1
-
-        // 동점 항목 찾아서 문자열로 결합
-        String primaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == maxScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .collect(Collectors.joining());
-
-        String secondaryType = typeScores.entrySet().stream()
-            .filter(e -> e.getValue() == secondScore)
-            .map(Map.Entry::getKey)
-            .sorted()
-            .collect(Collectors.joining());
-
-        surveyResult.updateDisc(dScore,iScore,sScore,cScore,primaryType,secondaryType);
+        surveyResult.updateDisc(dScore,iScore,sScore,cScore,discType);
         surveyResultRepository.save(surveyResult);
     }
 
@@ -201,7 +188,10 @@ public class SurveyResultService {
         int teamCollabScore = calculateScoreForQuestions(surveyRequestDtos, TEAM_COLLAB_QUESTIONS);
         int problemSolvingScore = calculateScoreForQuestions(surveyRequestDtos, PROBLEM_SOLVING_QUESTIONS);
         int devValuesScore = calculateScoreForQuestions(surveyRequestDtos, DEV_VALUES_QUESTIONS);
-        surveyResult.updateDev(devApproachScore,teamCollabScore,problemSolvingScore,devValuesScore);
+
+        DeveloperType developerType = determineDeveloperType(devApproachScore,teamCollabScore,problemSolvingScore,devValuesScore);
+
+        surveyResult.updateDev(devApproachScore,teamCollabScore,problemSolvingScore,devValuesScore,developerType);
         surveyResultRepository.save(surveyResult);
     }
 }

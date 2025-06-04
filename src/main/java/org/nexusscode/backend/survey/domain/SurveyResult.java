@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -40,11 +41,9 @@ public class SurveyResult extends Timestamped {
     @Column(name = "conscientiousness_score")
     private int conscientiousnessScore;
 
-    @Column(name = "primary_type")
-    private String primaryType;
-
-    @Column(name = "secondary_type")
-    private String secondaryType;
+    @ManyToOne
+    @JoinColumn(name = "disc_type")
+    private DiscType discType;
 
     @Column(name = "development_approach_scroe")
     private int developmentApproachScore;
@@ -58,37 +57,41 @@ public class SurveyResult extends Timestamped {
     @Column(name = "development_values_score")
     private int developmentValuesScore;
 
+    @ManyToOne
+    @JoinColumn(name = "developer_type")
+    private DeveloperType developerType;
+
     @Builder
     public SurveyResult(User user,int dominanceScore, int influenceScore, int steadinessScore,
-        int conscientiousnessScore, String primaryType, String secondaryType,
+        int conscientiousnessScore,DiscType discType,
         int developmentApproachScore, int teamCollaborationScore, int problemSolvingScore,
-        int developmentValuesScore) {
+        int developmentValuesScore,DeveloperType developerType) {
         this.user=user;
         this.dominanceScore = dominanceScore;
         this.influenceScore = influenceScore;
         this.steadinessScore = steadinessScore;
         this.conscientiousnessScore = conscientiousnessScore;
-        this.primaryType = primaryType;
-        this.secondaryType = secondaryType;
+        this.discType=discType;
         this.developmentApproachScore = developmentApproachScore;
         this.teamCollaborationScore = teamCollaborationScore;
         this.problemSolvingScore = problemSolvingScore;
         this.developmentValuesScore = developmentValuesScore;
+        this.developerType=developerType;
     }
 
-    public void updateDisc(int dScore, int iScore, int sScore, int cScore, String primaryType, String secondaryType) {
+    public void updateDisc(int dScore, int iScore, int sScore, int cScore,DiscType discType) {
         this.dominanceScore=dScore;
         this.influenceScore=iScore;
         this.steadinessScore=sScore;
         this.conscientiousnessScore=cScore;
-        this.primaryType=primaryType;
-        this.secondaryType=secondaryType;
+        this.discType=discType;
     }
 
-    public void updateDev(int devApproachScore, int teamCollabScore, int problemSolvingScore, int devValuesScore) {
+    public void updateDev(int devApproachScore, int teamCollabScore, int problemSolvingScore, int devValuesScore,DeveloperType developerType) {
         this.developmentApproachScore=devApproachScore;
         this.teamCollaborationScore=teamCollabScore;
         this.problemSolvingScore=problemSolvingScore;
         this.developmentValuesScore=devValuesScore;
+        this.developerType=developerType;
     }
 }
