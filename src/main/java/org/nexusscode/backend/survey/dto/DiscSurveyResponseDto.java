@@ -1,5 +1,6 @@
 package org.nexusscode.backend.survey.dto;
 
+import java.util.List;
 import lombok.Getter;
 import org.nexusscode.backend.survey.domain.SurveyResult;
 
@@ -10,8 +11,9 @@ public class DiscSurveyResponseDto {
     private int influenceScore;
     private int steadinessScore;
     private int conscientiousnessScore;
-    private String primaryType;
-    private String secondaryType;
+    private String discType;
+    private String description;
+    private List<String> keywords;
 
     public DiscSurveyResponseDto(SurveyResult surveyResult) {
         this.id=surveyResult.getId();
@@ -19,8 +21,9 @@ public class DiscSurveyResponseDto {
         this.influenceScore=surveyResult.getInfluenceScore();
         this.steadinessScore=surveyResult.getSteadinessScore();
         this.conscientiousnessScore=surveyResult.getConscientiousnessScore();
-        this.primaryType=surveyResult.getPrimaryType();
-        this.secondaryType=surveyResult.getSecondaryType();
+        this.discType=surveyResult.getDiscType().getName();
+        this.description=surveyResult.getDiscType().getDescription();
+        this.keywords=surveyResult.getDiscType().getKeywords();
     }
 
 }
