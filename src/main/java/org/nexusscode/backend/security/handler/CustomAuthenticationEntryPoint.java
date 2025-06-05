@@ -3,6 +3,7 @@ package org.nexusscode.backend.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonErrorResponse;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.springframework.http.HttpStatus;
@@ -14,9 +15,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request,
