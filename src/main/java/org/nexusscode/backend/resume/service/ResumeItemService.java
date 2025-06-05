@@ -19,6 +19,7 @@ import org.nexusscode.backend.resume.repository.ResumeItemFeedbackRepository;
 import org.nexusscode.backend.resume.repository.ResumeItemRepository;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
+import org.nexusscode.backend.user.service.UserStatService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,7 @@ public class ResumeItemService {
     private final ResumeItemFeedbackService resumeItemFeedbackService;
     private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
     private final ResumeFeedbackLimiterService resumeFeedbackLimiterService;
+    private final UserStatService userStatService;
 
     @Transactional
     public List<ResumeItemResponseDto> createResumeItems(Long userId,Long resumeId,
@@ -65,6 +67,7 @@ public class ResumeItemService {
                 .build();
             resumeItemFeedbackRepository.save(feedback);
             resume.updateAiCount();
+            userStatService.incrementResumeCount(userId);
         }
         resume.updateFeedbackStatus();
         resumeService.save(resume);
@@ -98,6 +101,7 @@ public class ResumeItemService {
         resumeItemFeedbackRepository.save(feedback);
         resume.updateAiCount();
         resumeService.save(resume);
+        userStatService.incrementResumeCount(userId);
 
         return new ResumeItemResponseDto(resumeItem);
     }
@@ -192,6 +196,7 @@ public class ResumeItemService {
                 resumeItemFeedbackRepository.save(feedback);
                 resume.updateAiCount();
                 resumeService.save(resume);
+                userStatService.incrementResumeCount(userId);
             }
             resume.updateFeedbackStatus();
             resumeService.save(resume);

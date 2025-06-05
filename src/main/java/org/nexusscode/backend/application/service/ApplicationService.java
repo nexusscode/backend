@@ -23,6 +23,9 @@ import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.application.repository.JobApplicationRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.resume.domain.Resume;
+import org.nexusscode.backend.resume.domain.ResumeFeedbackStatus;
+import org.nexusscode.backend.resume.service.ResumeService;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +42,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ApplicationService {
 
     private final JobApplicationRepository applicationRepository;
+    private final ResumeService resumeService;
     private final UserService userService;
 
     @Value("${saramin.access-key}")
@@ -141,6 +145,9 @@ public class ApplicationService {
                 .build();
 
             applicationRepository.save(application);
+
+            // 공고 생성시 바로 자소서 생성 (1대1)
+            resumeService.createResume(user,application);
             return new ApplicationResponseDto(application);
 
         } catch (Exception e) {
@@ -174,9 +181,13 @@ public class ApplicationService {
     public Page<ApplicationSimpleDto> getAllApplication(Long userId, int page, int size) {
         User user = userService.findById(userId);
         Pageable pageable = PageRequest.of(page, size);
-        Page<JobApplication> applicationPage = applicationRepository.findAllByUser(user,pageable);
+        Page<JobApplication> applicationPage = applicationRepository.findAllByUser(user, pageable);
 
-        return applicationPage.map(ApplicationSimpleDto::new);
+        return applicationPage.map(application -> {
+            Resume resume = resumeService.findResumeByApplication(application);
+            ResumeFeedbackStatus feedbackStatus = resume.getFeedbackStatus();
+            return new ApplicationSimpleDto(application, feedbackStatus);
+        });
     }
 
     /*@Transactional
@@ -208,7 +219,11 @@ public class ApplicationService {
         Pageable pageable = PageRequest.of(page, size);
         Page<JobApplication> jobApplicationPage = applicationRepository.searchByUserAndCompanyOrTitle(user,searchWord,pageable);
 
-        return jobApplicationPage.map(ApplicationSimpleDto::new);
+        return jobApplicationPage.map(application -> {
+            Resume resume = resumeService.findResumeByApplication(application);
+            ResumeFeedbackStatus feedbackStatus = resume.getFeedbackStatus();
+            return new ApplicationSimpleDto(application, feedbackStatus);
+        });
     }
 
     public JobApplication findById(Long id){
