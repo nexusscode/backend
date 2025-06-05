@@ -17,6 +17,7 @@ import org.nexusscode.backend.survey.domain.SurveyResult;
 import org.nexusscode.backend.survey.service.SurveyResultService;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
+import org.nexusscode.backend.user.service.UserStatService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,6 +36,7 @@ public class ResumeItemFeedbackService {
     private final ResumeItemFeedbackRepository resumeItemFeedbackRepository;
     private final ResumeFeedbackLimiterService resumeFeedbackLimiterService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final UserStatService userStatService;
 
     private static final PromptTemplate FEEDBACK_PROMPT_TEMPLATE = new PromptTemplate("""
         [자기소개서 문항 피드백 요청]
@@ -136,6 +138,7 @@ public class ResumeItemFeedbackService {
         resumeItemFeedbackRepository.save(feedback);
         resumeItem.getResume().updateAiCount();
         resumeService.save(resumeItem.getResume());
+        userStatService.incrementResumeCount(userId);
         return new ResumeItemFeedbackResponseDto(feedback);
     }
 
