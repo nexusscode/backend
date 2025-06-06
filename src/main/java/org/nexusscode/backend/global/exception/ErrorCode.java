@@ -21,6 +21,7 @@ public enum ErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
     TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 타입이 존재하지 않습니다."),
     GPT_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GPT 응답 처리 중 오류가 발생했습니다"),
+    GPT_ANALYSIS_FAILED(HttpStatus.UNPROCESSABLE_ENTITY, "GPT 분석 처리에 실패했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 입력 값입니다"),
     RESUME_NOT_FOUND(HttpStatus.NOT_FOUND, "자기소개서를 찾을 수 없습니다"),
     RESUME_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "자기소개서 항목들을 찾을 수 없습니다."),
