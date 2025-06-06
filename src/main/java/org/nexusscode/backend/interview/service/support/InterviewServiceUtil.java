@@ -253,6 +253,27 @@ public class InterviewServiceUtil {
               질문과 대답:
               {inputText}
                 """;
+
+            case REPORT_MEMO -> """
+            다음은 한 지원자의 면접 내용 및 피드백입니다.
+
+             이 정보를 바탕으로, 아래 두 문장을 각각 작성해 주세요:
+
+             1. **지원자의 강점과 약점을 한 문장으로 요약한 문장**
+             2. **AI 면접관의 전반적인 평가 요약 문장**
+
+             - 각 문장은 **완결된 하나의 문장**으로 작성해 주세요.
+             - 문장 앞에 ‘강약 요약:’, ‘AI 평가 요약:’이라는 레이블을 붙여 주세요.
+             - 예시:
+             - 강약 요약: 논리적 설명력은 뛰어났으나, 구체적인 사례 제시는 부족했습니다.
+             - AI 평가 요약: 전체적으로 직무 이해도는 높았으나 표현 방식이 다소 직관적이지 않았습니다.
+
+             ---
+
+             입력 텍스트:
+             {inputText}
+              """;
+
         };
 
         return type.needsCount() ? new PromptTemplate(base.formatted(count)) : new PromptTemplate(base);
