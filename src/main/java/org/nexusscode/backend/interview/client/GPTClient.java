@@ -34,6 +34,10 @@ public class GPTClient {
         return parseGptAdviceResponse(callClient(Map.of("inputText", inputText), pro));
     }
 
+    public Map<String, String> generateReportMemoAnalysis(String inputText, PromptTemplate pro) {
+        return parseReportMemoResponse(callClient(Map.of("inputText", inputText), pro));
+    }
+
     private String callClient(Map inputText, PromptTemplate pro) {
         try {
             PromptTemplate promptTemplate = pro;
@@ -261,6 +265,27 @@ public class GPTClient {
         vocabMap.put("어휘 평가 - 개선 제안", suggestions.toString().trim());
 
         return vocabMap;
+    }
+
+    private Map<String, String> parseReportMemoResponse(String responseText) {
+        log.info(responseText);
+        String prosAndCons = "";
+        String analysisResult = "";
+
+        String[] lines = responseText.split("\\r?\\n");
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("강약 요약:")) {
+                prosAndCons = line.replace("강약 요약:", "").trim();
+            } else if (line.startsWith("AI 평가 요약:")) {
+                analysisResult = line.replace("AI 평가 요약:", "").trim();
+            }
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("prosAndCons", prosAndCons);
+        result.put("analysisResult", analysisResult);
+        return result;
     }
 
 }
