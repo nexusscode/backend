@@ -1,5 +1,6 @@
 package org.nexusscode.backend.memo.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.nexusscode.backend.global.common.CommonResponse;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 
 import java.util.List;
 
+@Tag(name = "memo API",description = "메모 API")
 @RestController
 @RequestMapping("/api/memos")
 @RequiredArgsConstructor

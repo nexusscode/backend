@@ -5,7 +5,8 @@ public enum PromptType {
     INTERVIEW(true),
     SUMMARY(false),
     ADVICE_TECH(false),
-    ADVICE_PER(false);
+    ADVICE_PER(false),
+    REPORT_MEMO(false);
 
     private final boolean needsCount;
 
