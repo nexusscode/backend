@@ -40,8 +40,6 @@ public class InterviewController {
     public ResponseEntity<CommonResponse<QuestionAndHintDTO>> getQuestion(
             @PathVariable Long sessionId, @RequestParam Integer seq, @RequestHeader Long userId) {
         QuestionAndHintDTO result = interviewService.getQuestion(sessionId, seq);
-        String url = interviewService.getAIVoicePreSignUrl(result.getTtsUrl());
-        result.setTtsUrl(url);
 
         return ResponseEntity.ok(new CommonResponse<>("질문 조회 성공", 200, result));
     }
