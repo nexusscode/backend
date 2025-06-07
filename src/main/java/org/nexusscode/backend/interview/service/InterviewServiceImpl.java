@@ -8,6 +8,7 @@ import org.nexusscode.backend.global.aop.lock.RedissonLock;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.client.AwsClient;
+import org.nexusscode.backend.interview.client.support.GptVoice;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.domain.InterviewSummary;
@@ -122,14 +123,30 @@ public class InterviewServiceImpl implements InterviewService {
             return result;
         });
 
+        InterviewSession session = question.getSession();
+
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())
                 .questionText(question.getQuestionText())
                 .intentText(question.getIntentText())
                 .seq(question.getSeq())
                 .type(question.getInterviewType())
-                .ttsUrl(question.getTtsFileName())
+                .ttsUrl(getAIVoicePreSignUrl(question.getTtsFileName()))
+                .videoUrl(changeVoiceTypeToVideoUrl(session.getVoice()))
                 .build();
+    }
+
+    private String changeVoiceTypeToVideoUrl(GptVoice voice) {
+        if (voice == GptVoice.ONYX) {
+            return getAIVideoPreSignUrl("onyx_video.mp4");
+        } else if (voice == GptVoice.ALLOY) {
+            return getAIVideoPreSignUrl("alloy_video.mp4");
+        } else if (voice == GptVoice.NOVA) {
+            return getAIVideoPreSignUrl("nova_video.mp4");
+        }else if (voice == GptVoice.ECHO) {
+            return getAIVideoPreSignUrl("echo_video.mp4");
+        }
+        throw new CustomException(ErrorCode.TYPE_NOT_FOUND);
     }
 
     @Override
@@ -199,6 +216,11 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     public String getAIVoicePreSignUrl(String fileName) {
         return awsClient.generateAIVoicePresignedUrl(fileName, Duration.ofSeconds(90));
+    }
+
+    @Override
+    public String getAIVideoPreSignUrl(String fileName) {
+        return awsClient.generateAIVideoPresignedUrl(fileName, Duration.ofSeconds(90));
     }
 
     @Override

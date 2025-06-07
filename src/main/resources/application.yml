@@ -42,6 +42,7 @@ aws:
     bucket-name: demo-my-testbucket-277707098184
     user-upload-path: upload/audio
     ai-upload-path: upload/aiAudio
+    ai-video-path: upload/video
 
 
 jwt:
