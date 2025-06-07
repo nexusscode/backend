@@ -47,6 +47,9 @@ public class AwsClient {
     @Value("${aws.s3.ai-upload-path}")
     private String aiVoiceUploadPath;
 
+    @Value("${aws.s3.ai-video-path}")
+    private String aiVideoUploadPath;
+
     public Map<String, Object> convertAudioText(String audioUrl) {
         String jobName = "job-" + System.currentTimeMillis();
         log.info("Transcribe 시작: {}", jobName);
@@ -151,6 +154,7 @@ public class AwsClient {
     private String detectMediaFormat(String url) {
         if (url.endsWith(".mp3")) return "mp3";
         if (url.endsWith(".mp4")) return "mp4";
+        if (url.endsWith(".mp4")) return "mp4";
         if (url.endsWith(".wav")) return "wav";
         if (url.endsWith(".flac")) return "flac";
         log.error("지원하지 않는 오디오 형식입니다: " + url);
@@ -163,6 +167,10 @@ public class AwsClient {
 
     public String generateAIVoicePresignedUrl(String fileName, Duration expiresIn) {
         return generatePresignedUrl(aiVoiceUploadPath, fileName, expiresIn);
+    }
+
+    public String generateAIVideoPresignedUrl(String fileName, Duration expiresIn) {
+        return generatePresignedUrl(aiVideoUploadPath, fileName, expiresIn);
     }
 
 

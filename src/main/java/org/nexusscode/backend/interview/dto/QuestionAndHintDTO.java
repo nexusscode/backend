@@ -15,4 +15,5 @@ public class QuestionAndHintDTO {
     private Integer seq;
     private InterviewType type;
     private String ttsUrl;
+    private String videoUrl;
 }
