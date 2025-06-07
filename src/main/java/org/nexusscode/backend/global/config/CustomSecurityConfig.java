@@ -68,7 +68,10 @@ public class CustomSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000")); //추후 프론트엔드에 매칭
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:8080",
+                "http://localhost:5173"
+        )); //추후 프론트엔드에 매칭
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "userId"));
         configuration.setAllowCredentials(true);
