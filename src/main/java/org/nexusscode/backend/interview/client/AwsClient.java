@@ -44,7 +44,7 @@ public class AwsClient {
     @Value("${aws.s3.user-upload-path}")
     private String userVoiceUploadPath;
 
-    @Value("{${aws.s3.ai-upload-path}}")
+    @Value("${aws.s3.ai-upload-path}")
     private String aiVoiceUploadPath;
 
     @Value("${aws.s3.ai-video-path}")
