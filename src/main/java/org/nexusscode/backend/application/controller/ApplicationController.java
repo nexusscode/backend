@@ -61,7 +61,7 @@ public class ApplicationController {
     @Operation(summary = "전체 공고 조회")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping
-    public ResponseEntity<CommonResponse<Page<ApplicationSimpleDto>>> getAllApplication(@RequestHeader Long userId,@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "10")int size){
+    public ResponseEntity<CommonResponse<Page<ApplicationSimpleDto>>> getAllApplication(@RequestHeader Long userId,@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "8")int size){
         Page<ApplicationSimpleDto> responseDtoList = applicationService.getAllApplication(userId,page-1,size);
         CommonResponse<Page<ApplicationSimpleDto>> response = new CommonResponse<>("공고 전체 조회가 완료되었습니다.",200,responseDtoList);
         return new ResponseEntity<>(response,HttpStatus.OK);
