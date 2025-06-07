@@ -2,7 +2,7 @@ name: CI/CD - Upload Spring Boot Package to S3 for CodeDeploy
 
 on:
   push:
-    branches: [ feat/aws-alb ]
+    branches: [ release-alb ]
 
 jobs:
   deploy:
