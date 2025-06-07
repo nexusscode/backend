@@ -12,11 +12,16 @@ import org.nexusscode.backend.user.dto.ProfileResponseDto;
 import org.nexusscode.backend.user.dto.ProfileUpdateRequestDto;
 import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +34,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserStatService userStatService;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${oauth.kakao.rest-api-key}")
+    private String kakaoRestApiKey;
+
+    @Value("${oauth.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+
+    @Value("${oauth.kakao.auth-uri}")
+    private String kakaoAuthUri;
 
     public void signup(UserRequestDto userRequestDto) {
         DevType devType = DevType.from(userRequestDto.getDevType());
@@ -165,6 +179,31 @@ public class UserService {
         return account;
     }
 
+    public UserDTO requestAccessTokenFromKakao(String code) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", kakaoRestApiKey);
+        params.add("redirect_uri", kakaoRedirectUri);
+        params.add("code", code);
+
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(params, headers);
+
+        ResponseEntity<KakaoTokenResponse> response = restTemplate.postForEntity(
+                "https://kauth.kakao.com/oauth/token",
+                tokenRequest,
+                KakaoTokenResponse.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new CustomException(ErrorCode.KAKAO_USER_FETCH_FAILED);
+        }
+
+        return getKakaoMember(response.getBody().getAccessToken());
+    }
 
     public String findEmail(EmailFindRequestDto emailFindRequestDto) {
         User user = userRepository.findByNameAndPhoneNumber(emailFindRequestDto.getName(),emailFindRequestDto.getPhoneNumber());
@@ -198,4 +237,12 @@ public class UserService {
         return new ProfileResponseDto(user);
     }
 
+    public String generateKakaoLoginUrl() {
+        return UriComponentsBuilder.fromHttpUrl(kakaoAuthUri)
+                .queryParam("client_id", kakaoRestApiKey)
+                .queryParam("redirect_uri", kakaoRedirectUri)
+                .queryParam("response_type", "code")
+                .toUriString();
+    }
 }
+

@@ -68,6 +68,13 @@ coolsms:
     key: ${coolsms.api-key}
     secret: ${coolsms.api-secret}
 
+oauth:
+  kakao:
+    rest-api-key: ${kakao.rest-api-key}
+    redirect-uri: http://localhost:3000/member/kakao
+    auth-uri: https://kauth.kakao.com/oauth/authorize
+
+
 cloud:
   aws:
     region:

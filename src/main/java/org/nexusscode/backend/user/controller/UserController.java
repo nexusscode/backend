@@ -96,10 +96,8 @@ public class UserController {
     @Operation(summary = "kakao 로그인")
     @PreAuthorize("permitAll()")
     @GetMapping("/kakao")
-    public ResponseEntity<CommonResponse<TokenResponseDTO>> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
-        log.info("access Token: {}", accessToken);
-
-        UserDTO memberDTO = userService.getKakaoMember(accessToken);
+    public ResponseEntity<CommonResponse<TokenResponseDTO>> getMemberFromKakao(@RequestParam("accessToken") String code) {
+        UserDTO memberDTO = userService.requestAccessTokenFromKakao(code);
 
         Map<String, Object> claims = memberDTO.getClaims();
 
@@ -117,7 +115,7 @@ public class UserController {
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        TokenResponseDTO responseDTO = new TokenResponseDTO(accessToken, userId);
+        TokenResponseDTO responseDTO = new TokenResponseDTO(jwtAccessToken, userId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -194,4 +192,11 @@ public class UserController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "카카오 로그인 URL 반환")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/kakao/login-link")
+    public ResponseEntity<CommonResponse<String>> getKakaoLoginUrl() {
+        String kakaoLoginUrl = userService.generateKakaoLoginUrl();
+        return ResponseEntity.ok(new CommonResponse<>("카카오 로그인 URL", 200, kakaoLoginUrl));
+    }
 }
