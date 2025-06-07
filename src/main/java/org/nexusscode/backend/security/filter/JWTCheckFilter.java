@@ -39,7 +39,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/webjars/**",
             "/configuration/**",
              "/api/memos/**",
-             "/api/user/**"
+             "/api/user/**",
+             "/internal-actuator/health/**"
              //커뮤니티나 인증 필요없는 부분 나중에 수정하기
     );
 

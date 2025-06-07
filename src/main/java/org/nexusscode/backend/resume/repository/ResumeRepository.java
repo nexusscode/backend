@@ -1,6 +1,7 @@
 package org.nexusscode.backend.resume.repository;
 
-import java.util.List;
+import java.util.Optional;
+
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.user.domain.User;
@@ -13,7 +14,7 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
 
     @EntityGraph(attributePaths = {"application", "resumeItems"})
     @Query("select r from Resume r where r.application.id = :applicationId")
-    List<Resume> findAllByApplicationId(@Param("applicationId") Long applicationId);
+    Optional<Resume> findByApplicationId(@Param("applicationId") Long applicationId);
 
     Resume findByApplication(JobApplication application);
 
