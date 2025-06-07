@@ -185,8 +185,7 @@ public class ApplicationService {
 
         return applicationPage.map(application -> {
             Resume resume = resumeService.findResumeByApplication(application);
-            ResumeFeedbackStatus feedbackStatus = resume.getFeedbackStatus();
-            return new ApplicationSimpleDto(application, feedbackStatus);
+            return new ApplicationSimpleDto(application, resume);
         });
     }
 
@@ -221,8 +220,7 @@ public class ApplicationService {
 
         return jobApplicationPage.map(application -> {
             Resume resume = resumeService.findResumeByApplication(application);
-            ResumeFeedbackStatus feedbackStatus = resume.getFeedbackStatus();
-            return new ApplicationSimpleDto(application, feedbackStatus);
+            return new ApplicationSimpleDto(application, resume);
         });
     }
 
