@@ -210,17 +210,17 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     public String getUserVoicePreSignUrl(String fileName) {
-        return awsClient.generateUserVoicePresignedUrl(fileName, Duration.ofSeconds(90));
+        return awsClient.generateUserVoicePresignedUrl(fileName, Duration.ofSeconds(600));
     }
 
     @Override
     public String getAIVoicePreSignUrl(String fileName) {
-        return awsClient.generateAIVoicePresignedUrl(fileName, Duration.ofSeconds(90));
+        return awsClient.generateAIVoicePresignedUrl(fileName, Duration.ofSeconds(600));
     }
 
     @Override
     public String getAIVideoPreSignUrl(String fileName) {
-        return awsClient.generateAIVideoPresignedUrl(fileName, Duration.ofSeconds(90));
+        return awsClient.generateAIVideoPresignedUrl(fileName, Duration.ofSeconds(600));
     }
 
     @Override
