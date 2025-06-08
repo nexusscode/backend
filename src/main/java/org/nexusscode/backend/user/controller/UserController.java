@@ -204,6 +204,6 @@ public class UserController {
     @GetMapping("/check-email")
     public ResponseEntity<CommonResponse<Boolean>> checkEmail(@RequestParam String email) {
         boolean result = userService.isEmailDuplicate(email);
-        return ResponseEntity.ok(new CommonResponse<>("카카오 로그인 URL", 200, result));
+        return ResponseEntity.ok(new CommonResponse<>("로그인 중복 방지 확인", 200, result));
     }
 }
