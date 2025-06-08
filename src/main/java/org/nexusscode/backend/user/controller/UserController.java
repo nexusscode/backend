@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -198,5 +197,13 @@ public class UserController {
     public ResponseEntity<CommonResponse<String>> getKakaoLoginUrl() {
         String kakaoLoginUrl = userService.generateKakaoLoginUrl();
         return ResponseEntity.ok(new CommonResponse<>("카카오 로그인 URL", 200, kakaoLoginUrl));
+    }
+
+    @Operation(summary = "로그인 중복확인")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/check-email")
+    public ResponseEntity<CommonResponse<Boolean>> checkEmail(@RequestParam String email) {
+        boolean result = userService.isEmailDuplicate(email);
+        return ResponseEntity.ok(new CommonResponse<>("로그인 중복 방지 확인", 200, result));
     }
 }
