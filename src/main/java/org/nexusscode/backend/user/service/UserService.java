@@ -244,5 +244,9 @@ public class UserService {
                 .queryParam("response_type", "code")
                 .toUriString();
     }
+
+    public boolean isEmailDuplicate(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }
 
