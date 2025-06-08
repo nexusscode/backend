@@ -15,6 +15,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL SERVER ERROR"),
 
     INVALID_VALUE(HttpStatus.BAD_REQUEST,"유효하지 않은 값 입니다."),
+    NULL_FIELD_VALUE(HttpStatus.BAD_REQUEST, "필수 입력 값이 누락되었습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 거부되었습니다"),
