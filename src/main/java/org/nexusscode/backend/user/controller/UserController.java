@@ -75,6 +75,7 @@ public class UserController {
         String newRefreshToken = jwtProvider.generateRefreshToken(claims);
 
         String userId = (String) claims.get("userId");
+        String name = (String) claims.get("name");
         redisRefreshTokenRepository.saveRefreshToken(userId, newRefreshToken, Duration.ofDays(1));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
@@ -85,7 +86,7 @@ public class UserController {
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(newAccessToken, userId);
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(newAccessToken, userId, name);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -104,6 +105,7 @@ public class UserController {
         String jwtRefreshToken = jwtProvider.generateRefreshToken(claims);
 
         String userId = (String) claims.get("userId");
+        String name = (String) claims.get("name");
         redisRefreshTokenRepository.saveRefreshToken(userId, jwtRefreshToken, Duration.ofDays(1));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", jwtRefreshToken)
@@ -114,7 +116,7 @@ public class UserController {
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        TokenResponseDTO responseDTO = new TokenResponseDTO(jwtAccessToken, userId);
+        TokenResponseDTO responseDTO = new TokenResponseDTO(jwtAccessToken, userId, name);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())

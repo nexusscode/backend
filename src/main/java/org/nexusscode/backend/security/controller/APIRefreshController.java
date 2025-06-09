@@ -50,9 +50,10 @@ public class APIRefreshController {
 
         Map<String, Object> claims = jwtProvider.validateToken(refreshToken);
         String userId = (String) claims.get("userId");
+        String name = (String) claims.get("name");
 
         if (!checkExpiredToken(accessToken)) {
-            return ResponseEntity.ok(new CommonResponse<>("accessToken이 아직 만료되지 않았습니다..", 200, new TokenResponseDTO(accessToken, userId)));
+            return ResponseEntity.ok(new CommonResponse<>("accessToken이 아직 만료되지 않았습니다..", 200, new TokenResponseDTO(accessToken, userId, name)));
         }
 
         String newAccessToken = jwtProvider.generateAccessToken(claims);
@@ -71,7 +72,7 @@ public class APIRefreshController {
             response.setHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         }
 
-        return ResponseEntity.ok(new CommonResponse<>("accessToken이 교체되었습니다.", 200, new TokenResponseDTO(newAccessToken, userId)));
+        return ResponseEntity.ok(new CommonResponse<>("accessToken이 교체되었습니다.", 200, new TokenResponseDTO(newAccessToken, userId ,name)));
     }
 
     private boolean checkTime(Integer exp) {
