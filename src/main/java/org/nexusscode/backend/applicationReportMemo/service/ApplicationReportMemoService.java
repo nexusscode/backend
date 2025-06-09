@@ -3,8 +3,9 @@ package org.nexusscode.backend.applicationReportMemo.service;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.applicationReportMemo.domain.ApplicationReportMemo;
 import org.nexusscode.backend.applicationReportMemo.domain.ReportMemoInputSet;
+import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoAllResponse;
+import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoDetailResponse;
 import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoInputSetRequest;
-import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoInputSetResponse;
 import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoAnalysisResponse;
 import org.nexusscode.backend.applicationReportMemo.repository.ApplicationReportMemoRepository;
 import org.nexusscode.backend.applicationReportMemo.repository.ReportMemoInputSetRepository;
@@ -34,13 +35,26 @@ public class ApplicationReportMemoService {
     private final GPTClient gptClient;
 
     @Transactional
-    public ReportMemoInputSetResponse saveUserInput(Long userId, ReportMemoInputSetRequest request) {
+    public ReportMemoDetailResponse saveUserInput(Long userId, ReportMemoInputSetRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        if (request.getCompanyAtmosphere() == null || request.getInterviewers() == null ||
+                request.getStartTime() == null || request.getFinishedTime() == null ||
+                request.getCompanyName() == null || request.getPosition() == null ||
+                request.getInterviewDate() == null) {
+            throw new CustomException(ErrorCode.NULL_FIELD_VALUE);
+        }
 
         ApplicationReportMemo reportMemo = ApplicationReportMemo.builder()
                 .user(user)
+                .companyAtmosphere(request.getCompanyAtmosphere())
+                .interviewers(request.getInterviewers())
+                .startTime(request.getStartTime())
+                .finishedTime(request.getFinishedTime())
+                .companyName(request.getCompanyName())
+                .position(request.getPosition())
+                .interviewDate(request.getInterviewDate())
                 .build();
         ApplicationReportMemo savedReportMemo = applicationReportMemoRepository.save(reportMemo);
 
@@ -52,19 +66,28 @@ public class ApplicationReportMemoService {
                         .answer(memo.getAnswer())
                         .applicationReportMemo(savedReportMemo)
                         .build())
-                .collect(Collectors.toList());
-        List<ReportMemoInputSet> savedInputSets = reportMemoInputSetRepository.saveAll(inputSets);
+                .toList();
+        savedReportMemo.getInputSetList().addAll(inputSets);
+        reportMemoInputSetRepository.saveAll(inputSets);
 
-
-        List<ReportMemoInputSetResponse.MemoOutput> memoOutputs = savedInputSets.stream()
-                .map(input -> new ReportMemoInputSetResponse.MemoOutput(
-                        input.getId(),
+        List<ReportMemoDetailResponse.MemoOutput> memoOutputs = reportMemo.getInputSetList().stream()
+                .map(input -> new ReportMemoDetailResponse.MemoOutput(
                         input.getQuestion(),
                         input.getAnswer()
                 ))
                 .collect(Collectors.toList());
 
-        return new ReportMemoInputSetResponse(userId, memoOutputs);
+        return ReportMemoDetailResponse.builder()
+                .reportMemoId(reportMemo.getId())
+                .companyName(reportMemo.getCompanyName())
+                .position(reportMemo.getPosition())
+                .companyAtmosphere(reportMemo.getCompanyAtmosphere())
+                .interviewers(reportMemo.getInterviewers())
+                .startTime(reportMemo.getStartTime())
+                .finishedTime(reportMemo.getFinishedTime())
+                .interviewDate(reportMemo.getInterviewDate())
+                .memoList(memoOutputs)
+                .build();
     }
 
     @Transactional
@@ -85,19 +108,19 @@ public class ApplicationReportMemoService {
 
         PromptTemplate promptTemplate = buildPrompt(PromptType.REPORT_MEMO, 0);
         Map<String, String> analysisResult = gptClient.generateReportMemoAnalysis(inputText, promptTemplate);
-        
+
         System.out.println("=== GPT 분석 결과 ===");
         System.out.println("강점/약점: " + analysisResult.getOrDefault("prosAndCons", ""));
         System.out.println("분석 결과: " + analysisResult.getOrDefault("analysisResult", ""));
         System.out.println("=================");
-        
+
         if (analysisResult == null || analysisResult.isEmpty()) {
             throw new CustomException(ErrorCode.GPT_ANALYSIS_FAILED);
         }
 
         String prosAndCons = analysisResult.getOrDefault("prosAndCons", "");
         String analysisResultText = analysisResult.getOrDefault("analysisResult", "");
-        
+
         // System.out.println("=== 저장할 데이터 ===");
         // System.out.println("강점/약점: " + prosAndCons);
         // System.out.println("분석 결과: " + analysisResultText);
@@ -105,7 +128,7 @@ public class ApplicationReportMemoService {
 
         reportMemo.updateAnalysisResult(prosAndCons, analysisResultText);
         applicationReportMemoRepository.save(reportMemo);
-        
+
         // System.out.println("=== 저장된 데이터 ===");
         // System.out.println("강점/약점: " + reportMemo.getProsAndCons());
         // System.out.println("분석 결과: " + reportMemo.getAnalysisResult());
@@ -125,4 +148,55 @@ public class ApplicationReportMemoService {
         }
         return text.toString();
     }
+
+    @Transactional(readOnly = true)
+    public ReportMemoDetailResponse getMemoDetail(Long userId, Long reportMemoId) {
+        ApplicationReportMemo reportMemo = applicationReportMemoRepository.findById(reportMemoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        if (!reportMemo.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        List<ReportMemoInputSet> inputSets = reportMemo.getInputSetList();
+
+        List<ReportMemoDetailResponse.MemoOutput> memoOutputs = inputSets.stream()
+                .map(input -> new ReportMemoDetailResponse.MemoOutput(
+                        input.getQuestion(),
+                        input.getAnswer()
+                ))
+                .collect(Collectors.toList());
+
+        return ReportMemoDetailResponse.builder()
+                .reportMemoId(reportMemo.getId())
+                .companyAtmosphere(reportMemo.getCompanyAtmosphere())
+                .interviewers(reportMemo.getInterviewers())
+                .startTime(reportMemo.getStartTime())
+                .finishedTime(reportMemo.getFinishedTime())
+                .memoList(memoOutputs)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReportMemoAllResponse> getAllReportMemosByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        List<ApplicationReportMemo> memos = applicationReportMemoRepository.findAllByUser(user);
+
+        return memos.stream()
+                .map(memo -> ReportMemoAllResponse.builder()
+                        .id(memo.getId())
+                        .companyName(memo.getCompanyName())
+                        .position(memo.getPosition())
+                        .companyAtmosphere(memo.getCompanyAtmosphere())
+                        .interviewers(memo.getInterviewers())
+                        .startTime(memo.getStartTime())
+                        .finishedTime(memo.getFinishedTime())
+                        .interviewDate(memo.getInterviewDate())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
 }
