@@ -47,7 +47,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/api/user/kakao/login-link",
             "/api/user/find/email",
             "/api/user/find/password",
-            "/api/user/check-email"
+            "/api/user/check-email",
+            "/api/user/login"
     );
 
     @Override
