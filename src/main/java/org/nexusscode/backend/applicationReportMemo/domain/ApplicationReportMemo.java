@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.user.domain.User;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +31,42 @@ public class ApplicationReportMemo extends Timestamped {
     @Column(nullable = true)
     private String analysisResult; // GPT 요약
 
+    @Column(nullable = false)
+    private String companyName;
+
+    @Column(nullable = false)
+    private String position;
+
+    @Column(nullable = false)
+    private LocalDate interviewDate;
+
+    @Column(nullable = false)
+    private String companyAtmosphere;
+
+    @Column(nullable = false)
+    private Long interviewers;
+
+    @Column(nullable = false)
+    private LocalTime startTime;
+
+    @Column(nullable = false)
+    private LocalTime finishedTime;
+
     @OneToMany(mappedBy = "applicationReportMemo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportMemoInputSet> inputSetList = new ArrayList<>();
 
     @Builder
-    public ApplicationReportMemo(User user) {
+    public ApplicationReportMemo(User user, String companyAtmosphere, Long interviewers,
+                                 LocalTime startTime, LocalTime finishedTime,
+                                 String companyName, String position, LocalDate interviewDate) {
         this.user = user;
+        this.companyAtmosphere = companyAtmosphere;
+        this.interviewers = interviewers;
+        this.startTime = startTime;
+        this.finishedTime = finishedTime;
+        this.companyName = companyName;
+        this.position = position;
+        this.interviewDate = interviewDate;
     }
 
     public void updateAnalysisResult(String prosAndCons, String analysisResult) {
