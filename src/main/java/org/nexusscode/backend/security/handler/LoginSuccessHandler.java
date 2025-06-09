@@ -43,6 +43,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = jwtProvider.generateRefreshToken(claims);
 
         String userId = claims.get("userId").toString();
+        String name = claims.get("name").toString();
         redisRefreshTokenRepository.saveRefreshToken(userId, refreshToken, Duration.ofDays(1));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -55,7 +56,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         response.setHeader("Set-Cookie", refreshCookie.toString());
 
-        TokenResponseDTO tokenResponse = new TokenResponseDTO(accessToken, userId);
+        TokenResponseDTO tokenResponse = new TokenResponseDTO(accessToken, userId, name);
 
         response.setContentType("application/json; charset=UTF-8");
         objectMapper.writeValue(response.getWriter(), tokenResponse);
