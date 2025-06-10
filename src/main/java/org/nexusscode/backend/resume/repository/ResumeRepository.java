@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.nexusscode.backend.application.domain.JobApplication;
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +24,6 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
 
     @Query("SELECT SUM(r.aiCount) FROM Resume r WHERE r.user = :user")
     Long sumAiCountByUser(@Param("user") User user);
+
+    Page<Resume> findAllByUserAndIsSaved(User user, boolean b, Pageable pageable);
 }
