@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.global.common.CommonResponse;
 import org.nexusscode.backend.resume.dto.RecentResumeResponseDto;
 import org.nexusscode.backend.resume.dto.ResumeResponseDto;
+import org.nexusscode.backend.resume.dto.SavedResumeResponseDto;
 import org.nexusscode.backend.resume.service.ResumeService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Resume API", description = "자소서 관련 API")
@@ -61,7 +64,7 @@ public class ResumeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }*/
 
-    @Operation(summary = "자소서 삭제")
+    /*@Operation(summary = "자소서 삭제")
     @PreAuthorize("#userId == principal.userId")
     @DeleteMapping("/resume/{resumeId}")
     public ResponseEntity<CommonResponse> deleteResume(
@@ -69,7 +72,7 @@ public class ResumeController {
         resumeService.deleteResume(userId,resumeId);
         CommonResponse response = new CommonResponse<>("자소서 삭제가 완료되었습니다.", 200, "");
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    }*/
 
     @Operation(summary = "자소서 보관 저장")
     @PreAuthorize("#userId == principal.userId")
@@ -86,6 +89,15 @@ public class ResumeController {
     public ResponseEntity<CommonResponse> cancelResumeFromArchieve(@RequestHeader Long userId,@PathVariable(name = "resumeId")Long resumeId){
         resumeService.cancelResumeFromArchieve(userId,resumeId);
         CommonResponse response = new CommonResponse<>("보관함에 자소서 저장이 취소되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "보관된 자소서 전체 조회 및 검색")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/resume/saved")
+    public ResponseEntity<CommonResponse<Page<SavedResumeResponseDto>>> getResumeFromArchieve(@RequestHeader Long userId,@RequestParam(required = false, defaultValue = "") String searchWord,@RequestParam(defaultValue = "1")int page,@RequestParam(defaultValue = "10")int size){
+        Page<SavedResumeResponseDto> savedResumePage = resumeService.getResumeFromArchieve(userId,searchWord,page-1,size);
+        CommonResponse<Page<SavedResumeResponseDto>> response = new CommonResponse<>("보관된 자소서 전체 조회가 완료되었습니다.", 200, savedResumePage);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
