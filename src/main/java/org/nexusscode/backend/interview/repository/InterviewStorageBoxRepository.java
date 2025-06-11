@@ -1,6 +1,8 @@
 package org.nexusscode.backend.interview.repository;
 
 import org.nexusscode.backend.interview.domain.InterviewSummaryStorageBox;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,14 +21,12 @@ public interface InterviewStorageBoxRepository extends JpaRepository<InterviewSu
     SELECT b FROM InterviewSummaryStorageBox b
     WHERE b.user.id = :userId
       AND (
-            LOWER(b.sessionTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-            LOWER(b.strengths) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-            LOWER(b.weaknesses) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-            LOWER(b.overallAssessment) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            LOWER(b.sessionTitle) LIKE LOWER(CONCAT('%', :keyword, '%'))
           )
-    ORDER BY b.createdAt DESC
 """)
-    List<InterviewSummaryStorageBox> findAllByUserIdAndKeyword(@Param("userId") Long userId,
-                                                               @Param("keyword") String keyword);
+    Page<InterviewSummaryStorageBox> findAllByUserIdAndKeyword(@Param("userId") Long userId,
+                                                               @Param("keyword") String keyword,
+                                                               Pageable pageable);
 
+    Page<InterviewSummaryStorageBox> findAllByUserId(Long userId, Pageable pageable);
 }

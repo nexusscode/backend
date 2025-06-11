@@ -10,12 +10,10 @@ import org.nexusscode.backend.interview.dto.InterviewAllSessionDTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDTO;
 import org.nexusscode.backend.interview.service.InterviewService;
 import org.nexusscode.backend.interview.service.delegation.InterviewStorageBoxService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "Interview Storage API", description = "인터뷰 보관함 관련 API")
 @RestController
@@ -51,19 +49,19 @@ public class InterviewStorageController {
     @Operation(summary = "면접 세션 보관함 전체 불러오기")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/storage/getall")
-    public ResponseEntity<CommonResponse<List<InterviewSessionDTO>>> getAllStorageSessions(
-            @RequestHeader Long userId, @RequestParam(required = false, defaultValue = "")String searchWord
+    public ResponseEntity<CommonResponse<Page<InterviewSessionDTO>>> getAllStorageSessions(
+            @RequestHeader Long userId,
+            @RequestParam(required = false, defaultValue = "")String searchWord,
+            @RequestParam(defaultValue = "1")int page,
+            @RequestParam(defaultValue = "10")int size
     ) {
-        List<InterviewSummaryStorageBox> list = boxService.list(userId, searchWord);
+        Page<InterviewSummaryStorageBox> list = boxService.list(userId, searchWord, page, size);
 
-        List<InterviewSessionDTO> result = list
-                .stream()
-                .map(box -> InterviewSessionDTO.builder()
-                        .sessionId(box.getId())
-                        .title(box.getSessionTitle())
-                        .createdAt(box.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
+        Page<InterviewSessionDTO> result = list.map(box -> InterviewSessionDTO.builder()
+                .sessionId(box.getId())
+                .title(box.getSessionTitle())
+                .createdAt(box.getCreatedAt())
+                .build());
 
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함 전체 조회", 200, result));
     }
