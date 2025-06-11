@@ -15,6 +15,7 @@ import org.nexusscode.backend.interview.client.GPTClient;
 import org.nexusscode.backend.interview.service.support.PromptType;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.repository.UserRepository;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class ApplicationReportMemoService {
     private final ReportMemoInputSetRepository reportMemoInputSetRepository;
     private final UserRepository userRepository;
     private final GPTClient gptClient;
+    private final UserService userService;
 
     @Transactional
     public ReportMemoDetailResponse saveUserInput(Long userId, ReportMemoInputSetRequest request) {
@@ -197,6 +199,26 @@ public class ApplicationReportMemoService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    public void saveReportMemoInArchive(Long userId, Long reportMemoId) {
+        User user = userService.findById(userId);
+        ApplicationReportMemo reportMemo = findById(reportMemoId);
+        if(reportMemo.getUser() != user) {
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_REPORT_MEMO);
+        }
+
+        if(reportMemo.isSaved()) {
+            throw new CustomException(ErrorCode.ALREADY_SAVED_REPORT_MEMO);
+        }
+        reportMemo.updateSaveStatus(true);
+        applicationReportMemoRepository.save(reportMemo);
+    }
+
+    public ApplicationReportMemo findById(Long id) {
+        return applicationReportMemoRepository.findById(id).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_REPORT_MEMO)
+        );
     }
 
 }

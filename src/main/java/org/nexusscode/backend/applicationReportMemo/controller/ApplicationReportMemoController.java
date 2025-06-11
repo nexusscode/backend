@@ -11,6 +11,7 @@ import org.nexusscode.backend.applicationReportMemo.service.ApplicationReportMem
 import org.nexusscode.backend.applicationReportMemo.domain.ApplicationReportMemo;
 
 import org.nexusscode.backend.global.common.CommonResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,20 @@ public class ApplicationReportMemoController {
         List<ReportMemoAllResponse> memos = applicationReportMemoService.getAllReportMemosByUserId(userId);
         return ResponseEntity.ok(new CommonResponse<>("전체 메모 조회 완료", 200, memos));
     }
+
+    @Operation(summary = "실제면접 기록 보관함 저장")
+    @PreAuthorize("#userId == principal.userId")
+    @PostMapping("/storage")
+    public ResponseEntity<CommonResponse> saveArchive(@RequestHeader Long userId,
+                                                      @PathVariable(value = "reportMemoId") Long reportMemoId) {
+        applicationReportMemoService.saveReportMemoInArchive(userId, reportMemoId);
+        CommonResponse response = new CommonResponse<>("보관함에 자소서 저장이 완료되었습니다.", 200, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+//    @Operation(summary = "실제면접 기록 보관함 저장")
+//    @PreAuthorize("#userId == principal.userId")
+//    @PostMapping("/storage")
+
 
 }
