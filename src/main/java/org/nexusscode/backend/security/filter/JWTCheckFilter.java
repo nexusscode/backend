@@ -47,7 +47,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/api/user/find/email",
             "/api/user/find/password",
             "/api/user/check-email",
-            "/api/user/login"
+            "/api/user/login",
+            "/api/sms/**"
     );
 
     @Override
