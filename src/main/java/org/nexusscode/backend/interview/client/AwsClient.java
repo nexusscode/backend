@@ -154,7 +154,7 @@ public class AwsClient {
     private String detectMediaFormat(String url) {
         if (url.endsWith(".mp3")) return "mp3";
         if (url.endsWith(".mp4")) return "mp4";
-        if (url.endsWith(".mp4")) return "mp4";
+        if (url.endsWith(".m4a")) return "m4a";
         if (url.endsWith(".wav")) return "wav";
         if (url.endsWith(".flac")) return "flac";
         log.error("지원하지 않는 오디오 형식입니다: " + url);
