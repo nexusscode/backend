@@ -70,6 +70,7 @@ public enum ErrorCode {
     NOT_CONNECT_SESSION(HttpStatus.NOT_FOUND, "최근에 끊긴 세션이 없습니다."),
     NOT_FOUND_DISC_TYPE(HttpStatus.NOT_FOUND,"DISC 유형을 찾을 수 없습니다."),
     NOT_FOUND_DEV_TYPE(HttpStatus.NOT_FOUND,"개발 유형을 찾을 수 없습니다."),
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS,"사람인 API 요청 제한 초과 입니다."),
     EMAIL_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일 아이디 입니다.");
 
     private final HttpStatus status;
