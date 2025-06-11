@@ -31,12 +31,14 @@ public class ResumeService {
     private final UserService userService;
 
     @Transactional
-    public void createResume(User user ,JobApplication application) {
+    public Resume createResume(User user ,JobApplication application) {
         Resume resume = Resume.builder()
             .application(application)
             .user(user)
             .build();
         resumeRepository.save(resume);
+
+        return resume;
     }
 
     public ResumeResponseDto getResume(Long userId, Long applicationId) {
