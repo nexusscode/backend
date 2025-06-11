@@ -19,6 +19,7 @@ public class Resume extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @OneToOne
     @JoinColumn(name = "application_id")
     private JobApplication application;

@@ -1,5 +1,6 @@
 package org.nexusscode.backend.application.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,13 +11,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.global.Timestamped;
+import org.nexusscode.backend.interview.domain.InterviewSession;
+import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.user.domain.User;
 
 @Entity
@@ -63,10 +70,13 @@ public class JobApplication extends Timestamped {
 
     private String location;
 
-    /*@Column(name = "job_description")
-    private String jobDescription;*/
-
     private String memo;
+
+    @OneToOne(mappedBy = "application",cascade = CascadeType.ALL, orphanRemoval = true)
+    private Resume resume;
+
+    @OneToMany(mappedBy = "application", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InterviewSession> interviewSessions = new ArrayList<>();
 
     @Builder
     public JobApplication(User user, String saraminJobId, String companyName, String jobTitle, Status status,
@@ -86,11 +96,14 @@ public class JobApplication extends Timestamped {
         this.salary=salary;
     }
 
-    /*public void updateJobDescription(String imageText) {
-        this.jobDescription=imageText;
-    }*/
-
     public void updateMemo(MemoRequestDto memoRequestDto) {
         this.memo=memoRequestDto.getMemo();
+    }
+
+    public void setResume(Resume resume) {
+        this.resume = resume;
+        if (resume != null) {
+            resume.setApplication(this);
+        }
     }
 }
