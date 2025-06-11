@@ -49,6 +49,7 @@ public enum ErrorCode {
     ALREADY_SAVED_RESUME(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 자소서입니다."),
     NOT_SAVED_RESUME(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 자소서입니다."),
     ALREADY_SAVED_REPORT_MEMO(HttpStatus.BAD_REQUEST,"이미 보관함에 저장된 면접 기록 입니다."),
+    NOT_SAVED_REPORT_MEMO(HttpStatus.BAD_REQUEST,"보관함에 존재하지 않는 면접 기록 입니다."),
     MALFORMED_JWT(HttpStatus.BAD_REQUEST, "Malformed JWT"),
     EXPIRED_JWT(HttpStatus.UNAUTHORIZED, "Expired JWT"),
     INVALID_CLAIM(HttpStatus.UNAUTHORIZED, "Invalid JWT claims"),
