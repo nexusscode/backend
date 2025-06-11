@@ -21,6 +21,9 @@ public class ReportMemoDetailResponse {
     private LocalTime startTime;
     private LocalTime finishedTime;
     private LocalDate interviewDate;
+    private String prosAndCons;
+    private String analysisResult;
+    private boolean isSaved;
     private List<MemoOutput> memoList;
 
     @Getter
