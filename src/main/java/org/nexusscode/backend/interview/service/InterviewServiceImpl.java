@@ -57,7 +57,7 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional
-    @RateLimit(limit = 10, duration = 24, timeUnit = ChronoUnit.HOURS)
+    @RateLimit(limit = 5, duration = 24, timeUnit = ChronoUnit.HOURS)
     @RedissonLock(key = "'start:' + #userId + ':' + #request.applicationId")
     public Long startInterview(InterviewStartRequest request, Long userId) {
         Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId());
