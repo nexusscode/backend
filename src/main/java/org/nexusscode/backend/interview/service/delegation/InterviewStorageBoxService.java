@@ -81,7 +81,11 @@ public class InterviewStorageBoxService {
     }
 
     @Transactional(readOnly = true)
-    public List<InterviewSummaryStorageBox> list(Long userId) {
-        return boxRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+    public List<InterviewSummaryStorageBox> list(Long userId, String searchWord) {
+        if (searchWord != null && !searchWord.isBlank()) {
+            return boxRepository.findAllByUserIdAndKeyword(userId, searchWord);
+        } else {
+            return boxRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+        }
     }
 }

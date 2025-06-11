@@ -51,8 +51,10 @@ public class InterviewStorageController {
     @Operation(summary = "면접 세션 보관함 전체 불러오기")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/storage/getall")
-    public ResponseEntity<CommonResponse<List<InterviewSessionDTO>>> getAllStorageSessions(@RequestHeader Long userId) {
-        List<InterviewSummaryStorageBox> list = boxService.list(userId);
+    public ResponseEntity<CommonResponse<List<InterviewSessionDTO>>> getAllStorageSessions(
+            @RequestHeader Long userId, @RequestParam(required = false, defaultValue = "")String searchWord
+    ) {
+        List<InterviewSummaryStorageBox> list = boxService.list(userId, searchWord);
 
         List<InterviewSessionDTO> result = list
                 .stream()
