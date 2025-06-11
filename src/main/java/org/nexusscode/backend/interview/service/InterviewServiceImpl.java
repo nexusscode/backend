@@ -57,7 +57,7 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional
-    @RateLimit(limit = 10, duration = 24, timeUnit = ChronoUnit.HOURS)
+    @RateLimit(limit = 5, duration = 24, timeUnit = ChronoUnit.HOURS)
     @RedissonLock(key = "'start:' + #userId + ':' + #request.applicationId")
     public Long startInterview(InterviewStartRequest request, Long userId) {
         Resume resume = resumeService.findResumeListByApplicationId(request.getApplicationId());
@@ -123,7 +123,8 @@ public class InterviewServiceImpl implements InterviewService {
             return result;
         });
 
-        InterviewSession session = question.getSession();
+        InterviewSession session = interviewSessionService.findById(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
 
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())
@@ -133,6 +134,7 @@ public class InterviewServiceImpl implements InterviewService {
                 .type(question.getInterviewType())
                 .ttsUrl(getAIVoicePreSignUrl(question.getTtsFileName()))
                 .videoUrl(changeVoiceTypeToVideoUrl(session.getVoice()))
+                .countAll(session.getQuestionCount())
                 .build();
     }
 
