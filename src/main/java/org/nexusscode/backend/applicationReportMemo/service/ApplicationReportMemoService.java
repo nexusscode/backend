@@ -173,10 +173,16 @@ public class ApplicationReportMemoService {
 
         return ReportMemoDetailResponse.builder()
                 .reportMemoId(reportMemo.getId())
+                .companyName(reportMemo.getCompanyName())
+                .position(reportMemo.getPosition())
                 .companyAtmosphere(reportMemo.getCompanyAtmosphere())
                 .interviewers(reportMemo.getInterviewers())
                 .startTime(reportMemo.getStartTime())
                 .finishedTime(reportMemo.getFinishedTime())
+                .interviewDate(reportMemo.getInterviewDate())
+                .prosAndCons(reportMemo.getProsAndCons())
+                .analysisResult(reportMemo.getAnalysisResult())
+                .isSaved(reportMemo.isSaved())
                 .memoList(memoOutputs)
                 .build();
     }
