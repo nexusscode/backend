@@ -16,4 +16,5 @@ public class QuestionAndHintDTO {
     private InterviewType type;
     private String ttsUrl;
     private String videoUrl;
+    private Integer countAll;
 }
