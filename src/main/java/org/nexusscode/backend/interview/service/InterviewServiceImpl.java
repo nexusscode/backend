@@ -134,6 +134,7 @@ public class InterviewServiceImpl implements InterviewService {
                 .type(question.getInterviewType())
                 .ttsUrl(getAIVoicePreSignUrl(question.getTtsFileName()))
                 .videoUrl(changeVoiceTypeToVideoUrl(session.getVoice()))
+                .countAll(session.getQuestionCount())
                 .build();
     }
 
