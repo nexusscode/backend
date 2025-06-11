@@ -3,19 +3,22 @@ package org.nexusscode.backend.applicationReportMemo.service;
 import lombok.RequiredArgsConstructor;
 import org.nexusscode.backend.applicationReportMemo.domain.ApplicationReportMemo;
 import org.nexusscode.backend.applicationReportMemo.domain.ReportMemoInputSet;
-import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoAllResponse;
-import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoDetailResponse;
-import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoInputSetRequest;
-import org.nexusscode.backend.applicationReportMemo.dto.ReportMemoAnalysisResponse;
+import org.nexusscode.backend.applicationReportMemo.dto.*;
 import org.nexusscode.backend.applicationReportMemo.repository.ApplicationReportMemoRepository;
 import org.nexusscode.backend.applicationReportMemo.repository.ReportMemoInputSetRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.client.GPTClient;
 import org.nexusscode.backend.interview.service.support.PromptType;
+import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.repository.UserRepository;
+import org.nexusscode.backend.user.service.UserService;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class ApplicationReportMemoService {
     private final ReportMemoInputSetRepository reportMemoInputSetRepository;
     private final UserRepository userRepository;
     private final GPTClient gptClient;
+    private final UserService userService;
 
     @Transactional
     public ReportMemoDetailResponse saveUserInput(Long userId, ReportMemoInputSetRequest request) {
@@ -197,6 +201,58 @@ public class ApplicationReportMemoService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void saveReportMemoInArchive(Long userId, Long reportMemoId) {
+        User user = userService.findById(userId);
+        ApplicationReportMemo reportMemo = findById(reportMemoId);
+        if(reportMemo.getUser() != user) {
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_REPORT_MEMO);
+        }
+
+        if(reportMemo.isSaved()) {
+            throw new CustomException(ErrorCode.ALREADY_SAVED_REPORT_MEMO);
+        }
+        reportMemo.updateSaveStatus(true);
+        applicationReportMemoRepository.save(reportMemo);
+    }
+
+    @Transactional
+    public void cancelReportMemoFromArchieve(Long userId,Long reportMemoId) {
+        User user = userService.findById(userId);
+        ApplicationReportMemo reportMemo = findById(reportMemoId);
+        if(reportMemo.getUser() != user) {
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED_RESUME);
+        }
+        if(!reportMemo.isSaved()) {
+            throw new CustomException(ErrorCode.NOT_SAVED_REPORT_MEMO);
+        }
+        reportMemo.updateSaveStatus(false);
+        applicationReportMemoRepository.save(reportMemo);
+    }
+
+    @Transactional(readOnly = true)
+    public ApplicationReportMemo findById(Long id) {
+        return applicationReportMemoRepository.findById(id).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_REPORT_MEMO)
+        );
+    }
+
+    public Page<ReportMemoSavedResponseDto> getSavedReportMemos(Long userId, String searchWord, int page, int size) {
+        User user = userService.findById(userId);
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (searchWord != null && !searchWord.isEmpty()) {
+            Page<ApplicationReportMemo> resultPage = applicationReportMemoRepository.searchSavedByUserAndCompanyOrPosition(user, searchWord, pageable);
+            List<ReportMemoSavedResponseDto> dtoList = resultPage.getContent().stream()
+                    .map(memo -> new ReportMemoSavedResponseDto(memo.getId(), memo.getCompanyName()))
+                    .toList();
+            return new PageImpl<>(dtoList, pageable, resultPage.getTotalElements());
+        }
+
+        Page<ApplicationReportMemo> savedPage = applicationReportMemoRepository.findAllByUserAndIsSaved(user, true, pageable);
+        return savedPage.map(memo -> new ReportMemoSavedResponseDto(memo.getId(), memo.getCompanyName()));
     }
 
 }

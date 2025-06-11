@@ -52,6 +52,9 @@ public class ApplicationReportMemo extends Timestamped {
     @Column(nullable = false)
     private LocalTime finishedTime;
 
+    @Column(name = "is_saved")
+    private boolean isSaved;
+
     @OneToMany(mappedBy = "applicationReportMemo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportMemoInputSet> inputSetList = new ArrayList<>();
 
@@ -67,11 +70,16 @@ public class ApplicationReportMemo extends Timestamped {
         this.companyName = companyName;
         this.position = position;
         this.interviewDate = interviewDate;
+        this.isSaved=false;
     }
 
     public void updateAnalysisResult(String prosAndCons, String analysisResult) {
         this.prosAndCons = prosAndCons;
         this.analysisResult = analysisResult;
+    }
+
+    public void updateSaveStatus(boolean status) {
+        this.isSaved=status;
     }
 }
 
