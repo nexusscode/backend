@@ -45,7 +45,7 @@ public class UserService {
     private String kakaoAuthUri;
 
     public void signup(UserRequestDto userRequestDto) {
-        if (!isEmailDuplicate(userRequestDto.getEmail())) {
+        if (isEmailDuplicate(userRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.EMAIL_EXIST);
         }
         DevType devType = DevType.from(userRequestDto.getDevType());
