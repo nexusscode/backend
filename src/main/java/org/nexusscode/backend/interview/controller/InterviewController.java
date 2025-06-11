@@ -81,20 +81,6 @@ public class InterviewController {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 전체 조회 성공", 200, interviewService.getFullSessionDetail(sessionId)));
     }
 
-    @Operation(summary = "면접 세션 보관함에 저장")
-    @PreAuthorize("#userId == principal.userId")
-    @PutMapping("/{sessionId}/storage/save")
-    public ResponseEntity<CommonResponse<Boolean>> saveStorageSession(@PathVariable Long sessionId, @RequestHeader Long userId) {
-        return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함에 저장", 200, interviewService.saveSessionToArchive(sessionId)));
-    }
-
-    @Operation(summary = "면접 세션 보관함에서 삭제")
-    @PreAuthorize("#userId == principal.userId")
-    @DeleteMapping("/{sessionId}/storage/delete")
-    public ResponseEntity<CommonResponse<Boolean>> deleteStorageSession(@PathVariable Long sessionId, @RequestHeader Long userId) {
-        return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함에서 삭제", 200, interviewService.deleteSessionToArchive(sessionId)));
-    }
-
     @Operation(summary = "면접 세션 삭제")
     @PreAuthorize("#userId == principal.userId")
     @DeleteMapping("/{sessionId}/delete")
