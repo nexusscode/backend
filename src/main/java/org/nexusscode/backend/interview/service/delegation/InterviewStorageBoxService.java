@@ -9,6 +9,10 @@ import org.nexusscode.backend.interview.dto.InterviewAllSessionDTO;
 import org.nexusscode.backend.interview.repository.InterviewStorageBoxRepository;
 import org.nexusscode.backend.user.domain.User;
 import org.nexusscode.backend.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,11 +85,13 @@ public class InterviewStorageBoxService {
     }
 
     @Transactional(readOnly = true)
-    public List<InterviewSummaryStorageBox> list(Long userId, String searchWord) {
+    public Page<InterviewSummaryStorageBox> list(Long userId, String searchWord, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
         if (searchWord != null && !searchWord.isBlank()) {
-            return boxRepository.findAllByUserIdAndKeyword(userId, searchWord);
+            return boxRepository.findAllByUserIdAndKeyword(userId, searchWord, pageable);
         } else {
-            return boxRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+            return boxRepository.findAllByUserId(userId, pageable);
         }
     }
 }
