@@ -3,6 +3,7 @@ package org.nexusscode.backend.interview.dto;
 import lombok.*;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.interview.domain.InterviewSummary;
+import org.nexusscode.backend.interview.domain.InterviewSummaryStorageBox;
 import org.nexusscode.backend.interview.domain.VocabularyEvaluation;
 
 import java.util.Arrays;
@@ -62,5 +63,39 @@ public class InterviewAllSessionDTO {
                 .build();
 
         return build;
+    }
+
+    public static InterviewAllSessionDTO boxEntityToDTO(InterviewSummaryStorageBox box) {
+        return InterviewAllSessionDTO.builder()
+                .sessionId(box.getId())
+                .title(box.getSessionTitle())
+                .totalCount(box.getTotalQuestionCount())
+                .questions(
+                        box.getQuestions().stream()
+                                .map(q -> InterviewQnADTO.builder()
+                                        .questionId(q.getId())
+                                        .questionText(q.getQuestionText())
+                                        .transcript(q.getTranscript())
+                                        .feedback(q.getFeedback())
+                                        .second(q.getSecond())
+                                        .cheated(q.isCheated())
+                                        .completeAnswer(q.isCompleteAnswer())
+                                        .questionFulfilled(q.isQuestionFulfilled())
+                                        .blindKeywords(q.getBlindKeywords())
+                                        .build()
+                                )
+                                .collect(Collectors.toList())
+                )
+                .countSeconds(box.getCountSeconds())
+                .strengths(box.getStrengths())
+                .weaknesses(box.getWeaknesses())
+                .overallAssessment(box.getOverallAssessment())
+                .comparisonWithPrevious(box.getComparisonWithPrevious())
+                .vocabularyEvaluation(box.getVocabularyEvaluation())
+                .workAttitude(box.getWorkAttitude())
+                .developerStyle(box.getDeveloperStyle())
+                .notCompleteAnswer(box.getNotCompleteAnswer())
+                .blindList(box.getBlindList())
+                .build();
     }
 }
