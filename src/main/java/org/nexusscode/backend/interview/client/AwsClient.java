@@ -177,7 +177,6 @@ public class AwsClient {
     private String generatePresignedUrl(String prefixPath, String fileName, Duration expiresIn) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(Region.AP_NORTHEAST_2)
-                .credentialsProvider(ProfileCredentialsProvider.create("s3-test"))
                 .build()) {
 
             String key = prefixPath + "/" + fileName;
