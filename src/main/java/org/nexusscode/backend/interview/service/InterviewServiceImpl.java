@@ -123,7 +123,8 @@ public class InterviewServiceImpl implements InterviewService {
             return result;
         });
 
-        InterviewSession session = question.getSession();
+        InterviewSession session = interviewSessionService.findById(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SESSION_LIST_EMPTY));
 
         return QuestionAndHintDTO.builder()
                 .interviewQuestionId(question.getId())
