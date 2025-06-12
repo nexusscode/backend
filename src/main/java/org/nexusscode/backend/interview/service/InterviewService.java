@@ -26,6 +26,8 @@ public interface InterviewService {
 
     String getAIVideoPreSignUrl(String fileName);
 
+    String getUserVoicePutPreSignUrl(String fileName);
+
     Boolean deleteSession(Long sessionId);
 
     InterviewRecentSessionDTO getRecentSession(Long applicationId);
