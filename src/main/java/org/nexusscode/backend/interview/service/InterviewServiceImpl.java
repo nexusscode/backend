@@ -164,7 +164,7 @@ public class InterviewServiceImpl implements InterviewService {
         InterviewQuestion question = interviewQuestionService.findById(request.getQuestionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        Long answerId = interviewAnswerService.saveAnswer(question);
+        Long answerId = interviewAnswerService.saveAnswer(request, question);
 
         processGenerateAdvice(request);
 
