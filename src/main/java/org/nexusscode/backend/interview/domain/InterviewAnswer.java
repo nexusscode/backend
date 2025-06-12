@@ -61,7 +61,7 @@ public class InterviewAnswer extends Timestamped {
         return answer;
     }
 
-    public static InterviewAnswer createInterviewPassedAnswer(Long questionId, InterviewQuestion question) {
+    public static InterviewAnswer createInterviewPassedAnswer(InterviewQuestion question) {
         InterviewAnswer answer = InterviewAnswer.builder()
                 .question(question)
                 .audioUrl("no link")
