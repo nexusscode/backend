@@ -22,9 +22,13 @@ import org.nexusscode.backend.interview.service.delegation.InterviewSummaryServi
 import org.nexusscode.backend.resume.domain.Resume;
 import org.nexusscode.backend.resume.domain.ResumeItem;
 import org.nexusscode.backend.resume.service.ResumeService;
+import org.nexusscode.backend.user.dto.UserDTO;
 import org.nexusscode.backend.user.service.UserStatService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -33,6 +37,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +59,7 @@ public class InterviewServiceImpl implements InterviewService {
     private final InterviewSummaryService interviewSummaryService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     @Transactional
@@ -260,6 +266,30 @@ public class InterviewServiceImpl implements InterviewService {
         InterviewQuestion question = interviewQuestionService.findById(questionId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         return interviewAnswerService.saveAnswer(questionId, question);
+    }
+
+    @Override
+    public RateLimitStatusDTO getInterviewRateLimitStatus() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(auth.getPrincipal() instanceof UserDTO user)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String userEmail = user.getEmail();
+        String key = "rate:startInterview:" + userEmail;
+
+        Object raw = redisTemplate.opsForValue().get(key);
+        long count = raw != null ? ((Number) raw).longValue() : 0L;
+
+        Long ttlSeconds = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+
+        return new RateLimitStatusDTO(
+                5,
+                count,
+                5 - count,
+                ttlSeconds != null && ttlSeconds > 0 ? ttlSeconds : 0
+        );
     }
 }
 
