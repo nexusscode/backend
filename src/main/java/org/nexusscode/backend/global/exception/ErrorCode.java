@@ -71,7 +71,8 @@ public enum ErrorCode {
     NOT_FOUND_DISC_TYPE(HttpStatus.NOT_FOUND,"DISC 유형을 찾을 수 없습니다."),
     NOT_FOUND_DEV_TYPE(HttpStatus.NOT_FOUND,"개발 유형을 찾을 수 없습니다."),
     TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS,"사람인 API 요청 제한 초과 입니다."),
-    EMAIL_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일 아이디 입니다.");
+    EMAIL_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일 아이디 입니다."),
+    ALREADY_EXISTENCE_SURVEY_RESULT(HttpStatus.BAD_REQUEST,"이미 설문결과가 존재합니다.");
 
     private final HttpStatus status;
     private final String message;
