@@ -37,4 +37,6 @@ public interface InterviewService {
     Integer getInterviewCallCount(Long userId);
 
     Long passAnswer(Long questionId, Long userId);
+
+    RateLimitStatusDTO getInterviewRateLimitStatus();
 }
