@@ -4,11 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.interview.dto.InterviewAnswerRequest;
-import org.nexusscode.backend.user.domain.User;
 
 @Entity
 @Getter
@@ -41,9 +38,14 @@ public class InterviewAnswer extends Timestamped {
     @Column(columnDefinition = "TEXT")
     private String transcript;
 
-    public void saveScriptAndAudioLength(String script, int audioLength) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AnswerStatus answerStatus = AnswerStatus.PENDING;
+
+    public void saveScriptAndAudioLengthAndStatus(String script, int audioLength, AnswerStatus answerStatus) {
         this.transcript = script;
         this.audioLength = audioLength;
+        this.answerStatus = answerStatus;
     }
 
     public static InterviewAnswer createInterviewAnswer(InterviewAnswerRequest request, InterviewQuestion question) {
@@ -51,10 +53,28 @@ public class InterviewAnswer extends Timestamped {
                 .question(question)
                 .audioUrl(request.getAudioUrl())
                 .cheated(request.getIsCheated())
+                .answerStatus(AnswerStatus.PENDING)
                 .build();
 
         question.saveAnswer(answer);
 
         return answer;
+    }
+
+    public static InterviewAnswer createInterviewPassedAnswer(Long questionId, InterviewQuestion question) {
+        InterviewAnswer answer = InterviewAnswer.builder()
+                .question(question)
+                .audioUrl("no link")
+                .cheated(false)
+                .answerStatus(AnswerStatus.PASS)
+                .build();
+
+        question.saveAnswer(answer);
+
+        return answer;
+    }
+
+    public void changeAnswerStatus(AnswerStatus answerStatus) {
+        this.answerStatus = answerStatus;
     }
 }
