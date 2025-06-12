@@ -71,6 +71,8 @@ public class InterviewSession extends Timestamped {
             question.saveSession(build);
         }
 
+        application.addInterviewSession(build);
+
         return build;
     }
 

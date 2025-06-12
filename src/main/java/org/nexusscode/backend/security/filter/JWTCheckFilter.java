@@ -21,6 +21,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -90,18 +91,23 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             Boolean social = (Boolean) claims.get("social");
             List<String> roleNames = (List<String>) claims.get("roleNames");
 
-            List<GrantedAuthority> authorities = roleNames.stream()
-                    .map(SimpleGrantedAuthority::new)
+            Collection<GrantedAuthority> authorities = roleNames.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .collect(Collectors.toList());
 
             UserDTO memberDTO = new UserDTO(userId, email, password, name, social, roleNames);
 
+            log.info("1");
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(memberDTO, password, authorities);
+            log.info("2");
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("3");
 
-            filterChain.doFilter(request, response);
+
+            log.info("4");
 
         } catch (CustomException e) {
             log.error("JWT 검증 실패: {}", e.getMessage());
@@ -111,5 +117,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             request.setAttribute("customException", new CustomException(ErrorCode.JWT_VALIDATION_ERROR));
             throw new BadCredentialsException("JWT_PROCESSING_ERROR");
         }
+
+        filterChain.doFilter(request, response);
     }
 }

@@ -33,4 +33,6 @@ public interface InterviewService {
     InterviewSessionDTO getRecentInterviewSessionByUserId(Long userId);
 
     Integer getInterviewCallCount(Long userId);
+
+    Long passAnswer(Long questionId, Long userId);
 }
