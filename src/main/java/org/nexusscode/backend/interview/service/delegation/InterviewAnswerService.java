@@ -6,7 +6,6 @@ import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.domain.AnswerStatus;
 import org.nexusscode.backend.interview.domain.InterviewAnswer;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
-import org.nexusscode.backend.interview.dto.InterviewAnswerRequest;
 import org.nexusscode.backend.interview.repository.InterviewAnswerRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +16,8 @@ import java.util.Optional;
 public class InterviewAnswerService {
     private final InterviewAnswerRepository interviewAnswerRepository;
 
-    public Long saveAnswer(InterviewAnswerRequest request, InterviewQuestion question) {
-        InterviewAnswer answer = InterviewAnswer.createInterviewAnswer(request, question);
+    public Long saveAnswer(InterviewQuestion question) {
+        InterviewAnswer answer = InterviewAnswer.createInterviewAnswer(question);
 
         try {
             return interviewAnswerRepository.save(answer).getId();
@@ -28,7 +27,7 @@ public class InterviewAnswerService {
     }
 
     public Long saveAnswer(Long questionId, InterviewQuestion question) {
-        InterviewAnswer answer = InterviewAnswer.createInterviewPassedAnswer(questionId, question);
+        InterviewAnswer answer = InterviewAnswer.createInterviewPassedAnswer(question);
 
         try {
             return interviewAnswerRepository.save(answer).getId();

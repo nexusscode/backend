@@ -164,7 +164,7 @@ public class InterviewServiceImpl implements InterviewService {
         InterviewQuestion question = interviewQuestionService.findById(request.getQuestionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        Long answerId = interviewAnswerService.saveAnswer(request, question);
+        Long answerId = interviewAnswerService.saveAnswer(question);
 
         processGenerateAdvice(request);
 
@@ -267,10 +267,11 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
+    @Transactional
     public Long passAnswer(Long questionId, Long userId) {
         InterviewQuestion question = interviewQuestionService.findById(questionId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        return interviewAnswerService.saveAnswer(questionId, question);
+        return interviewAnswerService.saveAnswer(question);
     }
 
     @Override
