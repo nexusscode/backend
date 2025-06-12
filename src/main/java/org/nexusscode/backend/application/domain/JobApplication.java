@@ -24,6 +24,7 @@ import org.nexusscode.backend.application.dto.MemoRequestDto;
 import org.nexusscode.backend.global.Timestamped;
 import org.nexusscode.backend.interview.domain.InterviewSession;
 import org.nexusscode.backend.resume.domain.Resume;
+import org.nexusscode.backend.resume.domain.ResumeItemFeedback;
 import org.nexusscode.backend.user.domain.User;
 
 @Entity
@@ -105,5 +106,13 @@ public class JobApplication extends Timestamped {
         if (resume != null) {
             resume.setApplication(this);
         }
+    }
+
+    public void addInterviewSession(InterviewSession interviewSession) {
+        if (this.interviewSessions == null) {
+            this.interviewSessions = new ArrayList<>();
+        }
+
+        this.interviewSessions.add(interviewSession);
     }
 }

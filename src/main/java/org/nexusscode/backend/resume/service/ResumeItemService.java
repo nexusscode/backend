@@ -56,7 +56,6 @@ public class ResumeItemService {
                 .build();
             resumeItems.add(resumeItem);
             resume.addResumeItem(resumeItem);
-            resumeItemRepository.save(resumeItem);
 
             String feedbackText = resumeItemFeedbackService.createResumeFeedback(
                 resume.getApplication(), resumeItemRequestDto.getQuestion(),
@@ -66,6 +65,8 @@ public class ResumeItemService {
                 .feedbackText(feedbackText)
                 .build();
             resumeItemFeedbackRepository.save(feedback);
+            resumeItem.addResumeItemFeedback(feedback);
+            resumeItemRepository.save(resumeItem);
             resume.updateAiCount();
             userStatService.incrementResumeCount(userId);
         }
@@ -89,7 +90,6 @@ public class ResumeItemService {
             .answer(resumeItemRequestDto.getAnswer())
             .build();
         resume.addResumeItem(resumeItem);
-        resumeItemRepository.save(resumeItem);
 
         String feedbackText = resumeItemFeedbackService.createResumeFeedback(
             resume.getApplication(), resumeItemRequestDto.getQuestion(),
@@ -99,7 +99,9 @@ public class ResumeItemService {
             .feedbackText(feedbackText)
             .build();
         resumeItemFeedbackRepository.save(feedback);
+        resumeItem.addResumeItemFeedback(feedback);
         resume.updateAiCount();
+        resumeItemRepository.save(resumeItem);
         resumeService.save(resume);
         userStatService.incrementResumeCount(userId);
 
