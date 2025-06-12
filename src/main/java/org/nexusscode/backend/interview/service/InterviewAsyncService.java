@@ -79,9 +79,6 @@ public class InterviewAsyncService {
         if (answer == null || answer.getAnswerStatus() == AnswerStatus.PASS) {
             log.warn("questionId {} 에 대한 answer가 존재하지 않습니다", question.getId());
             return null;
-        }else if (answer.getAudioLength() == 0 || answer.getTranscript() == null || answer.getTranscript().length() == 0) {
-            answer.changeAnswerStatus(AnswerStatus.FAILED);
-            return null;
         }
 
         try {
@@ -103,6 +100,7 @@ public class InterviewAsyncService {
             );
         } catch (Exception e) {
             log.error("답변 저장 또는 피드백 생성 중 오류 - questionId: {}", question.getId(), e);
+            answer.changeAnswerStatus(AnswerStatus.FAILED);
             return null;
         }
 
