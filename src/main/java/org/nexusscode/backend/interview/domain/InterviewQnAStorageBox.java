@@ -20,12 +20,16 @@ public class InterviewQnAStorageBox {
     @JoinColumn(name = "storage_box_id")
     private InterviewSummaryStorageBox storageBox;
 
+    @Column(columnDefinition = "TEXT")
     private String questionText;
+    @Column(columnDefinition = "TEXT")
     private String transcript;
+    @Column(columnDefinition = "TEXT")
     private String feedback;
     private int second;
     private boolean cheated;
     private boolean completeAnswer;
     private boolean questionFulfilled;
+    @Column(columnDefinition = "TEXT")
     private String blindKeywords;
 }

@@ -81,6 +81,14 @@ public class InterviewController {
         return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
     }
 
+    @Operation(summary = "AI 영상 파일 s3 접근 권한 presign")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/ai-presign")
+    public ResponseEntity<CommonResponse<Map<String, String>>> getAccessAIPresignUrlPath(@RequestParam String fileName, @RequestHeader Long userId) {
+        Map<String, String> url = Map.of("url", interviewService.getAIVideoPreSignUrl(fileName));
+        return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
+    }
+
     @Operation(summary = "면접 세션에 대한 모든 정보 조회(질문, 답변, 결과지 포함)")
     @PreAuthorize("#userId == principal.userId")
     @GetMapping("/{sessionId}/detail")

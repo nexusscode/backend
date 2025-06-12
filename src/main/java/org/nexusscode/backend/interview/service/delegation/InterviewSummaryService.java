@@ -29,7 +29,6 @@ public class InterviewSummaryService {
         }
     }
 
-    @Cacheable(value = "interview:summary", key = "#sessionId")
     public Optional<InterviewSummary> findBySessionId(Long sessionId) {
         return interviewSummaryRepository.findSummaryBySessionId(sessionId);
     }
