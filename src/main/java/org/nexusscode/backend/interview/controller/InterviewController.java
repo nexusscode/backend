@@ -141,8 +141,8 @@ public class InterviewController {
 
     @Operation(summary = "api 횟수 조회")
     @PreAuthorize("#userId == principal.userId")
-    @GetMapping("/interview/rate-limit")
-    public ResponseEntity<CommonResponse<RateLimitStatusDTO>> getRateLimitStatus() {
+    @GetMapping("/rate-limit")
+    public ResponseEntity<CommonResponse<RateLimitStatusDTO>> getRateLimitStatus(@RequestHeader Long userId) {
         return ResponseEntity.ok(new CommonResponse<>("api 조회 성공", 200, interviewService.getInterviewRateLimitStatus()));
     }
 }
