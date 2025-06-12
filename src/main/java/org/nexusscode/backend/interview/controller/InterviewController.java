@@ -61,8 +61,8 @@ public class InterviewController {
     @Operation(summary = "답변 패스")
     @PreAuthorize("#userId == principal.userId")
     @PostMapping("/interview-answer-pass")
-    public ResponseEntity<CommonResponse<Long>> passAnswer(@RequestBody Long questionId, @RequestHeader Long userId) {
-        return ResponseEntity.ok(new CommonResponse<>("답변 패스 완료", 200, interviewService.passAnswer(questionId, userId)));
+    public ResponseEntity<CommonResponse<Long>> passAnswer(@RequestBody InterviewAnswerRequest request, @RequestHeader Long userId) {
+        return ResponseEntity.ok(new CommonResponse<>("답변 패스 완료", 200, interviewService.passAnswer(request.getQuestionId(), userId)));
     }
 
     @Operation(summary = "사용자 목소리를 접근 위한 s3 접근 권한 presign")
