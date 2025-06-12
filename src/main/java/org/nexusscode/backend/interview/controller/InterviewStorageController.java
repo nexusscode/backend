@@ -41,7 +41,7 @@ public class InterviewStorageController {
 
     @Operation(summary = "면접 세션 보관함 하나 조회")
     @PreAuthorize("#userId == principal.userId")
-    @DeleteMapping("/get/{sessionId}")
+    @GetMapping("/get/{sessionId}")
     public ResponseEntity<CommonResponse<InterviewAllSessionDTO>> getStorageSession(@PathVariable Long sessionId, @RequestHeader Long userId) {
         return ResponseEntity.ok(new CommonResponse<>("면접 세션 보관함에서 조회 성공", 200, InterviewAllSessionDTO.boxEntityToDTO(boxService.get(sessionId, userId))));
     }
@@ -52,7 +52,7 @@ public class InterviewStorageController {
     public ResponseEntity<CommonResponse<Page<InterviewSessionDTO>>> getAllStorageSessions(
             @RequestHeader Long userId,
             @RequestParam(required = false, defaultValue = "")String searchWord,
-            @RequestParam(defaultValue = "1")int page,
+            @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "10")int size
     ) {
         Page<InterviewSummaryStorageBox> list = boxService.list(userId, searchWord, page, size);
