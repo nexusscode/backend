@@ -131,5 +131,11 @@ public class InterviewController {
         return ResponseEntity.ok(new CommonResponse<>("면접 횟수 조회", 200, interviewService.getInterviewCallCount(userId)));
     }
 
+    @Operation(summary = "api 횟수 조회")
+    @PreAuthorize("#userId == principal.userId")
+    @GetMapping("/interview/rate-limit")
+    public ResponseEntity<CommonResponse<RateLimitStatusDTO>> getRateLimitStatus() {
+        return ResponseEntity.ok(new CommonResponse<>("api 조회 성공", 200, interviewService.getInterviewRateLimitStatus()));
+    }
 }
 
