@@ -45,6 +45,10 @@ public class SurveyResultService {
     @Transactional
     public void submitSurvey(Long userId, List<SurveyRequestDto> surveyRequestDtoList) {
         User user = userService.findById(userId);
+        SurveyResult result = findByUser(user);
+        if(result!=null){
+            throw new CustomException(ErrorCode.ALREADY_EXISTENCE_SURVEY_RESULT);
+        }
         // 각 유형별 점수 계산
         int dScore = calculateScoreForQuestions(surveyRequestDtoList, D_TYPE_QUESTIONS);
         int iScore = calculateScoreForQuestions(surveyRequestDtoList, I_TYPE_QUESTIONS);

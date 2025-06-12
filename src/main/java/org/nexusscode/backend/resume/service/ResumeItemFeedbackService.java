@@ -129,13 +129,15 @@ public class ResumeItemFeedbackService {
         resumeFeedbackLimiterService.checkLimit(user.getId());
         resumeItem.updateResumeItem(resumeItemRequestDto);
         resumeItem.updateAiCount();
-        resumeItemRepository.save(resumeItem);
+
         String feedbackText = createResumeFeedback(resumeItem.getResume().getApplication(),resumeItemRequestDto.getQuestion(),resumeItemRequestDto.getAnswer());
         ResumeItemFeedback feedback = ResumeItemFeedback.builder()
             .resumeItem(resumeItem)
             .feedbackText(feedbackText)
             .build();
         resumeItemFeedbackRepository.save(feedback);
+        resumeItem.addResumeItemFeedback(feedback);
+        resumeItemRepository.save(resumeItem);
         resumeItem.getResume().updateAiCount();
         resumeService.save(resumeItem.getResume());
         userStatService.incrementResumeCount(userId);
