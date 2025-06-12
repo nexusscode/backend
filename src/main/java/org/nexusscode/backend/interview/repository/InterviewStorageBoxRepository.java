@@ -1,6 +1,7 @@
 package org.nexusscode.backend.interview.repository;
 
 import org.nexusscode.backend.interview.domain.InterviewSummaryStorageBox;
+import org.nexusscode.backend.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,6 @@ public interface InterviewStorageBoxRepository extends JpaRepository<InterviewSu
                                                                Pageable pageable);
 
     Page<InterviewSummaryStorageBox> findAllByUserId(Long userId, Pageable pageable);
+
+    void deleteAllByUser(User user);
 }
