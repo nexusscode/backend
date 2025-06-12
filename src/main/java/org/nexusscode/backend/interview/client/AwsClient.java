@@ -164,7 +164,7 @@ public class AwsClient {
         return switch (format) {
             case "mp3" -> "audio/mpeg";
             case "mp4" -> "video/mp4";      // 또는 audio/mp4 depending on actual media
-            case "webm" -> "audio/webm";
+            case "webm" -> "video/webm";
             case "m4a" -> "audio/mp4";
             case "wav" -> "audio/wav";
             case "flac" -> "audio/flac";
