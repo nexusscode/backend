@@ -26,4 +26,6 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
     Long sumAiCountByUser(@Param("user") User user);
 
     Page<Resume> findAllByUserAndIsSaved(User user, boolean b, Pageable pageable);
+
+    void deleteAllByUser(User user);
 }

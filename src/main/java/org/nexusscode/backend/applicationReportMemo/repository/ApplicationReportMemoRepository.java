@@ -29,4 +29,6 @@ public interface ApplicationReportMemoRepository extends JpaRepository<Applicati
             Pageable pageable);
 
     Page<ApplicationReportMemo> findAllByUserAndIsSaved(User user, boolean isSaved, Pageable pageable);
+
+    void deleteAllByUser(User user);
 }

@@ -208,4 +208,13 @@ public class UserController {
         boolean result = userService.isEmailDuplicate(email);
         return ResponseEntity.ok(new CommonResponse<>("로그인 중복 방지 확인", 200, result));
     }
+
+    @Operation(summary = "회원탈퇴")
+    @PreAuthorize("#userId == principal.userId")
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<CommonResponse<Boolean>> withdraw(@RequestHeader Long userId) {
+        userService.withdraw(userId);
+        CommonResponse response = new CommonResponse("회원탈퇴가 완료되었습니다.",200,"");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

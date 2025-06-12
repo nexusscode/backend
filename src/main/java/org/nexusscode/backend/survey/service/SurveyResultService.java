@@ -136,19 +136,25 @@ public class SurveyResultService {
 
     public SurveyResponseDto getSurveyResult(Long userId) {
         User user = userService.findById(userId);
-        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
         return new SurveyResponseDto(surveyResult);
     }
 
     public DiscSurveyResponseDto getDiscSurveyResult(Long userId) {
         User user = userService.findById(userId);
-        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
         return new DiscSurveyResponseDto(surveyResult);
     }
 
     public DevSurveyResponseDto getDevSurveyResult(Long userId) {
         User user = userService.findById(userId);
-        SurveyResult surveyResult = surveyResultRepository.findByUser(user);
+        SurveyResult surveyResult = surveyResultRepository.findByUser(user).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
         return new DevSurveyResponseDto(surveyResult);
     }
 
@@ -159,11 +165,9 @@ public class SurveyResultService {
     }
 
     public SurveyResult findByUser(User user) {
-        SurveyResult result = surveyResultRepository.findByUser(user);
-        if (result == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT);
-        }
-        return result;
+        return surveyResultRepository.findByUser(user).orElseThrow(
+            ()->new CustomException(ErrorCode.NOT_FOUND_SURVEY_RESULT)
+        );
     }
 
     @Transactional

@@ -6,6 +6,7 @@ import org.nexusscode.backend.interview.dto.InterviewAdviceDTO;
 import org.nexusscode.backend.interview.dto.InterviewQnADTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDetailDto;
+import org.nexusscode.backend.user.domain.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -96,4 +97,6 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
         where u.id = :userId
 """)
     InterviewSessionDTO findRecentSessionByUserId(Long userId);
+
+    void deleteAllByUser(User user);
 }
