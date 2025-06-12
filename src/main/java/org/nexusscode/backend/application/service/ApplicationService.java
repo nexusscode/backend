@@ -145,13 +145,10 @@ public class ApplicationService {
                 .build();
 
             applicationRepository.save(application);
-            user.addApplication(application);
 
             // 공고 생성시 바로 자소서 생성 (1대1)
             Resume resume = resumeService.createResume(user,application);
             application.setResume(resume);
-            user.addResume(resume);
-            userService.save(user);
 
             return new ApplicationResponseDto(application);
 

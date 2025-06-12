@@ -67,30 +67,6 @@ public class User extends Timestamped {
     @Builder.Default
     private List<MemberRole> userRoleList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<JobApplication> jobApplications;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private SurveyResult surveyResult;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Resume> resumes;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InterviewSession> interviewSessions;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InterviewSummaryStorageBox> interviewSummaryStorageBoxes;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ApplicationReportMemo> reportMemos;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportMemoInputSet> reportMemoInputSets;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStat userStat;
-
     @Builder
     public User(String email, String password, String name, String phoneNumber,DevType devType, ExperienceLevel experienceLevel,List<MemberRole> userRoleList, boolean isSocial) {
         this.email = email;
@@ -117,61 +93,5 @@ public class User extends Timestamped {
         this.phoneNumber=profileUpdateRequestDto.getPhoneNumber();
         this.devType=DevType.from(profileUpdateRequestDto.getDevType());
         this.experienceLevel=ExperienceLevel.from(profileUpdateRequestDto.getExperienceLevel());
-    }
-
-    public void addApplication(JobApplication application) {
-        if (this.jobApplications == null) {
-            this.jobApplications = new ArrayList<>();
-        }
-
-        this.jobApplications.add(application);
-    }
-
-    public void addSurveyResult(SurveyResult surveyResult) {
-        this.surveyResult=surveyResult;
-    }
-
-    public void addResume(Resume resume) {
-        if (this.resumes == null) {
-            this.resumes = new ArrayList<>();
-        }
-
-        this.resumes.add(resume);
-    }
-
-    public void addInterviewSession(InterviewSession interviewSession) {
-        if (this.interviewSessions == null) {
-            this.interviewSessions = new ArrayList<>();
-        }
-
-        this.interviewSessions.add(interviewSession);
-    }
-
-    public void addInterviewSummaryStorageBox(InterviewSummaryStorageBox interviewSummaryStorageBox) {
-        if (this.interviewSummaryStorageBoxes == null) {
-            this.interviewSummaryStorageBoxes = new ArrayList<>();
-        }
-
-        this.interviewSummaryStorageBoxes.add(interviewSummaryStorageBox);
-    }
-
-    public void addApplicationReportMemo(ApplicationReportMemo reportMemo) {
-        if (this.reportMemos == null) {
-            this.reportMemos = new ArrayList<>();
-        }
-
-        this.reportMemos.add(reportMemo);
-    }
-
-    public void addReportMemoInputSet(ReportMemoInputSet reportMemoInputSet) {
-        if (this.reportMemoInputSets == null) {
-            this.reportMemoInputSets = new ArrayList<>();
-        }
-
-        this.reportMemoInputSets.add(reportMemoInputSet);
-    }
-
-    public void addUserStat(UserStat userStat) {
-        this.userStat=userStat;
     }
 }
