@@ -149,6 +149,7 @@ public class ApplicationService {
             // 공고 생성시 바로 자소서 생성 (1대1)
             Resume resume = resumeService.createResume(user,application);
             application.setResume(resume);
+
             return new ApplicationResponseDto(application);
 
         } catch (Exception e) {

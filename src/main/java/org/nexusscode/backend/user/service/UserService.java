@@ -2,8 +2,17 @@ package org.nexusscode.backend.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.nexusscode.backend.application.repository.JobApplicationRepository;
+import org.nexusscode.backend.applicationReportMemo.repository.ApplicationReportMemoRepository;
+import org.nexusscode.backend.applicationReportMemo.repository.ReportMemoInputSetRepository;
 import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
+import org.nexusscode.backend.interview.domain.InterviewSession;
+import org.nexusscode.backend.interview.domain.InterviewSummaryStorageBox;
+import org.nexusscode.backend.interview.repository.InterviewSessionRepository;
+import org.nexusscode.backend.interview.repository.InterviewStorageBoxRepository;
+import org.nexusscode.backend.resume.repository.ResumeRepository;
+import org.nexusscode.backend.survey.repository.SurveyResultRepository;
 import org.nexusscode.backend.user.domain.*;
 import org.nexusscode.backend.user.dto.*;
 import org.nexusscode.backend.user.dto.EmailFindRequestDto;
@@ -12,6 +21,7 @@ import org.nexusscode.backend.user.dto.ProfileResponseDto;
 import org.nexusscode.backend.user.dto.ProfileUpdateRequestDto;
 import org.nexusscode.backend.user.dto.UserRequestDto;
 import org.nexusscode.backend.user.repository.UserRepository;
+import org.nexusscode.backend.user.repository.UserStatRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +44,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserStatService userStatService;
     private final PasswordEncoder passwordEncoder;
+    private final UserDeleteService userDeleteService;
 
     @Value("${oauth.kakao.rest-api-key}")
     private String kakaoRestApiKey;
@@ -250,6 +261,18 @@ public class UserService {
 
     public boolean isEmailDuplicate(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Transactional
+    public void withdraw(Long userId) {
+        User user = findById(userId);
+        userDeleteService.deleteUser(user);
+        userRepository.delete(user);
+    }
+
+
+    public void save(User user){
+        userRepository.save(user);
     }
 }
 

@@ -22,4 +22,6 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
         Pageable pageable);
 
     Page<JobApplication> findAllByUser(User user, Pageable pageable);
+
+    void deleteAllByUser(User user);
 }
