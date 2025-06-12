@@ -254,5 +254,12 @@ public class InterviewServiceImpl implements InterviewService {
     public Integer getInterviewCallCount(Long userId) {
         return userStatService.getUserStat(userId).getTotalInterviews();
     }
+
+    @Override
+    public Long passAnswer(Long questionId, Long userId) {
+        InterviewQuestion question = interviewQuestionService.findById(questionId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        return interviewAnswerService.saveAnswer(questionId, question);
+    }
 }
 

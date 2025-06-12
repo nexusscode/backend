@@ -134,9 +134,9 @@ public class UserController {
         String token = authHeader.substring(7);
         Map<String, Object> claims = jwtProvider.validateToken(token);
 
-        String userId = (String) claims.get("userId");
+        Long userId = ((Number) claims.get("userId")).longValue();
 
-        redisRefreshTokenRepository.deleteRefreshToken(userId);
+        redisRefreshTokenRepository.deleteRefreshToken(userId.toString());
 
         ResponseCookie expiredCookie = ResponseCookie.from("refreshToken", "")
             .httpOnly(true)

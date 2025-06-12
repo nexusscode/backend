@@ -6,7 +6,6 @@ import org.nexusscode.backend.global.exception.CustomException;
 import org.nexusscode.backend.global.exception.ErrorCode;
 import org.nexusscode.backend.interview.domain.*;
 import org.nexusscode.backend.interview.dto.InterviewAdviceDTO;
-import org.nexusscode.backend.interview.dto.InterviewQnADTO;
 import org.nexusscode.backend.interview.dto.InterviewSessionDetailDto;
 import org.nexusscode.backend.interview.dto.InterviewSummaryDTO;
 import org.nexusscode.backend.interview.event.InterviewSummaryNotifier;
@@ -16,8 +15,6 @@ import org.nexusscode.backend.interview.service.delegation.InterviewSessionServi
 import org.nexusscode.backend.interview.service.delegation.InterviewSummaryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -79,15 +76,16 @@ public class InterviewAsyncService {
 
     private InterviewAnswer saveScriptAndFeedback(InterviewQuestion question, Map<String, Object> stringMap) {
         InterviewAnswer answer = question.getAnswer();
-        if (answer == null) {
+        if (answer == null || answer.getAnswerStatus() == AnswerStatus.PASS) {
             log.warn("questionId {} 에 대한 answer가 존재하지 않습니다", question.getId());
             return null;
         }
 
         try {
-            answer.saveScriptAndAudioLength(
+            answer.saveScriptAndAudioLengthAndStatus(
                     (String) stringMap.get("transcript"),
-                    (Integer) stringMap.get("duration")
+                    (Integer) stringMap.get("duration"),
+                    AnswerStatus.DONE
             );
 
             Map<String, String> result = generatorService.generateAdviceFromInterviewQAndA(question);
@@ -102,6 +100,7 @@ public class InterviewAsyncService {
             );
         } catch (Exception e) {
             log.error("답변 저장 또는 피드백 생성 중 오류 - questionId: {}", question.getId(), e);
+            answer.changeAnswerStatus(AnswerStatus.FAILED);
             return null;
         }
 

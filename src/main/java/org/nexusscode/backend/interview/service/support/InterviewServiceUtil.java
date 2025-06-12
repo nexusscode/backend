@@ -1,5 +1,6 @@
 package org.nexusscode.backend.interview.service.support;
 
+import org.nexusscode.backend.interview.domain.AnswerStatus;
 import org.nexusscode.backend.interview.domain.InterviewQuestion;
 import org.nexusscode.backend.interview.domain.InterviewSummary;
 import org.nexusscode.backend.interview.domain.InterviewType;
@@ -90,6 +91,7 @@ public class InterviewServiceUtil {
             4. **이전 응시 대비 변화 및 비교 평가 ** \s
             이전 응답과 비교하여 **개선된 점, 반복되는 문제, 퇴보된 부분** 등을 정성적으로 분석해 주세요. \s
             구조가 더 명확해졌는지, 표현력이 향상되었는지, 여전히 구체성 부족 문제가 반복되고 있는지 등 **기준을 갖고 비교**해 주세요. \s
+            만약에 이번이 첫 번째 응시입니다. 라고 작성되어 있다면 이전 응시가 존재하지 않습니다.로 작성해주세요.
             예: “이전 응시보다 구조화는 향상되었으나 여전히 어휘 반복 현상은 지속되고 있습니다.”
 
             ---
@@ -324,7 +326,11 @@ public class InterviewServiceUtil {
                 .collect(Collectors.toList());
     }
 
-    public static String makeTextFromInterviewQAndA(InterviewQuestion answer) {
-        return "Q: " + answer.getQuestionText() + "\n  A: " + answer.getAnswer().getTranscript() + "\n\n";
+    public static String makeTextFromInterviewQAndA(InterviewQuestion question) {
+        if (question.getAnswer().getAnswerStatus() == AnswerStatus.DONE){
+            return "Q: " + question.getQuestionText() + "\n  A: " + question.getAnswer().getTranscript() + "\n\n";
+        } else {
+            return "Q: " + question.getQuestionText() + "\n  A: 답변을 패스한 문항입니다." + "\n\n";
+        }
     }
 }
