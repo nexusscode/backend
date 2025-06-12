@@ -70,7 +70,8 @@ public class CustomSecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:8080",
-                "http://localhost:5173"
+                "http://localhost:5173",
+                "http://web.jobveloper.co.kr/"
         )); //추후 프론트엔드에 매칭
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "userId"));
