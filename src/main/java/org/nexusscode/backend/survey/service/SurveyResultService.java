@@ -78,6 +78,8 @@ public class SurveyResultService {
             .build();
 
         surveyResultRepository.save(surveyResult);
+        user.addSurveyResult(surveyResult);
+        userService.save(user);
     }
 
     private DiscType determineDiscType(int dScore,int iScore,int sScore,int cScore) {

@@ -62,7 +62,8 @@ public class UserService {
                 .experienceLevel(experienceLevel)
                 .build();
 
-        userStatService.createUserStat(user);
+        UserStat userStat = userStatService.createUserStat(user);
+        user.addUserStat(userStat);
 
         user.addUserRole(MemberRole.USER);
 
@@ -250,6 +251,17 @@ public class UserService {
 
     public boolean isEmailDuplicate(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Transactional
+    public void withdraw(Long userId) {
+        User user = findById(userId);
+
+        userRepository.delete(user);
+    }
+
+    public void save(User user){
+        userRepository.save(user);
     }
 }
 
