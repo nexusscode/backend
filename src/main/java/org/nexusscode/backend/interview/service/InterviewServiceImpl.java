@@ -281,15 +281,18 @@ public class InterviewServiceImpl implements InterviewService {
 
         Object raw = redisTemplate.opsForValue().get(key);
         long count = raw != null ? ((Number) raw).longValue() : 0L;
+        count = Math.min(5, count);
 
         Long ttlSeconds = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+        long remaining = Math.max(0, 5 - count);
 
         return new RateLimitStatusDTO(
                 5,
                 count,
-                5 - count,
+                remaining,
                 ttlSeconds != null && ttlSeconds > 0 ? ttlSeconds : 0
         );
     }
+
 }
 
