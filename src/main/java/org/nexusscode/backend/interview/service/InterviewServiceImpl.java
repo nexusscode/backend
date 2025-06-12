@@ -232,6 +232,11 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
+    public String getUserVoicePutPreSignUrl(String fileName) {
+        return awsClient.generateUserVoicePutPresignURL(fileName, Duration.ofSeconds(600));
+    }
+
+    @Override
     public Boolean deleteSession(Long sessionId) {
         return interviewSessionService.deleteSession(sessionId);
     }

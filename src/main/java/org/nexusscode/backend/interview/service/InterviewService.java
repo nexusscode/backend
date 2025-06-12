@@ -26,6 +26,8 @@ public interface InterviewService {
 
     String getAIVideoPreSignUrl(String fileName);
 
+    String getUserVoicePutPreSignUrl(String fileName);
+
     Boolean deleteSession(Long sessionId);
 
     InterviewRecentSessionDTO getRecentSession(Long applicationId);
@@ -35,6 +37,4 @@ public interface InterviewService {
     Integer getInterviewCallCount(Long userId);
 
     Long passAnswer(Long questionId, Long userId);
-
-    RateLimitStatusDTO getInterviewRateLimitStatus();
 }

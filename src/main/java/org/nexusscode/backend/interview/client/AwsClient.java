@@ -9,9 +9,6 @@ import org.nexusscode.backend.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -19,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.services.transcribe.TranscribeClient;
 import software.amazon.awssdk.services.transcribe.model.*;
 
@@ -162,20 +160,36 @@ public class AwsClient {
         throw new IllegalArgumentException("지원하지 않는 오디오 형식입니다: " + url);
     }
 
+    private String getContentTypeByFormat(String format) {
+        return switch (format) {
+            case "mp3" -> "audio/mpeg";
+            case "mp4" -> "video/mp4";      // 또는 audio/mp4 depending on actual media
+            case "webm" -> "audio/webm";
+            case "m4a" -> "audio/mp4";
+            case "wav" -> "audio/wav";
+            case "flac" -> "audio/flac";
+            default -> throw new IllegalArgumentException("지원하지 않는 오디오 형식입니다: " + format);
+        };
+    }
+
     public String generateUserVoicePresignedUrl(String fileName, Duration expiresIn) {
-        return generatePresignedUrl(userVoiceUploadPath, fileName, expiresIn);
+        return generatePresignedUrlGet(userVoiceUploadPath, fileName, expiresIn);
     }
 
     public String generateAIVoicePresignedUrl(String fileName, Duration expiresIn) {
-        return generatePresignedUrl(aiVoiceUploadPath, fileName, expiresIn);
+        return generatePresignedUrlGet(aiVoiceUploadPath, fileName, expiresIn);
     }
 
     public String generateAIVideoPresignedUrl(String fileName, Duration expiresIn) {
-        return generatePresignedUrl(aiVideoUploadPath, fileName, expiresIn);
+        return generatePresignedUrlGet(aiVideoUploadPath, fileName, expiresIn);
+    }
+
+    public String generateUserVoicePutPresignURL(String fileName, Duration expiresIn) {
+        return generatePresignedPutUrl(userVoiceUploadPath, fileName, expiresIn);
     }
 
 
-    private String generatePresignedUrl(String prefixPath, String fileName, Duration expiresIn) {
+    private String generatePresignedUrlGet(String prefixPath, String fileName, Duration expiresIn) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(Region.AP_NORTHEAST_2)
                 .build()) {
@@ -200,6 +214,33 @@ public class AwsClient {
         }
     }
 
+    private String generatePresignedPutUrl(String prefixPath, String fileName, Duration expiresIn) {
+        try (S3Presigner presigner = S3Presigner.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .build()) {
+
+            String key = prefixPath + "/" + fileName;
+            String format = detectMediaFormat(fileName);
+            String contentType = getContentTypeByFormat(format);
+
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .contentType(contentType)
+                    .build();
+
+            PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                    .putObjectRequest(putObjectRequest)
+                    .signatureDuration(expiresIn)
+                    .build();
+
+            return presigner.presignPutObject(presignRequest).url().toString();
+
+        } catch (Exception e) {
+            log.error("Presigned PUT URL 생성 실패 - path: {}/{}", prefixPath, fileName, e);
+            throw new RuntimeException("Presigned URL 생성 실패");
+        }
+    }
 
 
     @Async
