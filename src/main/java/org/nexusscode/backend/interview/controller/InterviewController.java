@@ -75,7 +75,7 @@ public class InterviewController {
 
     @Operation(summary = "사용자 목소리를 업로드 시키기 위한 s3 접근 권한 presign")
     @PreAuthorize("#userId == principal.userId")
-    @GetMapping("/voice-presign")
+    @GetMapping("/voice-putpresign")
     public ResponseEntity<CommonResponse<Map<String, String>>> getUploadPutPresignUrlPath(@RequestParam String fileName, @RequestHeader Long userId) {
         Map<String, String> url = Map.of("url", interviewService.getUserVoicePutPreSignUrl(fileName));
         return ResponseEntity.ok(new CommonResponse<>("Presigned URL 생성 완료", 200, url));
