@@ -34,12 +34,12 @@ public class SaraminService {
             throw new IllegalArgumentException("검색 키워드는 비어 있을 수 없습니다.");
         }
         String broadKeyword = keyword.length() >= 2 ? keyword.substring(0, 2) : keyword;
-        log.info("[사람인 검색] 요청 keyword: '{}', broadKeyword:'{}'", keyword,broadKeyword);
+        //log.info("[사람인 검색] 요청 keyword: '{}', broadKeyword:'{}'", keyword,broadKeyword);
 
         try {
             String apiURL = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .queryParam("access-key", accessKey)
-                .queryParam("keywords", broadKeyword)
+                .queryParam("keywords", keyword)
                 .toUriString();
 
             URL url = new URL(apiURL);
