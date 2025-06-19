@@ -159,8 +159,7 @@ class CommonErrorResponse {
 ---
 
 ## API Reference
-- **Swagger UI:** `/swagger-ui/index.html` (dev/prod 모두 노출 제한)
-- **Postman Collection:** `docs/postman/JobveloperBackend.postman_collection.json`
+- **Swagger UI:** `/swagger-ui/index.html` 
 
 ### Example – Start Interview
 
