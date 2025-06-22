@@ -97,17 +97,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             UserDTO memberDTO = new UserDTO(userId, email, password, name, social, roleNames);
 
-            log.info("1");
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(memberDTO, password, authorities);
-            log.info("2");
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("3");
-
-
-            log.info("4");
 
         } catch (CustomException e) {
             log.error("JWT 검증 실패: {}", e.getMessage());
