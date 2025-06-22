@@ -1,1 +1,90 @@
-spring.application.name=backend
+spring:
+  application:
+    name: backend
+
+  ai:
+    openai:
+      api-key: ${openai.apikey}
+      model: gpt-3.5-turbo
+
+  datasource:
+    url: jdbc:mysql://${mysql.host}/${mysql.database}
+    username: ${mysql.user}
+    password: ${mysql.password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.default_batch_fetch_size: 100
+      hibernate.format_sql: true
+
+
+  data:
+    redis:
+      host: ${redis.host}
+      port: 6379
+
+org:
+  nexusscode:
+    openAITTS:
+      tts-endpoint: https://api.openai.com/v1/audio/speech
+    openAIWhisper:
+      whisper-endpoint: https://api.openai.com/v1/audio/transcriptions
+
+saramin:
+  access-key: ${saramin.access-key}
+  endpoint: https://oapi.saramin.co.kr/job-search
+
+aws:
+  s3:
+    bucket-name: demo-my-testbucket-277707098184
+    user-upload-path: upload/audio
+    ai-upload-path: upload/aiAudio
+    ai-video-path: upload/video
+
+
+jwt:
+  secret: RjYz0g4tJGLd/kkNntLsT7EW9SJGzdGaJuI3TI/BKzU=
+  access-token-expire-minutes: 10
+  refresh-token-expire-minutes: 1440
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /internal-actuator
+  endpoint:
+    health:
+      show-details: never
+
+coolsms:
+  sender:
+    phone-number: ${coolsms.sender-phone}
+  api:
+    key: ${coolsms.api-key}
+    secret: ${coolsms.api-secret}
+
+oauth:
+  kakao:
+    rest-api-key: ${kakao.rest-api-key}
+    redirect-uri: http://localhost:3000/member/kakao
+    auth-uri: https://kauth.kakao.com/oauth/authorize
+
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: "aws-parameterstore:/myapp/"
